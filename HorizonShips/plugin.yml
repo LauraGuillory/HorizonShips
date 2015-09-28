@@ -1,0 +1,4 @@
+name: HorizonShips
+main: com.gmail.Rhisereld.HorizonShips.Main
+version: 1.0
+softdepend: [Horizon_Professions]
