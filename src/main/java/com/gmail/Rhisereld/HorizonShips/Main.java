@@ -13,7 +13,6 @@ public class Main extends JavaPlugin implements CommandExecutor
 	@Override
 	public void onEnable()
 	{
-		getLogger().info("Hello World!");
 	}
 
 	@Override

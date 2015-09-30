@@ -23,5 +23,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/Spigot/dhutils.jar"/>
+	<classpathentry kind="lib" path="D:/Spigot/WorldEdit.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
