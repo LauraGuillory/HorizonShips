@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -14,6 +15,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.MCEditSchematicFormat;
 
@@ -58,6 +60,30 @@ public class SchematicManager
 		
 		Vector min = getMin(loc1, loc2);
 		Vector max = getMax(loc1, loc2);
+		
+		editSession.enableQueue();
+		clipboard = new CuboidClipboard(max.subtract(min).add(new Vector(1, 1, 1)), min);
+		clipboard.copy(editSession);
+		MCEditSchematicFormat.MCEDIT.save(clipboard, file);
+		editSession.flushQueue();		
+	}
+	
+	/**
+	 * saveSchematic() copies the blocks found inside the selection given and saves them to a schematic in
+	 * \plugins\HorizonShips\schematics\.
+	 * 
+	 * @param selection
+	 * @param schematicName - the name under which the selection will be saved.
+	 * @throws DataException
+	 * @throws IOException
+	 */
+	public void saveSchematic(Selection selection, String schematicName) throws DataException, IOException
+	{
+		file = new File("plugins\\HorizonShips\\schematics\\" + schematicName + ".schematic");
+		file.getParentFile().mkdirs(); //Ensure the directory exists.
+		
+		Vector min = loc2Vector(selection.getMinimumPoint());
+		Vector max = loc2Vector(selection.getMaximumPoint());
 		
 		editSession.enableQueue();
 		clipboard = new CuboidClipboard(max.subtract(min).add(new Vector(1, 1, 1)), min);
@@ -112,5 +138,24 @@ public class SchematicManager
 		return new Vector(Math.max(l1.getBlockX(), l2.getBlockX()),
 		                  Math.max(l1.getBlockY(), l2.getBlockY()),
 		                  Math.max(l1.getBlockZ(), l2.getBlockZ()));
+	}
+	
+	/**
+	 * getPlayerSelection() returns the current selection of the player
+	 * @return selection
+	 */
+	public Selection getPlayerSelection(Player player)
+	{
+		return wep.getSelection(player);
+	}
+	
+	/**
+	 * loc2Vector() takes a location and returns a vector
+	 * @param l - location
+	 * @return vector
+	 */
+	private Vector loc2Vector(Location l)
+	{
+		return new Vector(l.getX(), l.getY(), l.getZ());
 	}
 }
