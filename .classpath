@@ -24,6 +24,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="D:/Spigot/dhutils.jar"/>
-	<classpathentry kind="lib" path="D:/Spigot/WorldEdit.jar"/>
+	<classpathentry kind="lib" path="D:/Spigot/WorldEdit/worldedit-bukkit-6.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
