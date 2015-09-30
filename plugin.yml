@@ -3,3 +3,6 @@ main: com.gmail.Rhisereld.HorizonShips.Main
 version: 1.0
 depend: [WorldEdit]
 softdepend: [Horizon_Professions]
+commands:
+  ship:
+    description: All Horizon Ships commands.

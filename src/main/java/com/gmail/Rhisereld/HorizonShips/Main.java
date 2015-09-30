@@ -1,12 +1,18 @@
 package com.gmail.Rhisereld.HorizonShips;
 
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.Rhisereld.HorizonShips.ConfigAccessor;
+import com.gmail.Rhisereld.HorizonShips.ShipsCommandExecutor;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class Main extends JavaPlugin implements CommandExecutor
 {
+	static Plugin plugin;						//Some functions require a reference to the plugin in args.
+	WorldEditPlugin worldEditPlugin;
+	
 	ConfigAccessor config;						//Configuration file.
 	ConfigAccessor data;						//Data file.
 
@@ -19,6 +25,8 @@ public class Main extends JavaPlugin implements CommandExecutor
 	@Override
 	public void onEnable()
 	{
+		plugin = this;
+		
 		//Setup files for configuration and data storage.
     	config = new ConfigAccessor(this, "config.yml");
     	data = new ConfigAccessor(this, "data.yml");
@@ -33,6 +41,9 @@ public class Main extends JavaPlugin implements CommandExecutor
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        //Register commands
+    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor());
 	}
 
 	/**
