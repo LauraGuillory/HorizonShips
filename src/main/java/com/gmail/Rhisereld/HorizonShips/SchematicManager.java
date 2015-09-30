@@ -2,11 +2,14 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -20,8 +23,8 @@ public class SchematicManager
 	private final WorldEditPlugin wep;
 	private final WorldEdit worldEdit;
 	private final EditSession editSession;
-	private File file;
 	private CuboidClipboard clipboard;
+	private File file;
 	
 	public SchematicManager(World world)
 	{
@@ -30,7 +33,7 @@ public class SchematicManager
 		editSession = worldEdit.getEditSessionFactory().getEditSession(new BukkitWorld(world), 10000000);
 	}
 	
-	public boolean saveSchematic(Location loc1, Location loc2, String schematicName)
+	public boolean saveSchematic(Location loc1, Location loc2, String schematicName) throws DataException, IOException
 	{
 		file = new File("plugins\\HorizonShips\\schematics\\" + schematicName + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
@@ -40,17 +43,22 @@ public class SchematicManager
 		
 		editSession.enableQueue();
 		clipboard = new CuboidClipboard(max.subtract(min).add(new Vector(1, 1, 1)), min);
-		try {
-			MCEditSchematicFormat.MCEDIT.save(clipboard, file);
-		} catch (DataException e) {
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		
+		clipboard.copy(editSession);
+		MCEditSchematicFormat.MCEDIT.save(clipboard, file);
 		editSession.flushQueue();		
+		return true;
+	}
+
+	public boolean loadSchematic(String schematicName, Location l) throws MaxChangedBlocksException, DataException, IOException
+	{
+		file = new File("plugins\\HorizonShips\\schematics\\" + schematicName + ".schematic");
+		Vector origin = new Vector(l.getX(), l.getY(), l.getZ());
+		
+		editSession.enableQueue();
+		
+		//Load schematic into clipboard.
+		MCEditSchematicFormat.MCEDIT.load(file).paste(editSession, origin, true, true);
+		editSession.flushQueue();
 		return true;
 	}
 	

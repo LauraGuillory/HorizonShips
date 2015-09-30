@@ -1,11 +1,16 @@
 package com.gmail.Rhisereld.HorizonShips;
 
+import java.io.IOException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.data.DataException;
 
 public class ShipsCommandExecutor implements CommandExecutor 
 {
@@ -28,14 +33,6 @@ public class ShipsCommandExecutor implements CommandExecutor
 			//ships test - used for testing during development.
 			if (args[0].equalsIgnoreCase("test"))
 			{
-				player = Bukkit.getPlayer(name);
-				Location l1 = new Location(player.getWorld(), -551, 14, -500);
-				Location l2 = new Location(player.getWorld(), -559, 23, -520);
-				
-				SchematicManager sm = new SchematicManager(player.getWorld());
-				sm.saveSchematic(l1, l2, "test");
-				
-				player.sendMessage("Schematic saved.");
 			}
 		}
 		return false;
