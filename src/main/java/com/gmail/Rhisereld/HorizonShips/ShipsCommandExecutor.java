@@ -50,14 +50,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 			if (args[0].equalsIgnoreCase("create"))
 			{
 				//Check for correct number of arguments.
-				if (args.length < 3)
+				if (args.length != 3)
 				{
-					player.sendMessage(ChatColor.RED + "Too few arguments! Correct usage: /ship create [shipName] [destinationName]");
-					return false;
-				}
-				if (args.length > 3)
-				{
-					sender.sendMessage(ChatColor.RED + "Too many arguments! Correct usage: /ship create [shipName] [destinationName]");
+					player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName] [destinationName]");
 					return false;
 				}
 
