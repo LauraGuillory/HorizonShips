@@ -43,7 +43,7 @@ public class Main extends JavaPlugin implements CommandExecutor
         }
 
         //Register commands
-    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor());
+    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data));
 	}
 
 	/**
@@ -55,5 +55,9 @@ public class Main extends JavaPlugin implements CommandExecutor
 	@Override
 	public void onDisable()
 	{
+		plugin = null;
+		worldEditPlugin = null;
+		config = null;
+		data = null;
 	}
 }

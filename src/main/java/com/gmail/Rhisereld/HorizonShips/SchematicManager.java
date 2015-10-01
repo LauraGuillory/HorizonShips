@@ -27,7 +27,7 @@ public class SchematicManager
 	private final EditSession editSession;
 	private CuboidClipboard clipboard;
 	private File file;
-	
+
 	/**
 	 * Constructor: Creates a SchematicManager object that contains an EditSession detailing all the changes that have been made.
 	 * 				The object can be retained for purposes of undoing/redoing.
@@ -141,12 +141,16 @@ public class SchematicManager
 	}
 	
 	/**
-	 * getPlayerSelection() returns the current selection of the player
+	 * getPlayerSelection() returns the current selection of the player.
+	 * If the player hasw no selection, throws NullPointerException.
 	 * @return selection
 	 */
 	public Selection getPlayerSelection(Player player)
 	{
-		return wep.getSelection(player);
+		Selection s = wep.getSelection(player);
+		if (s == null)
+			throw new NullPointerException();
+		return s;
 	}
 	
 	/**
