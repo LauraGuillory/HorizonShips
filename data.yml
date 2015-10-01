@@ -1,2 +1,9 @@
 ships:
-    NSS Example:
+  NSS_Example:
+    destinations:
+    - Home
+    currentDestination: Home
+    fuel: 0
+    broken: false
+    partConsumed: false
+    pilots: []

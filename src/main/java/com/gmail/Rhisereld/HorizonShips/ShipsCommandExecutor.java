@@ -2,7 +2,6 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -64,7 +63,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
 						+ " Type '/ship confirm create' to confirm.");
 				confirmCreate.put(name, args[1] + " " + args[2]);
-				confirmCreateTimeout(sender, name);
+				confirmCreateTimeout(sender);
 				
 				return true;
 			}
@@ -112,15 +111,22 @@ public class ShipsCommandExecutor implements CommandExecutor
 		return false;
 	}
 	
-	private void confirmCreateTimeout(final CommandSender sender, final String key)
+	/**
+	 * confirmCreateTimeout() removes the player from the list of players who have a create command awaiting
+	 * confirmation after 10 seconds.
+	 * 
+	 * @param sender
+	 * @param key
+	 */
+	private void confirmCreateTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
 		{
 			public void run() 
 			{
-				if (confirmCreate.containsKey(key))
+				if (confirmCreate.containsKey(sender))
 				{
-					confirmCreate.remove(key);
+					confirmCreate.remove(sender);
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
