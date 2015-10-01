@@ -132,7 +132,13 @@ public class ShipsCommandExecutor implements CommandExecutor
 						return true;
 					}
 					
-					ship.deleteShip(confirmDelete.get(name));
+					try {
+					ship.deleteShip(player, confirmDelete.get(name));
+					} catch (IllegalArgumentException e) {
+							sender.sendMessage(ChatColor.RED + e.getMessage());
+							return false;
+					}
+					
 					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
 					return true;
 				}

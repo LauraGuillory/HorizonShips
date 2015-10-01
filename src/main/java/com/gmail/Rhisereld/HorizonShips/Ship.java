@@ -1,6 +1,9 @@
 package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -54,5 +57,43 @@ public class Ship
 		
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		sm.saveSchematic(sm.getPlayerSelection(player), shipName);
+	}
+
+	public void deleteShip(Player player, String shipName) throws IllegalArgumentException
+	{
+		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		boolean shipFound = false;
+		
+		//Check that the ship exists
+		for (String s : shipNames)
+			if (s.equalsIgnoreCase(shipName))
+				shipFound = true;
+		if (!shipFound)
+			throw new IllegalArgumentException("Ship not found");
+		
+		//Check that the person has permission
+		if (!player.hasPermission("horizonShips.admin.delete"))
+			throw new IllegalArgumentException("You don't have permission to delete that ship.");
+		
+		//Delete all information on the ship.
+		data.getConfig().set("ships." + shipName + ".destinations", 0);
+		data.getConfig().set("ships." + shipName + ".currentDestination", 0);
+		data.getConfig().set("ships." + shipName + ".fuel", 0);
+		data.getConfig().set("ships." + shipName + ".broken", 0);
+		data.getConfig().set("ships." + shipName + ".partRequired", 0);
+		data.getConfig().set("ships." + shipName + ".partConsumed", 0);
+		data.getConfig().set("ships." + shipName + ".pilots", 0);
+		data.getConfig().set("ships." + shipName + ".owner", 0);
+		
+		//Delete ship schematic
+		Path path = FileSystems.getDefault().getPath("\\plugins\\HorizonShips\\schematics\\" + shipName + ".schematic");
+		try {
+			Files.deleteIfExists(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		//Delete all dock schematics
+		//TODO: When dock schematics are implemented.
 	}
 }
