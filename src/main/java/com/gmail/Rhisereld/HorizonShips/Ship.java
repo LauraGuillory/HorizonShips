@@ -1,14 +1,13 @@
 package com.gmail.Rhisereld.HorizonShips;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.data.DataException;
 
@@ -16,10 +15,12 @@ import com.sk89q.worldedit.data.DataException;
 public class Ship 
 {	
 	ConfigAccessor data;
+	Plugin plugin;
 	
-	public Ship(ConfigAccessor data) 
+	public Ship(ConfigAccessor data, Plugin plugin) 
 	{
 		this.data = data;
+		this.plugin = plugin;
 	}
 
 	/**
@@ -56,10 +57,17 @@ public class Ship
 		data.saveConfig();
 		
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		sm.saveSchematic(sm.getPlayerSelection(player), shipName, "ships\\");
+		sm.saveSchematic(sm.getPlayerSelection(player), shipName, shipName + "\\ship");
 	}
 
-	public void deleteShip(Player player, String shipName) throws IllegalArgumentException
+	/**
+	 * deleteShip() removes all saved information on the given ship.
+	 * 
+	 * @param player
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
+	public void deleteShip(Player player, String shipName) throws IllegalArgumentException, IOException
 	{
 		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
 		boolean shipFound = false;
@@ -69,31 +77,26 @@ public class Ship
 			if (s.equalsIgnoreCase(shipName))
 				shipFound = true;
 		if (!shipFound)
-			throw new IllegalArgumentException("Ship not found");
+			throw new IllegalArgumentException("Ship not found.");
 		
 		//Check that the person has permission
 		if (!player.hasPermission("horizonShips.admin.delete"))
 			throw new IllegalArgumentException("You don't have permission to delete that ship.");
 		
 		//Delete all information on the ship.
-		data.getConfig().set("ships." + shipName + ".destinations", 0);
-		data.getConfig().set("ships." + shipName + ".currentDestination", 0);
-		data.getConfig().set("ships." + shipName + ".fuel", 0);
-		data.getConfig().set("ships." + shipName + ".broken", 0);
-		data.getConfig().set("ships." + shipName + ".partRequired", 0);
-		data.getConfig().set("ships." + shipName + ".partConsumed", 0);
-		data.getConfig().set("ships." + shipName + ".pilots", 0);
-		data.getConfig().set("ships." + shipName + ".owner", 0);
+		data.getConfig().getConfigurationSection("ships.").set(shipName, null);
+		data.saveConfig();
 		
 		//Delete ship schematic
-		Path path = FileSystems.getDefault().getPath("\\plugins\\HorizonShips\\schematics\\ships\\" + shipName + ".schematic");
-		try {
-			Files.deleteIfExists(path);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		File file = new File(plugin.getDataFolder() + "\\schematics\\" + shipName + "\\ship.schematic");
+		file.delete();
 		
 		//Delete all dock schematics
 		//TODO: When dock schematics are implemented.
+		
+		//Delete directory
+		file = new File(plugin.getDataFolder() + "\\schematics\\" + shipName);
+		file.delete();
+		
 	}
 }

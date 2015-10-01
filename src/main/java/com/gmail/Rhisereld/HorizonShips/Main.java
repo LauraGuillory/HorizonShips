@@ -43,7 +43,7 @@ public class Main extends JavaPlugin implements CommandExecutor
         }
 
         //Register commands
-    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data));
+    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data, plugin));
 	}
 
 	/**

@@ -2,12 +2,15 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
 import com.sk89q.worldedit.data.DataException;
 
 @SuppressWarnings("deprecation")
@@ -15,14 +18,15 @@ public class ShipsCommandExecutor implements CommandExecutor
 {
 	ConfigAccessor data;
 	Ship ship;
+	Plugin plugin;
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
 	HashMap<String, String> confirmDelete = new HashMap<String, String>();
 	
-    public ShipsCommandExecutor(ConfigAccessor data) 
+    public ShipsCommandExecutor(ConfigAccessor data, Plugin plugin) 
     {
 		this.data = data;
-		ship = new Ship(data);
+		ship = new Ship(data, plugin);
 	}
 
 	/**
@@ -130,11 +134,15 @@ public class ShipsCommandExecutor implements CommandExecutor
 					try {
 					ship.deleteShip(player, confirmDelete.get(name));
 					} catch (IllegalArgumentException e) {
-							sender.sendMessage(ChatColor.RED + e.getMessage());
-							return false;
+						sender.sendMessage(ChatColor.RED + e.getMessage());
+						return false;
+					} catch (IOException e) {
+						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+						e.printStackTrace();
 					}
 					
 					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
+					confirmDelete.remove(name);
 					return true;
 				}
 			}

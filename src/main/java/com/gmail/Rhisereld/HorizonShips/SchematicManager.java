@@ -55,7 +55,7 @@ public class SchematicManager
 	 */
 	public void saveSchematic(Location loc1, Location loc2, String schematicName, String path) throws DataException, IOException
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = getMin(loc1, loc2);
@@ -79,7 +79,7 @@ public class SchematicManager
 	 */
 	public void saveSchematic(Selection selection, String schematicName, String path) throws DataException, IOException
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = loc2Vector(selection.getMinimumPoint());
