@@ -17,6 +17,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 	Ship ship;
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
+	HashMap<String, String> confirmDelete = new HashMap<String, String>();
 	
     public ShipsCommandExecutor(ConfigAccessor data) 
     {
@@ -68,6 +69,22 @@ public class ShipsCommandExecutor implements CommandExecutor
 				return true;
 			}
 			
+			//ship delete [shipName]
+			if (args[0].equalsIgnoreCase("delete"))
+			{
+				//Check for correct number of arguments.
+				if (args.length != 2)
+				{
+					player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete [shipName]");
+					return false;
+				}
+				
+				sender.sendMessage(ChatColor.YELLOW + "Are you sure you want to delete the ship " + args[1] + "?"
+						+ " Type '/ship confirm delete' to confirm.");
+				confirmDelete.put(name, args[1]);
+				confirmDeleteTimeout(sender);
+			}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -91,6 +108,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 
 					try {
 						ship.createShip(arguments[0], player, arguments[1]);
+						player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
 					} catch (DataException | IOException e) {
 						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
 						e.printStackTrace();
@@ -102,8 +120,20 @@ public class ShipsCommandExecutor implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "A ship already exists by that name.");
 						return false;
 					}
-
-					player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
+					return true;
+				}
+				
+				//ship confirm delete
+				if (args[1].equalsIgnoreCase("delete"))
+				{
+					if (confirmDelete.get(name) == null)
+					{
+						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+						return true;
+					}
+					
+					ship.deleteShip(confirmDelete.get(name));
+					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
 					return true;
 				}
 			}
@@ -122,7 +152,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
 		{
-			public void run() 
+			public void run()
 			{
 				if (confirmCreate.containsKey(sender))
 				{
@@ -133,4 +163,25 @@ public class ShipsCommandExecutor implements CommandExecutor
 		} , 200);
 	}
 
+	/**
+	 * confirmDeleteTimeout() removes the player from the list of players who have a delete command awaiting
+	 * confirmation after 10 seconds.
+	 * 
+	 * @param sender
+	 * @param key
+	 */
+	private void confirmDeleteTimeout(final CommandSender sender)
+	{
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
+		{
+			public void run()
+			{
+				if (confirmDelete.containsKey(sender))
+				{
+					confirmDelete.remove(sender);
+					sender.sendMessage(ChatColor.RED + "You timed out.");
+				}
+			}			
+		} , 200);
+	}
 }
