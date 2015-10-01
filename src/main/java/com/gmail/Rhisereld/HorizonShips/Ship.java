@@ -56,7 +56,7 @@ public class Ship
 		data.saveConfig();
 		
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		sm.saveSchematic(sm.getPlayerSelection(player), shipName);
+		sm.saveSchematic(sm.getPlayerSelection(player), shipName, "ships\\");
 	}
 
 	public void deleteShip(Player player, String shipName) throws IllegalArgumentException
@@ -86,7 +86,7 @@ public class Ship
 		data.getConfig().set("ships." + shipName + ".owner", 0);
 		
 		//Delete ship schematic
-		Path path = FileSystems.getDefault().getPath("\\plugins\\HorizonShips\\schematics\\" + shipName + ".schematic");
+		Path path = FileSystems.getDefault().getPath("\\plugins\\HorizonShips\\schematics\\ships\\" + shipName + ".schematic");
 		try {
 			Files.deleteIfExists(path);
 		} catch (IOException e) {
