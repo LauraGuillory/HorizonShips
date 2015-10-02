@@ -59,5 +59,7 @@ public class Main extends JavaPlugin implements CommandExecutor
 		worldEditPlugin = null;
 		config = null;
 		data = null;
+		
+		//TODO remove all destinations in the middle of being defined.
 	}
 }

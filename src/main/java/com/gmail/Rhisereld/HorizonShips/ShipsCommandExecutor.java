@@ -11,7 +11,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.regions.RegionOperationException;
 
 @SuppressWarnings("deprecation")
 public class ShipsCommandExecutor implements CommandExecutor 
@@ -22,6 +25,10 @@ public class ShipsCommandExecutor implements CommandExecutor
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
 	HashMap<String, String> confirmDelete = new HashMap<String, String>();
+	HashMap<String, String> confirmDestination = new HashMap<String, String>();
+	HashMap<String, String> confirmTweak = new HashMap<String, String>();
+	
+	SchematicManager sm;
 	
     public ShipsCommandExecutor(ConfigAccessor data, Plugin plugin) 
     {
@@ -84,6 +91,76 @@ public class ShipsCommandExecutor implements CommandExecutor
 				confirmDeleteTimeout(sender);
 			}
 			
+			//ship add
+			if (args[0].equalsIgnoreCase("add"))
+			{
+				if (args.length < 2)
+				{
+					player.sendMessage(ChatColor.RED + "Incorrect number of arguments!");
+					return false;
+				}
+				
+				//ship add destination [shipName] [destinationName]
+				if (args[1].equalsIgnoreCase("destination"))
+				{
+					//Check for correct number of arguments
+					if (args.length != 4)
+					{
+						player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
+								+ "[destinationName]");
+						return false;
+					}
+					
+					sender.sendMessage(ChatColor.YELLOW + "The ship will be pasted inside your current WorldEdit selection. Is this correct? "
+							+ " Type '/ship confirm destination' to confirm.");
+					confirmDestination.put(name, args[2] + " " + args[3]);
+					confirmDestinationTimeout(sender);
+				}
+				else
+				{
+					player.sendMessage(ChatColor.RED + "Incorrect format.");
+					return false;
+				}
+			}
+			
+			//ship tweak [north/east/south/west/up/down]
+			if (args[0].equalsIgnoreCase("tweak"))
+			{
+				//Check argument length
+				if (args.length != 2)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format.");
+					return true;
+				}
+				
+				//Check there's something to tweak
+				if (!confirmTweak.containsKey(name))
+				{
+					sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
+					return false;
+				}
+				
+				//Tweak
+				arguments = confirmTweak.get(name).split(" ");
+				
+				try {
+					ship.tweakDestination(sm, player, args[1], arguments[0]);
+				} catch (MaxChangedBlocksException e) {
+					sender.sendMessage(ChatColor.RED + "Ship too large!");
+					return false;
+				} catch (DataException | RegionOperationException | IncompleteRegionException | IOException e) {
+					sender.sendMessage(ChatColor.RED + e.getMessage());
+					sender.sendMessage(ChatColor.RED + "Unable to adjust destination. Please contact an administrator.");
+					e.printStackTrace();
+					return false;
+				} catch (IllegalArgumentException e) {
+					sender.sendMessage(ChatColor.RED + e.getMessage());
+					return false;
+				}
+				
+				return true;
+			}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -109,6 +186,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 						ship.createShip(arguments[0], player, arguments[1]);
 						player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
 					} catch (DataException | IOException e) {
+						sender.sendMessage(ChatColor.RED + e.getMessage());
 						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
 						e.printStackTrace();
 						return false;
@@ -137,14 +215,104 @@ public class ShipsCommandExecutor implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						return false;
 					} catch (IOException e) {
+						sender.sendMessage(ChatColor.RED + e.getMessage());
 						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
 						e.printStackTrace();
+						return false;
 					}
 					
 					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
 					confirmDelete.remove(name);
 					return true;
 				}
+				
+				//ship confirm destination
+				if (args[1].equalsIgnoreCase("destination"))
+				{
+					if (confirmDestination.get(name) == null)
+					{
+						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+						return true;
+					}
+
+					//Paste ship, retain SchematicManager session for undo
+					sm = new SchematicManager(player.getWorld());
+					arguments = confirmDestination.get(name).split(" ");
+					try {
+						ship.testDestination(sm, player, arguments[0], arguments[1]);
+					} catch (DataException | IOException e) {
+						sender.sendMessage(ChatColor.RED + e.getMessage());
+						player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
+						e.printStackTrace();
+						return false;
+					} catch (MaxChangedBlocksException e) {
+						player.sendMessage(ChatColor.RED + "Ship too large!");
+						e.printStackTrace();
+						return false;
+					}
+					
+					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Tweak the destination of the ship using "
+							+ "'/ship tweak [north/east/south/west/up/down'. To confirm placement, type "
+							+ "'/ship tweak confirm'.");
+					
+					//Remove confirmation for destination, add confirmation for tweaking
+					confirmTweak.put(name, confirmDestination.get(name));
+					confirmTweakTimeout(sender);
+					confirmDestination.remove(name);
+				}
+				
+				//ship confirm tweak
+				if (args[1].equalsIgnoreCase("tweak"))
+				{
+					if (confirmTweak.get(name) == null)
+					{
+						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+						return true;
+					}
+
+					//Add destination
+					arguments = confirmTweak.get(name).split(" ");
+					ship.addDestination(sm, player, arguments[0], arguments[1]);
+					confirmTweak.remove(name);
+
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
+				}
+			}
+			
+			//ship cancel
+			if (args[0].equalsIgnoreCase("cancel"))
+			{
+				if (confirmCreate.containsKey(name))
+				{
+					confirmCreate.remove(name);
+					player.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
+					return true;
+				}
+				
+				if (confirmDelete.containsKey(name))
+				{
+					confirmDelete.remove(name);
+					sender.sendMessage(ChatColor.YELLOW + "Ship deletion cancelled.");
+					return true;
+				}
+				
+				if (confirmDestination.containsKey(name))
+				{
+					confirmDestination.remove(name);
+					player.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+					return true;
+				}
+				
+				if (confirmTweak.containsKey(name))
+				{
+					confirmTweak.remove(name);
+					ship.cancelDestination(sm);
+					player.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+					return true;
+				}
+				
+				sender.sendMessage(ChatColor.RED + "There is nothing to cancel.");
+				return false;
 			}
 		}
 		return false;
@@ -192,5 +360,49 @@ public class ShipsCommandExecutor implements CommandExecutor
 				}
 			}			
 		} , 200);
+	}
+	
+	/**
+	 * confirmDestinationTimeout() removes the player from the list of players who are in the process 
+	 * of adding a destination and removes the destination being made.
+	 * 
+	 * @param sender
+	 */
+	private void confirmDestinationTimeout(final CommandSender sender)
+	{
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
+		{
+			public void run()
+			{
+				if (confirmDestination.containsKey(sender))
+				{
+					ship.cancelDestination(sm);
+					confirmDestination.remove(sender);
+					sender.sendMessage(ChatColor.RED + "You timed out.");
+				}
+			}			
+		} , 200);
+	}
+	
+	/**
+	 * confirmTweakTimeout() removes the player from the list of players who are in the process 
+	 * of adding a destination and removes the destination being made.
+	 * 
+	 * @param sender
+	 */
+	private void confirmTweakTimeout(final CommandSender sender)
+	{
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
+		{
+			public void run()
+			{
+				if (confirmTweak.containsKey(sender))
+				{
+					ship.cancelDestination(sm);
+					confirmTweak.remove(sender);
+					sender.sendMessage(ChatColor.RED + "You timed out.");
+				}
+			}			
+		} , 6000);
 	}
 }
