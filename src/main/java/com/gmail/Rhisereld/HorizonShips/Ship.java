@@ -49,14 +49,17 @@ public class Ship
 		Location max = s.getMaximumPoint();
 		int length = max.getBlockX() - min.getBlockX();
 		int width = max.getBlockZ() - min.getBlockZ();
-		int height = max.getBlockY() - min.getBlockY();
+		int height = max.getBlockY() - min.getBlockY(); //TODO getBlockX() vs. getX()? One could be more efficient.
 		
 		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
 		for (String sh : shipNames)
 			if (sh.equalsIgnoreCase(shipName))
 				throw new IllegalArgumentException();
 	
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName, min); //TODO serialise this manually
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", min.getY());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", min.getZ());
 		data.getConfig().set("ships." + shipName + ".currentDestination", destinationName);
 		data.getConfig().set("ships." + shipName + ".fuel", 0);
 		data.getConfig().set("ships." + shipName + ".broken", false);
