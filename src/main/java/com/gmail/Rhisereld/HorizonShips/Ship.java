@@ -114,6 +114,19 @@ public class Ship
 		file.delete();	
 	}
 
+	/**
+	 * testDestination() pastes the named ship inside the current WorldEdit selection of the player for visualisation purposes.
+	 * Checks that there isn't already a destination by that name.
+	 * Checks that the player has permission.
+	 * 
+	 * @param sm
+	 * @param player
+	 * @param shipName
+	 * @param destinationName
+	 * @throws MaxChangedBlocksException
+	 * @throws DataException
+	 * @throws IOException
+	 */
 	public void testDestination(SchematicManager sm, Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException
 	{
 		Selection s;
@@ -130,6 +143,21 @@ public class Ship
 		sm.loadSchematic(shipName, s, shipName + "\\ship");
 	}
 	
+	/**
+	 * tweakDestination() undoes the previous changes made stored in the SchematicManager object, and pastes the ship
+	 * in the new location one block in the direction given.
+	 * Checks that the direction is valid.
+	 * 
+	 * @param sm
+	 * @param player
+	 * @param direction
+	 * @param shipName
+	 * @throws MaxChangedBlocksException
+	 * @throws DataException
+	 * @throws IOException
+	 * @throws RegionOperationException
+	 * @throws IncompleteRegionException
+	 */
 	public void tweakDestination(SchematicManager sm, Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
 	{
 		Vector dir = null;
@@ -164,15 +192,29 @@ public class Ship
 		sm.loadSchematic(shipName, s, shipName + "\\ship");
 	}
 	
+	/**
+	 * cancelDestination() removes the ship previously pasted for visualisation purposes.
+	 * 
+	 * @param sm
+	 */
 	public void cancelDestination(SchematicManager sm)
 	{
 		sm.undoSession();
 	}
 	
+	/**
+	 * addDestination() officially adds the destination by storing its location and name. It also removes the 
+	 * ship previously pasted for visualisation purposes.
+	 * 
+	 * @param sm
+	 * @param player
+	 * @param shipName
+	 * @param destinationName
+	 */
 	public void addDestination(SchematicManager sm, Player player, String shipName, String destinationName)
 	{
 		//Save all the information about the new destination.
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName, sm.getPlayerSelection(player).getMinimumPoint());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName, sm.getPlayerSelection(player).getMinimumPoint()); //TODO serialise this manually
 
 		//Undo paste.
 		sm.undoSession();

@@ -147,7 +147,10 @@ public class SchematicManager
 		editSession.undo(editSession);
 	}
 	
-	//TODO: comment
+	/**
+	 * redoSession() redoes all of the actions undertaken with the current edit session
+	 * that may have been undone.
+	 */
 	public void redoSession()
 	{
 		editSession.redo(editSession);
@@ -213,7 +216,16 @@ public class SchematicManager
 		wep.setSelection(player, s);
 	}
 	
-	//TODO comment
+	/**
+	 * shiftSelection() moves the player's current selection one block in the given direction.
+	 * 
+	 * @param player
+	 * @param selection
+	 * @param dir
+	 * @return
+	 * @throws RegionOperationException
+	 * @throws IncompleteRegionException
+	 */
 	public Selection shiftSelection(Player player, Selection selection, Vector dir) throws RegionOperationException, IncompleteRegionException
 	{		
 		RegionSelector rs = selection.getRegionSelector();
