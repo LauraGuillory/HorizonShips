@@ -145,7 +145,7 @@ public class Ship
 	}
 	
 	/**
-	 * tweakDestination() undoes the previous changes made stored in the SchematicManager object, and pastes the ship
+	 * adjustDestination() undoes the previous changes made stored in the SchematicManager object, and pastes the ship
 	 * in the new location one block in the direction given.
 	 * Checks that the direction is valid.
 	 * 
@@ -159,7 +159,7 @@ public class Ship
 	 * @throws RegionOperationException
 	 * @throws IncompleteRegionException
 	 */
-	public void tweakDestination(SchematicManager sm, Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
+	public void adjustDestination(SchematicManager sm, Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
 	{
 		Vector dir;
 		Selection s = sm.getPlayerSelection(player);

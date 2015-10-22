@@ -13,8 +13,6 @@ import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
@@ -28,7 +26,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
 	HashMap<String, String> confirmDelete = new HashMap<String, String>();
 	HashMap<String, String> confirmDestination = new HashMap<String, String>();
-	HashMap<String, String> confirmTweak = new HashMap<String, String>();
+	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	
 	SchematicManager sm;
 	
@@ -125,8 +123,8 @@ public class ShipsCommandExecutor implements CommandExecutor
 				}
 			}
 			
-			//ship tweak [north/east/south/west/up/down]
-			if (args[0].equalsIgnoreCase("tweak"))
+			//ship adjust [north/east/south/west/up/down]
+			if (args[0].equalsIgnoreCase("adjust"))
 			{
 				//Check argument length
 				if (args.length != 2)
@@ -136,17 +134,17 @@ public class ShipsCommandExecutor implements CommandExecutor
 				}
 				
 				//Check there's something to tweak
-				if (!confirmTweak.containsKey(name))
+				if (!confirmAdjust.containsKey(name))
 				{
 					sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
 					return false;
 				}
 				
 				//Tweak
-				arguments = confirmTweak.get(name).split(" ");
+				arguments = confirmAdjust.get(name).split(" ");
 				
 				try {
-					ship.tweakDestination(sm, player, args[1], arguments[0]);
+					ship.adjustDestination(sm, player, args[1], arguments[0]);
 				} catch (MaxChangedBlocksException e) {
 					sender.sendMessage(ChatColor.RED + "Ship too large!");
 					return false;
@@ -264,24 +262,24 @@ public class ShipsCommandExecutor implements CommandExecutor
 							+ "'/ship tweak confirm'.");
 					
 					//Remove confirmation for destination, add confirmation for tweaking
-					confirmTweak.put(name, confirmDestination.get(name));
-					confirmTweakTimeout(sender);
+					confirmAdjust.put(name, confirmDestination.get(name));
+					confirmAdjustTimeout(sender);
 					confirmDestination.remove(name);
 				}
 				
-				//ship confirm tweak
-				if (args[1].equalsIgnoreCase("tweak"))
+				//ship confirm adjust
+				if (args[1].equalsIgnoreCase("adjust"))
 				{
-					if (confirmTweak.get(name) == null)
+					if (confirmAdjust.get(name) == null)
 					{
 						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
 						return true;
 					}
 
 					//Add destination
-					arguments = confirmTweak.get(name).split(" ");
+					arguments = confirmAdjust.get(name).split(" ");
 					ship.addDestination(sm, player, arguments[0], arguments[1]);
-					confirmTweak.remove(name);
+					confirmAdjust.remove(name);
 					sm = null;
 
 					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
@@ -312,9 +310,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 					return true;
 				}
 				
-				if (confirmTweak.containsKey(name))
+				if (confirmAdjust.containsKey(name))
 				{
-					confirmTweak.remove(name);
+					confirmAdjust.remove(name);
 					ship.cancelDestination(sm);
 					player.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
@@ -394,21 +392,21 @@ public class ShipsCommandExecutor implements CommandExecutor
 	}
 	
 	/**
-	 * confirmTweakTimeout() removes the player from the list of players who are in the process 
+	 * confirmAdjustTimeout() removes the player from the list of players who are in the process 
 	 * of adding a destination and removes the destination being made.
 	 * 
 	 * @param sender
 	 */
-	private void confirmTweakTimeout(final CommandSender sender)
+	private void confirmAdjustTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
 		{
 			public void run()
 			{
-				if (confirmTweak.containsKey(sender))
+				if (confirmAdjust.containsKey(sender))
 				{
 					ship.cancelDestination(sm);
-					confirmTweak.remove(sender);
+					confirmAdjust.remove(sender);
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
