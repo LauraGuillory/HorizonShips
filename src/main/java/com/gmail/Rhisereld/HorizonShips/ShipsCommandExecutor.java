@@ -13,6 +13,8 @@ import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
@@ -161,6 +163,12 @@ public class ShipsCommandExecutor implements CommandExecutor
 				return true;
 			}
 			
+			//ship list
+			if (args[0].equalsIgnoreCase("list"))
+			{
+				ship.listShips(sender);
+			}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -274,6 +282,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					arguments = confirmTweak.get(name).split(" ");
 					ship.addDestination(sm, player, arguments[0], arguments[1]);
 					confirmTweak.remove(name);
+					sm = null;
 
 					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
 				}

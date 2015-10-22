@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -160,13 +161,9 @@ public class Ship
 	 */
 	public void tweakDestination(SchematicManager sm, Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
 	{
-		Vector dir = null;
+		Vector dir;
 		Selection s = sm.getPlayerSelection(player);
 		
-		//Undo previous paste.
-		sm.undoSession();
-		
-		//Shift 1 block in direction specified.
 		switch (direction)
 		{
 			case "north": 	dir = new Vector(0, 0, -1);
@@ -181,14 +178,16 @@ public class Ship
 							break;
 			case "down": 	dir = new Vector(0, -1, 0);
 							break;
-			default:		throw new IllegalArgumentException("That is not a valid direction.");
-							
+			default:		throw new IllegalArgumentException("That is not a valid direction.");		
 		}
-		sm = new SchematicManager(player.getWorld());
+		
+		//Undo previous paste.
+		sm.undoSession();
+		
+		//Shift 1 block in direction specified.
 		sm.shiftSelection(player, s, dir);
-
+		
 		//Paste
-
 		sm.loadSchematic(shipName, s, shipName + "\\ship");
 	}
 	
@@ -218,5 +217,18 @@ public class Ship
 
 		//Undo paste.
 		sm.undoSession();
+	}
+	
+	public void listShips(CommandSender sender)
+	{
+		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		String list = "Ships currently saved: ";
+		
+		for (String ship: ships)
+		{
+			list = list.concat(ship + ", ");
+		}
+		
+		//TODO get rid of trailing ", "
 	}
 }
