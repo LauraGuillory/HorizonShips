@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -219,6 +221,11 @@ public class Ship
 		sm.undoSession();
 	}
 	
+	/**
+	 * listShips() sends the sender a list of names of all the existing ships.
+	 * 
+	 * @param sender
+	 */
 	public void listShips(CommandSender sender)
 	{
 		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
@@ -229,6 +236,14 @@ public class Ship
 			list = list.concat(ship + ", ");
 		}
 		
-		//TODO get rid of trailing ", "
+		if (ships.size() == 0)
+			list = list.concat("None.");
+		else if (list.length() > 0)
+		{
+			list = list.substring(0, list.length() - 2);
+			list = list.concat(".");
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + list);
 	}
 }
