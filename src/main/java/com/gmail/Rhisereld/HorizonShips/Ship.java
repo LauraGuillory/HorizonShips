@@ -46,6 +46,12 @@ public class Ship
 	 */
 	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
+		//Check a ship doesn't already exist by that name.
+		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		for (String sh : shipNames)
+			if (sh.equalsIgnoreCase(shipName))
+				throw new IllegalArgumentException("A ship already exists by that name.");	
+		
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		Location min = s.getMinimumPoint();
@@ -53,11 +59,6 @@ public class Ship
 		int length = max.getBlockX() - min.getBlockX();
 		int width = max.getBlockZ() - min.getBlockZ();
 		int height = max.getBlockY() - min.getBlockY(); //TODO getBlockX() vs. getX()? One could be more efficient.
-		
-		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
-		for (String sh : shipNames)
-			if (sh.equalsIgnoreCase(shipName))
-				throw new IllegalArgumentException();
 	
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());
@@ -98,7 +99,7 @@ public class Ship
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Check that the person has permission
-		if (!player.hasPermission("horizonShips.admin.delete"))
+		if (!player.hasPermission("horizonships.admin.delete"))
 			throw new IllegalArgumentException("You don't have permission to delete that ship.");
 		
 		//Delete all information on the ship.

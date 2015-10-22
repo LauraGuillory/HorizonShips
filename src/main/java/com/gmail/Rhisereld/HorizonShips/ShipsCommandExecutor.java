@@ -45,9 +45,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
 	{
-		String name = sender.getName();
-		Player player = Bukkit.getPlayer(name);
 		String[] arguments;
+		Player player = null;
+		String name = sender.getName();
 		
 		//All commands that fall under /ship [additional arguments]
 		if (commandLabel.equalsIgnoreCase("ship"))
@@ -59,11 +59,27 @@ public class ShipsCommandExecutor implements CommandExecutor
 			
 			//ship create [shipName] [destinationName]
 			if (args[0].equalsIgnoreCase("create"))
-			{
+			{				
+				//Check that the sender is a player
+				if (sender instanceof Player)
+					player = Bukkit.getPlayer(sender.getName());
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					return false;
+				}
+				
+				//Check the player has permission
+				if (!player.hasPermission("horizonships.admin.ship.create"))
+				{
+					sender.sendMessage("You don't have permission to create a ship.");
+					return false;
+				}
+				
 				//Check for correct number of arguments.
 				if (args.length != 3)
 				{
-					player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName] [destinationName]");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName] [destinationName]");
 					return false;
 				}
 
@@ -78,10 +94,17 @@ public class ShipsCommandExecutor implements CommandExecutor
 			//ship delete [shipName]
 			if (args[0].equalsIgnoreCase("delete"))
 			{
+				//Check the player has permission OR is the console
+				if (!sender.hasPermission("horizonships.admin.ship.create") && !(sender instanceof Player))
+				{
+					sender.sendMessage("You don't have permission to delete a ship.");
+					return false;
+				}
+				
 				//Check for correct number of arguments.
 				if (args.length != 2)
 				{
-					player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete [shipName]");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete [shipName]");
 					return false;
 				}
 				
@@ -96,17 +119,33 @@ public class ShipsCommandExecutor implements CommandExecutor
 			{
 				if (args.length < 2)
 				{
-					player.sendMessage(ChatColor.RED + "Incorrect number of arguments!");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments!");
 					return false;
 				}
 				
 				//ship add destination [shipName] [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
 				{
+					//Check that the sender is a player
+					if (sender instanceof Player)
+						player = Bukkit.getPlayer(sender.getName());
+					else
+					{
+						sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+						return false;
+					}
+					
+					//Check that the player has permission
+					if (!player.hasPermission("horizonships.admin.destination.create"))
+					{
+						sender.sendMessage("You don't have permission to create a destination.");
+						return false;
+					}
+					
 					//Check for correct number of arguments
 					if (args.length != 4)
 					{
-						player.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
 								+ "[destinationName]");
 						return false;
 					}
@@ -118,7 +157,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				}
 				else
 				{
-					player.sendMessage(ChatColor.RED + "Incorrect format.");
+					sender.sendMessage(ChatColor.RED + "Incorrect format.");
 					return false;
 				}
 			}
@@ -129,18 +168,19 @@ public class ShipsCommandExecutor implements CommandExecutor
 				//Check argument length
 				if (args.length != 2)
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format.");
-					return true;
+					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship adjust "
+							+ "[north/east/south/west/up/down]");
+					return false;
 				}
 				
-				//Check there's something to tweak
+				//Check there's something to adjust
 				if (!confirmAdjust.containsKey(name))
 				{
 					sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
 					return false;
 				}
 				
-				//Tweak
+				//Adjust
 				arguments = confirmAdjust.get(name).split(" ");
 				
 				try {
@@ -164,6 +204,13 @@ public class ShipsCommandExecutor implements CommandExecutor
 			//ship list
 			if (args[0].equalsIgnoreCase("list"))
 			{
+				//Check that the player has permission OR is the console
+				if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
+				{
+					sender.sendMessage("You don't have permission to view this.");
+					return false;
+				}
+				
 				ship.listShips(sender);
 			}
 			
@@ -200,7 +247,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "No ship selected. Please make a selection using WorldEdit.");
 						return false;
 					} catch (IllegalArgumentException e) {
-						sender.sendMessage(ChatColor.RED + "A ship already exists by that name.");
+						sender.sendMessage(ChatColor.RED + e.getMessage());
 						return false;
 					}
 					return true;
