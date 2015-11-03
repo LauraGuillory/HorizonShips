@@ -3,10 +3,10 @@ package com.gmail.Rhisereld.HorizonShips;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
-import net.md_5.bungee.api.ChatColor;
-
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,6 +24,8 @@ public class Ship
 {	
 	ConfigAccessor data;
 	Plugin plugin;
+	
+	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
 	
 	public Ship(ConfigAccessor data, Plugin plugin) 
 	{
@@ -51,9 +53,10 @@ public class Ship
 		for (String sh : shipNames)
 			if (sh.equalsIgnoreCase(shipName))
 				throw new IllegalArgumentException("A ship already exists by that name.");	
-		
+				
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
+		
 		Location min = s.getMinimumPoint();
 		Location max = s.getMaximumPoint();
 		int length = max.getBlockX() - min.getBlockX();
@@ -131,9 +134,11 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void testDestination(SchematicManager sm, Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException
+	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException
 	{
 		Selection s;
+		SchematicManager sm = new SchematicManager(player.getWorld());
+		schemManagers.put(player.getName(), sm);
 
 		//Check that the player has permission.
 		if (!player.hasPermission("horizonShips.admin.destination"))
@@ -162,9 +167,10 @@ public class Ship
 	 * @throws RegionOperationException
 	 * @throws IncompleteRegionException
 	 */
-	public void adjustDestination(SchematicManager sm, Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
+	public void adjustDestination(Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
 	{
 		Vector dir;
+		SchematicManager sm = schemManagers.get(player.getName());
 		Selection s = sm.getPlayerSelection(player);
 		
 		switch (direction)
@@ -199,8 +205,9 @@ public class Ship
 	 * 
 	 * @param sm
 	 */
-	public void cancelDestination(SchematicManager sm)
+	public void cancelDestination(Player player)
 	{
+		SchematicManager sm = schemManagers.get(player.getName());
 		sm.undoSession();
 	}
 	
@@ -213,8 +220,10 @@ public class Ship
 	 * @param shipName
 	 * @param destinationName
 	 */
-	public void addDestination(SchematicManager sm, Player player, String shipName, String destinationName)
+	public void addDestination(Player player, String shipName, String destinationName)
 	{
+		SchematicManager sm = schemManagers.get(player.getName());
+		
 		//Save all the information about the new destination.
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName, sm.getPlayerSelection(player).getMinimumPoint()); //TODO serialise this manually
 

@@ -201,7 +201,7 @@ public class SchematicManager
 	{	
 		Selection s = wep.getSelection(player);
 		if (s == null)
-			throw new NullPointerException();
+			throw new NullPointerException("No selection made.");
 		return s;
 	}
 	

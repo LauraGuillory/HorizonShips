@@ -28,8 +28,6 @@ public class ShipsCommandExecutor implements CommandExecutor
 	HashMap<String, String> confirmDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	
-	SchematicManager sm;
-	
     public ShipsCommandExecutor(ConfigAccessor data, Plugin plugin) 
     {
 		this.data = data;
@@ -184,7 +182,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				arguments = confirmAdjust.get(name).split(" ");
 				
 				try {
-					ship.adjustDestination(sm, player, args[1], arguments[0]);
+					ship.adjustDestination(player, args[1], arguments[0]);
 				} catch (MaxChangedBlocksException e) {
 					sender.sendMessage(ChatColor.RED + "Ship too large!");
 					return false;
@@ -234,6 +232,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					
 					arguments = confirmCreate.get(name).split(" ");
 					confirmCreate.remove(name);
+					player = Bukkit.getPlayer(sender.getName());
 
 					try {
 						ship.createShip(arguments[0], player, arguments[1]);
@@ -244,7 +243,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 						e.printStackTrace();
 						return false;
 					} catch (NullPointerException e) {
-						sender.sendMessage(ChatColor.RED + "No ship selected. Please make a selection using WorldEdit.");
+						sender.sendMessage(ChatColor.RED + e.getMessage());
 						return false;
 					} catch (IllegalArgumentException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
@@ -252,7 +251,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					}
 					return true;
 				}
-				
+
 				//ship confirm delete
 				if (args[1].equalsIgnoreCase("delete"))
 				{
@@ -288,11 +287,10 @@ public class ShipsCommandExecutor implements CommandExecutor
 						return true;
 					}
 
-					//Paste ship, retain SchematicManager session for undo
-					sm = new SchematicManager(player.getWorld());
+					//Paste ship
 					arguments = confirmDestination.get(name).split(" ");
 					try {
-						ship.testDestination(sm, player, arguments[0], arguments[1]);
+						ship.testDestination(player, arguments[0], arguments[1]);
 					} catch (DataException | IOException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
@@ -325,9 +323,8 @@ public class ShipsCommandExecutor implements CommandExecutor
 
 					//Add destination
 					arguments = confirmAdjust.get(name).split(" ");
-					ship.addDestination(sm, player, arguments[0], arguments[1]);
+					ship.addDestination(player, arguments[0], arguments[1]);
 					confirmAdjust.remove(name);
-					sm = null;
 
 					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
 				}
@@ -339,7 +336,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				if (confirmCreate.containsKey(name))
 				{
 					confirmCreate.remove(name);
-					player.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
 					return true;
 				}
 				
@@ -353,15 +350,15 @@ public class ShipsCommandExecutor implements CommandExecutor
 				if (confirmDestination.containsKey(name))
 				{
 					confirmDestination.remove(name);
-					player.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
 				}
 				
 				if (confirmAdjust.containsKey(name))
 				{
 					confirmAdjust.remove(name);
-					ship.cancelDestination(sm);
-					player.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+					ship.cancelDestination(player);
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
 				}
 				
@@ -385,9 +382,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 		{
 			public void run()
 			{
-				if (confirmCreate.containsKey(sender))
+				if (confirmCreate.containsKey(sender.getName()))
 				{
-					confirmCreate.remove(sender);
+					confirmCreate.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
@@ -407,9 +404,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 		{
 			public void run()
 			{
-				if (confirmDelete.containsKey(sender))
+				if (confirmDelete.containsKey(sender.getName()))
 				{
-					confirmDelete.remove(sender);
+					confirmDelete.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
@@ -428,10 +425,10 @@ public class ShipsCommandExecutor implements CommandExecutor
 		{
 			public void run()
 			{
-				if (confirmDestination.containsKey(sender))
+				if (confirmDestination.containsKey(sender.getName()))
 				{
-					ship.cancelDestination(sm);
-					confirmDestination.remove(sender);
+					ship.cancelDestination(Bukkit.getPlayer(sender.getName()));
+					confirmDestination.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
@@ -450,10 +447,10 @@ public class ShipsCommandExecutor implements CommandExecutor
 		{
 			public void run()
 			{
-				if (confirmAdjust.containsKey(sender))
+				if (confirmAdjust.containsKey(sender.getName()))
 				{
-					ship.cancelDestination(sm);
-					confirmAdjust.remove(sender);
+					ship.cancelDestination(Bukkit.getPlayer(sender.getName()));
+					confirmAdjust.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
