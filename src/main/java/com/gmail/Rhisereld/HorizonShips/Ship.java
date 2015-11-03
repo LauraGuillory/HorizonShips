@@ -59,9 +59,9 @@ public class Ship
 		
 		Location min = s.getMinimumPoint();
 		Location max = s.getMaximumPoint();
-		int length = max.getBlockX() - min.getBlockX();
-		int width = max.getBlockZ() - min.getBlockZ();
-		int height = max.getBlockY() - min.getBlockY(); //TODO getBlockX() vs. getX()? One could be more efficient.
+		double length = max.getX() - min.getX();
+		double width = max.getZ() - min.getZ();
+		double height = max.getY() - min.getY();
 	
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());

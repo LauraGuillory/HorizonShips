@@ -387,7 +387,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					confirmCreate.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
-			}			
+			}
 		} , 200);
 	}
 
