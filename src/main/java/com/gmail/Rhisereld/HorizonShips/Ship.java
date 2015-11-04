@@ -3,11 +3,15 @@ package com.gmail.Rhisereld.HorizonShips;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -71,7 +75,7 @@ public class Ship
 		data.getConfig().set("ships." + shipName + ".fuel", 0);
 		data.getConfig().set("ships." + shipName + ".broken", false);
 		data.getConfig().set("ships." + shipName + ".partRequired", null);
-		data.getConfig().set("ships." + shipName + ".partConsumed", false);
+		data.getConfig().set("ships." + shipName + ".consumePart", false);
 		data.getConfig().set("ships." + shipName + ".pilots", new ArrayList<String>());
 		data.getConfig().set("ships." + shipName + ".length", length);
 		data.getConfig().set("ships." + shipName + ".width", width);
@@ -79,7 +83,7 @@ public class Ship
 
 		data.saveConfig();
 		
-		sm.saveSchematic(s, shipName, shipName + "\\ship");
+		sm.saveSchematic(s, shipName, shipName + "\\ship"); //TODO: Fix how this is called.
 	}
 
 	/**
@@ -231,6 +235,7 @@ public class Ship
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", sm.getPlayerSelection(player).getMinimumPoint().getX());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", sm.getPlayerSelection(player).getMinimumPoint().getY());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", sm.getPlayerSelection(player).getMinimumPoint().getZ());
+		data.saveConfig();
 		
 		//Undo paste.
 		sm.undoSession();
@@ -260,5 +265,117 @@ public class Ship
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + list);
+	}
+	
+	//TODO
+	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
+	{
+		//Determine the ship the player is in.
+		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		World shipWorld;
+		double shipX;
+		double shipY;
+		double shipZ;
+		double shipL;
+		double shipW;
+		double shipH;
+		String shipCurrentDestination;
+		String ship = null;
+		
+		for (String s: ships)
+		{			
+			shipCurrentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
+	
+			shipWorld = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + shipCurrentDestination + ".world"));
+			shipX = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".x");
+			shipY = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".y");
+			shipZ = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".z");
+			shipL = data.getConfig().getDouble("ships." + s + ".length");
+			shipW = data.getConfig().getDouble("ships." + s + ".width");
+			shipH = data.getConfig().getDouble("ships." + s + ".height");
+				
+			if (player.getWorld().equals(shipWorld)
+					&& player.getLocation().getX() >= shipX && player.getLocation().getX() <= shipX + shipL
+					&& player.getLocation().getY() >= shipY && player.getLocation().getY() <= shipY + shipH
+					&& player.getLocation().getZ() >= shipZ && player.getLocation().getZ() <= shipZ + shipW)
+				ship = s;		
+		}
+		
+		if (ship == null)
+			throw new IllegalArgumentException("You are not inside a ship!");
+		
+		//Make sure the player is a permitted pilot
+		List <String> pilots = data.getConfig().getStringList("ships." + ship + ".pilots");
+		boolean isPilot = false;
+		
+		for (String p : pilots)
+			if (player.getUniqueId().toString().equalsIgnoreCase(p))
+				isPilot = true;
+		
+		if (!isPilot && !player.hasPermission("horizonships.admin.ship.move"))
+			throw new IllegalArgumentException("You don't have permission to pilot this ship.");
+		
+		//Make sure the ship isn't broken
+		if (data.getConfig().getBoolean("ships." + ship + ".broken"))
+			throw new IllegalArgumentException("The ship has broken down.");
+		
+		//Make sure the ship has enough fuel
+		if (data.getConfig().getInt("ships." + ship + ".fuel") == 0)
+			throw new IllegalArgumentException("The ship is out of fuel.");
+		
+		//Make sure the destination is valid. TODO
+		
+		//Save schematic at current location
+		SchematicManager sm = new SchematicManager(player.getWorld());
+		String currentDestination = data.getConfig().getString("ships." + ship + ".currentDestination");
+		World world = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + currentDestination + ".world"));
+		double x = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".x");
+		double y = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".y");
+		double z = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".z");
+		Location loc1 = new Location(world, x, y, z);
+		
+		double length = data.getConfig().getDouble("ships." + ship + ".length");
+		double width = data.getConfig().getDouble("ships." + ship + ".width");
+		double height = data.getConfig().getDouble("ships." + ship + ".height");
+		Location loc2 = new Location(world, x + length, y + height, z + width);
+
+		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
+		
+		//Paste schematic at new location
+		sm.loadSchematic("ship", loc1, ship + "\\");
+		
+		//Teleport all players from old to new location
+		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
+		double newX;
+		double newY;
+		double newZ;
+		
+		for (Player p: onlinePlayers)
+			if (p.getWorld().equals(world)
+					&& p.getLocation().getX() >= x && p.getLocation().getX() <= x + length
+					&& p.getLocation().getY() >= y && p.getLocation().getY() <= y + height
+					&& p.getLocation().getZ() >= z && p.getLocation().getZ() <= z + width)
+			{
+				World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
+				newX = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".x");
+				newY = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".y");
+				newZ = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".z");
+
+				p.teleport(new Location(newWorld, newX, newY, newZ));
+			}		
+		
+
+
+		//Erase old location
+		sm.eraseArea(world, loc1, loc2);
+		
+		//Reduce fuel by one
+		data.getConfig().set("ships." + ship + ".fuel", data.getConfig().getInt("ships." + ship + ".fuel") - 1);
+		
+		//Change current destination
+		data.getConfig().set("ships." + ship + ".currentDestination", destination);
+		data.saveConfig();
+		
+		//TODO: Event trigger
 	}
 }

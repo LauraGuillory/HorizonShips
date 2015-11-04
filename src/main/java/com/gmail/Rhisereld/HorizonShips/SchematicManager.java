@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -28,8 +29,6 @@ public class SchematicManager
 	private final WorldEditPlugin wep;
 	private final WorldEdit worldEdit;
 	private final EditSession editSession;
-	private CuboidClipboard clipboard;
-	private File file;
 
 	/**
 	 * Constructor: Creates a SchematicManager object that contains an EditSession detailing all the changes that have been made.
@@ -58,7 +57,10 @@ public class SchematicManager
 	 */
 	public void saveSchematic(Location loc1, Location loc2, String schematicName, String path) throws DataException, IOException
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		File file;
+		CuboidClipboard clipboard;
+		
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = getMin(loc1, loc2);
@@ -82,7 +84,10 @@ public class SchematicManager
 	 */
 	public void saveSchematic(Selection selection, String schematicName, String path) throws DataException, IOException
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		File file;
+		CuboidClipboard clipboard;
+		
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = loc2Vector(selection.getMinimumPoint());
@@ -105,9 +110,11 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(String schematicName, Location l, String path) throws MaxChangedBlocksException, DataException, IOException
+	public void loadSchematic(String schematicName, Location l, String path) throws MaxChangedBlocksException, DataException, IOException //TODO more intuitive argument order
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		File file;
+		
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
 		Vector origin = new Vector(l.getX(), l.getY(), l.getZ());
 		
 		editSession.enableQueue();
@@ -130,7 +137,9 @@ public class SchematicManager
 	 */
 	public void loadSchematic(String schematicName, Selection s, String path) throws MaxChangedBlocksException, DataException, IOException
 	{
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		File file;
+		
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
 		Vector origin = s.getNativeMinimumPoint();
 
 		//Load schematic into clipboard.
@@ -180,6 +189,20 @@ public class SchematicManager
 		return new Vector(Math.max(l1.getBlockX(), l2.getBlockX()),
 		                  Math.max(l1.getBlockY(), l2.getBlockY()),
 		                  Math.max(l1.getBlockZ(), l2.getBlockZ()));
+	}
+	
+	private Location getMinLocation(Location l1, Location l2)
+	{
+		return new Location(l1.getWorld(), Math.min(l1.getBlockX(), l2.getBlockX()),
+		                  Math.min(l1.getBlockY(), l2.getBlockY()),
+		                  Math.min(l1.getBlockZ(), l2.getBlockZ()));
+	}
+	
+	private Location getMaxLocation(Location l1, Location l2)
+	{
+		return new Location(l1.getWorld(), Math.max(l1.getBlockX(), l2.getBlockX()),
+                Math.max(l1.getBlockY(), l2.getBlockY()),
+                Math.max(l1.getBlockZ(), l2.getBlockZ()));
 	}
 	
 	/**
@@ -234,5 +257,33 @@ public class SchematicManager
 		rs.learnChanges();
 		
 		return wep.getSelection(player);
+	}
+	
+	public void eraseArea(World world, Location loc1, Location loc2)
+	{
+		Location min = getMinLocation(loc1, loc2);
+		Location max = getMaxLocation(loc1, loc2);
+		Location current;
+		
+		double x = min.getX();
+		double y = min.getY();
+		double z = min.getZ();
+		
+		while (x <= max.getX())
+		{
+			while (y <= max.getY())
+			{
+				while (z <= max.getZ())	
+				{
+					current = new Location(world, x, y, z);
+					current.getBlock().setType(Material.AIR);
+					z++;
+				}
+				
+				y++;
+			}
+			
+			x++;
+		}
 	}
 }

@@ -70,7 +70,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				//Check the player has permission
 				if (!player.hasPermission("horizonships.admin.ship.create"))
 				{
-					sender.sendMessage("You don't have permission to create a ship.");
+					sender.sendMessage(ChatColor.RED + "You don't have permission to create a ship.");
 					return false;
 				}
 				
@@ -95,7 +95,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				//Check the player has permission OR is the console
 				if (!sender.hasPermission("horizonships.admin.ship.create") && !(sender instanceof Player))
 				{
-					sender.sendMessage("You don't have permission to delete a ship.");
+					sender.sendMessage(ChatColor.RED + "You don't have permission to delete a ship.");
 					return false;
 				}
 				
@@ -213,6 +213,46 @@ public class ShipsCommandExecutor implements CommandExecutor
 				ship.listShips(sender);
 			}
 			
+			//TODO: ship pilot [destination]
+			if (args[0].equalsIgnoreCase("pilot"))
+			{
+				//Check that the sender is a player
+				if (sender instanceof Player)
+					player = Bukkit.getPlayer(sender.getName());
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					return false;
+				}
+				
+				//Check that the player has permission
+				if (!sender.hasPermission("horizonships.pilot"))
+				{
+					sender.sendMessage(ChatColor.RED + "You don't have permission to pilot a ship.");
+					return false;
+				}
+				
+				//Check for correct number of args.
+				if (args.length != 2)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format.");
+					return true;
+				}
+				
+				try {
+					ship.moveShip(player, args[1]);
+				} catch (DataException | IOException e) {
+					player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Adminstrator.");
+					e.printStackTrace();
+				} catch (MaxChangedBlocksException e) {
+					player.sendMessage(ChatColor.RED + "Ship too large!");
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					player.sendMessage(ChatColor.RED + e.getMessage());
+				}
+				
+			}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -306,7 +346,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					
 					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
 							+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
-							+ "'/ship adjust confirm'.");
+							+ "'/ship adjust confirm'."); //TODO: fix order
 					
 					//Remove confirmation for destination, add confirmation for tweaking
 					confirmAdjust.put(name, confirmDestination.get(name));
