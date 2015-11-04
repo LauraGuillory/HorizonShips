@@ -179,6 +179,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				}
 				
 				//Adjust
+				player = Bukkit.getPlayer(sender.getName());
 				arguments = confirmAdjust.get(name).split(" ");
 				
 				try {
@@ -262,7 +263,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					}
 					
 					try {
-					ship.deleteShip(player, confirmDelete.get(name));
+					ship.deleteShip(sender, confirmDelete.get(name));
 					} catch (IllegalArgumentException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						return false;
@@ -280,7 +281,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				
 				//ship confirm destination
 				if (args[1].equalsIgnoreCase("destination"))
-				{
+				{			
 					if (confirmDestination.get(name) == null)
 					{
 						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
@@ -288,6 +289,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					}
 
 					//Paste ship
+					player = Bukkit.getPlayer(sender.getName());
 					arguments = confirmDestination.get(name).split(" ");
 					try {
 						ship.testDestination(player, arguments[0], arguments[1]);
@@ -302,9 +304,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 						return false;
 					}
 					
-					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Tweak the destination of the ship using "
-							+ "'/ship tweak [north/east/south/west/up/down'. To confirm placement, type "
-							+ "'/ship tweak confirm'.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
+							+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
+							+ "'/ship adjust confirm'.");
 					
 					//Remove confirmation for destination, add confirmation for tweaking
 					confirmAdjust.put(name, confirmDestination.get(name));
@@ -322,6 +324,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					}
 
 					//Add destination
+					player = Bukkit.getPlayer(sender.getName());
 					arguments = confirmAdjust.get(name).split(" ");
 					ship.addDestination(player, arguments[0], arguments[1]);
 					confirmAdjust.remove(name);
@@ -427,7 +430,6 @@ public class ShipsCommandExecutor implements CommandExecutor
 			{
 				if (confirmDestination.containsKey(sender.getName()))
 				{
-					ship.cancelDestination(Bukkit.getPlayer(sender.getName()));
 					confirmDestination.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}

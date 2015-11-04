@@ -63,7 +63,7 @@ public class Ship
 		double width = max.getZ() - min.getZ();
 		double height = max.getY() - min.getY();
 	
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld().getName());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", min.getY());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", min.getZ());
@@ -85,11 +85,11 @@ public class Ship
 	/**
 	 * deleteShip() removes all saved information on the given ship.
 	 * 
-	 * @param player
+	 * @param sender
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void deleteShip(Player player, String shipName) throws IllegalArgumentException, IOException
+	public void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
 		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
 		boolean shipFound = false;
@@ -102,7 +102,7 @@ public class Ship
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Check that the person has permission
-		if (!player.hasPermission("horizonships.admin.delete"))
+		if (!sender.hasPermission("horizonships.admin.delete") && sender instanceof Player)
 			throw new IllegalArgumentException("You don't have permission to delete that ship.");
 		
 		//Delete all information on the ship.
@@ -137,6 +137,8 @@ public class Ship
 	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException
 	{
 		Selection s;
+		player.getWorld();
+		new SchematicManager(player.getWorld());
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		schemManagers.put(player.getName(), sm);
 
@@ -225,8 +227,11 @@ public class Ship
 		SchematicManager sm = schemManagers.get(player.getName());
 		
 		//Save all the information about the new destination.
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName, sm.getPlayerSelection(player).getMinimumPoint()); //TODO serialise this manually
-
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", sm.getPlayerSelection(player).getWorld().getName());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", sm.getPlayerSelection(player).getMinimumPoint().getX());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", sm.getPlayerSelection(player).getMinimumPoint().getY());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", sm.getPlayerSelection(player).getMinimumPoint().getZ());
+		
 		//Undo paste.
 		sm.undoSession();
 	}
