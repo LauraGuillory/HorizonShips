@@ -66,7 +66,7 @@ public class Ship
 		double length = max.getX() - min.getX();
 		double width = max.getZ() - min.getZ();
 		double height = max.getY() - min.getY();
-	
+
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld().getName());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", min.getY());
@@ -82,7 +82,7 @@ public class Ship
 		data.getConfig().set("ships." + shipName + ".height", height);
 
 		data.saveConfig();
-		
+
 		sm.saveSchematic(s, "ship", shipName + "\\");
 	}
 
@@ -229,6 +229,7 @@ public class Ship
 	public void addDestination(Player player, String shipName, String destinationName)
 	{
 		SchematicManager sm = schemManagers.get(player.getName());
+		destinationName = destinationName.toLowerCase();
 		
 		//Save all the information about the new destination.
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", sm.getPlayerSelection(player).getWorld().getName());
@@ -267,7 +268,6 @@ public class Ship
 		sender.sendMessage(ChatColor.YELLOW + list);
 	}
 	
-	//TODO
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{
 		//Determine the ship the player is in.
@@ -324,7 +324,17 @@ public class Ship
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
 		//Make sure the destination is valid. TODO
-		if (data.getConfig().getString("ships." + ship + ".destinations." + destination +".world") == null)
+		boolean destinationExists = false;
+		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + ship + ".destinations").getKeys(false);
+		
+		for (String d: destinations)
+			if (d.equalsIgnoreCase(destination))
+			{
+				destination = d;	//configuration fetching is case sensitive - use string from config for case insensitivity
+				destinationExists = true;
+			}
+		
+		if (!destinationExists)
 			throw new IllegalArgumentException("That destination does not exist.");
 		
 		//Save schematic at current location
