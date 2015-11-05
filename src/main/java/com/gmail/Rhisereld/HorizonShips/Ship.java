@@ -323,7 +323,7 @@ public class Ship
 		if (data.getConfig().getInt("ships." + ship + ".fuel") == 0)
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
-		//Make sure the destination is valid. TODO
+		//Make sure the destination is valid.
 		boolean destinationExists = false;
 		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + ship + ".destinations").getKeys(false);
 		
@@ -354,13 +354,18 @@ public class Ship
 		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
 		
 		//Paste schematic at new location
-		sm.loadSchematic("ship", loc1, ship + "\\");
+		World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
+		double newX = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
+		double newY = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
+		double newZ = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
+		Location newLoc = new Location(newWorld, newX, newY, newZ);
+		sm.loadSchematic("ship", newLoc, ship + "\\");
 		
 		//Teleport all players from old to new location
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
-		double newX;
-		double newY;
-		double newZ;
+		double teleportX;
+		double teleportY;
+		double teleportZ;
 		
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(world)
@@ -368,12 +373,12 @@ public class Ship
 					&& p.getLocation().getY() >= y && p.getLocation().getY() <= y + height
 					&& p.getLocation().getZ() >= z && p.getLocation().getZ() <= z + width)
 			{
-				World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
-				newX = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".x");
-				newY = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".y");
-				newZ = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".z");
+				World teleportWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
+				teleportX = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".x");
+				teleportY = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".y");
+				teleportZ = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".z");
 
-				p.teleport(new Location(newWorld, newX, newY, newZ));
+				p.teleport(new Location(teleportWorld, teleportX, teleportY, teleportZ));
 			}		
 
 		//Erase old location
