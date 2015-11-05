@@ -83,7 +83,7 @@ public class Ship
 
 		data.saveConfig();
 		
-		sm.saveSchematic(s, shipName, shipName + "\\ship"); //TODO: Fix how this is called.
+		sm.saveSchematic(s, "ship", shipName + "\\");
 	}
 
 	/**
@@ -153,9 +153,9 @@ public class Ship
 		//Check that there isn't already a destination by that name.
 		if (data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false).contains(shipName))
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
-		
+
 		s = sm.getPlayerSelection(player);
-		sm.loadSchematic(shipName, s, shipName + "\\ship");
+		sm.loadSchematic("ship", s, shipName + "\\");
 	}
 	
 	/**
@@ -325,6 +325,8 @@ public class Ship
 		
 		//Make sure the destination is valid. TODO
 		
+		//
+		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		String currentDestination = data.getConfig().getString("ships." + ship + ".currentDestination");
@@ -363,8 +365,6 @@ public class Ship
 
 				p.teleport(new Location(newWorld, newX, newY, newZ));
 			}		
-		
-
 
 		//Erase old location
 		sm.eraseArea(world, loc1, loc2);
