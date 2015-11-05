@@ -324,8 +324,8 @@ public class Ship
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
 		//Make sure the destination is valid. TODO
-		
-		//
+		if (data.getConfig().getString("ships." + ship + ".destinations." + destination +".world") == null)
+			throw new IllegalArgumentException("That destination does not exist.");
 		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
