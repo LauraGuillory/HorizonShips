@@ -138,7 +138,7 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException
+	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		Selection s;
 		player.getWorld();
@@ -211,10 +211,10 @@ public class Ship
 	 * 
 	 * @param sm
 	 */
-	public void cancelDestination(Player player)
+	public void cancelDestination(String name)
 	{
-		SchematicManager sm = schemManagers.get(player.getName());
-		schemManagers.remove(player.getName());
+		SchematicManager sm = schemManagers.get(name);
+		schemManagers.remove(name);
 		sm.undoSession();
 	}
 	

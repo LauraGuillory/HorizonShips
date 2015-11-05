@@ -342,7 +342,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 						player.sendMessage(ChatColor.RED + "Ship too large!");
 						e.printStackTrace();
 						return false;
-					} catch (NullPointerException e) {
+					} catch (NullPointerException | IllegalArgumentException e) {
 						player.sendMessage(ChatColor.RED + e.getMessage());
 						e.printStackTrace();
 					}
@@ -403,7 +403,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				if (confirmAdjust.containsKey(name))
 				{
 					confirmAdjust.remove(name);
-					ship.cancelDestination(player);
+					ship.cancelDestination(name);
 					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
 				}
@@ -494,7 +494,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 			{
 				if (confirmAdjust.containsKey(sender.getName()))
 				{
-					ship.cancelDestination(Bukkit.getPlayer(sender.getName()));
+					ship.cancelDestination(sender.getName());
 					confirmAdjust.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
