@@ -323,21 +323,21 @@ public class Ship
 		Location loc2 = new Location(world, xHere + length, yHere + height, zHere + width);
 
 		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
-		
+
 		//Paste schematic at new location
 		World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
 		double xThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
 		double yThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
 		double zThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
 		Location newLoc = new Location(newWorld, xThere, yThere, zThere);
-		sm.loadSchematic("ship", newLoc, ship + "\\");
-		
+		sm.loadSchematic(newLoc, ship + "\\", "ship");
+
 		//Teleport all players from old to new location
 		teleportPlayers(loc1, newLoc, length, width, height);
 
 		//Erase old location
 		sm.eraseArea(world, loc1, loc2);
-		
+
 		//Reduce fuel by one
 		data.getConfig().set("ships." + ship + ".fuel", data.getConfig().getInt("ships." + ship + ".fuel") - 1);
 		

@@ -110,7 +110,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(String schematicName, Location l, String path) throws MaxChangedBlocksException, DataException, IOException //TODO more intuitive argument order
+	public void loadSchematic(Location l, String path, String schematicName) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		
@@ -263,27 +263,10 @@ public class SchematicManager
 	{
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);
-		Location current;
-		
-		double x = min.getX();
-		double y = min.getY();
-		double z = min.getZ();
-		
-		while (x <= max.getX())
-		{
-			while (y <= max.getY())
-			{
-				while (z <= max.getZ())	
-				{
-					current = new Location(world, x, y, z);
-					current.getBlock().setType(Material.AIR);
-					z++;
-				}
-				
-				y++;
-			}
-			
-			x++;
-		}
+
+		for (int x = (int) min.getX(); x <= max.getX(); x++)
+			for (int y = (int) min.getY(); y <= max.getY(); y++)
+				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
+					world.getBlockAt(x, y, z).setType(Material.AIR);
 	}
 }
