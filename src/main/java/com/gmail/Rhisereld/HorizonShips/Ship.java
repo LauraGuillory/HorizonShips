@@ -269,40 +269,11 @@ public class Ship
 	}
 	
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
-	{
-		//Determine the ship the player is in.
-		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
-		World shipWorld;
-		double shipX;
-		double shipY;
-		double shipZ;
-		double shipL;
-		double shipW;
-		double shipH;
-		String shipCurrentDestination;
-		String ship = null;
-		
-		for (String s: ships)
-		{			
-			shipCurrentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
-	
-			shipWorld = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + shipCurrentDestination + ".world"));
-			shipX = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".x");
-			shipY = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".y");
-			shipZ = data.getConfig().getDouble("ships." + s + ".destinations." + shipCurrentDestination + ".z");
-			shipL = data.getConfig().getDouble("ships." + s + ".length");
-			shipW = data.getConfig().getDouble("ships." + s + ".width");
-			shipH = data.getConfig().getDouble("ships." + s + ".height");
-				
-			if (player.getWorld().equals(shipWorld)
-					&& player.getLocation().getX() >= shipX && player.getLocation().getX() <= shipX + shipL
-					&& player.getLocation().getY() >= shipY && player.getLocation().getY() <= shipY + shipH
-					&& player.getLocation().getZ() >= shipZ && player.getLocation().getZ() <= shipZ + shipW)
-				ship = s;		
-		}
-		
+	{		
+		//Determine the ship the player is trying to pilot.
+		String ship = findCurrentShip(player);
 		if (ship == null)
-			throw new IllegalArgumentException("You are not inside a ship!");
+			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Make sure the player is a permitted pilot
 		List <String> pilots = data.getConfig().getStringList("ships." + ship + ".pilots");
@@ -341,45 +312,28 @@ public class Ship
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		String currentDestination = data.getConfig().getString("ships." + ship + ".currentDestination");
 		World world = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + currentDestination + ".world"));
-		double x = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".x");
-		double y = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".y");
-		double z = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".z");
-		Location loc1 = new Location(world, x, y, z);
+		double xHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".x");
+		double yHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".y");
+		double zHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".z");
+		Location loc1 = new Location(world, xHere, yHere, zHere);
 		
 		double length = data.getConfig().getDouble("ships." + ship + ".length");
 		double width = data.getConfig().getDouble("ships." + ship + ".width");
 		double height = data.getConfig().getDouble("ships." + ship + ".height");
-		Location loc2 = new Location(world, x + length, y + height, z + width);
+		Location loc2 = new Location(world, xHere + length, yHere + height, zHere + width);
 
 		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
 		
 		//Paste schematic at new location
 		World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
-		double newX = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
-		double newY = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
-		double newZ = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
-		Location newLoc = new Location(newWorld, newX, newY, newZ);
+		double xThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
+		double yThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
+		double zThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
+		Location newLoc = new Location(newWorld, xThere, yThere, zThere);
 		sm.loadSchematic("ship", newLoc, ship + "\\");
 		
 		//Teleport all players from old to new location
-		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
-		double teleportX;
-		double teleportY;
-		double teleportZ;
-		
-		for (Player p: onlinePlayers)
-			if (p.getWorld().equals(world)
-					&& p.getLocation().getX() >= x && p.getLocation().getX() <= x + length
-					&& p.getLocation().getY() >= y && p.getLocation().getY() <= y + height
-					&& p.getLocation().getZ() >= z && p.getLocation().getZ() <= z + width)
-			{
-				World teleportWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
-				teleportX = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".x");
-				teleportY = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".y");
-				teleportZ = data.getConfig().getDouble("ships." + ship + ".destinations." + destination + ".z");
-
-				p.teleport(new Location(teleportWorld, teleportX, teleportY, teleportZ));
-			}		
+		teleportPlayers(loc1, newLoc, length, width, height);
 
 		//Erase old location
 		sm.eraseArea(world, loc1, loc2);
@@ -392,5 +346,57 @@ public class Ship
 		data.saveConfig();
 		
 		//TODO: Event trigger
+	}
+	
+	private String findCurrentShip(Player player)
+	{
+		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		World world;
+		double x;
+		double y;
+		double z;
+		double length;
+		double width;
+		double height;
+		String currentDestination;
+		String ship = null;
+				
+		for (String s: ships)
+		{			
+			currentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
+			world = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + currentDestination + ".world"));
+			x = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".x");
+			y = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".y");
+			z = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".z");
+			length = data.getConfig().getDouble("ships." + s + ".length");
+			width = data.getConfig().getDouble("ships." + s + ".width");
+			height = data.getConfig().getDouble("ships." + s + ".height");
+				
+			if (player.getWorld().equals(world)
+					&& player.getLocation().getX() >= x && player.getLocation().getX() <= x + length
+					&& player.getLocation().getY() >= y && player.getLocation().getY() <= y + height
+					&& player.getLocation().getZ() >= z && player.getLocation().getZ() <= z + width)
+				ship = s;		
+		}
+
+		return ship;
+	}
+	
+	private void teleportPlayers(Location oldLocation, Location newLocation, double length, double width, double height)
+	{
+		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
+
+		for (Player p: onlinePlayers)
+			if (p.getWorld().equals(oldLocation.getWorld())
+					&& p.getLocation().getX() >= oldLocation.getX() && p.getLocation().getX() <= oldLocation.getX() + length
+					&& p.getLocation().getY() >= oldLocation.getY() && p.getLocation().getY() <= oldLocation.getY() + height
+					&& p.getLocation().getZ() >= oldLocation.getZ() && p.getLocation().getZ() <= oldLocation.getZ() + width)
+			{		
+				//Determine new player location based on existing offset to ship location.			
+				p.teleport(new Location(newLocation.getWorld(), 
+						p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
+						p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
+						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ()));
+			}		
 	}
 }
