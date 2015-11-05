@@ -396,7 +396,9 @@ public class Ship
 				p.teleport(new Location(newLocation.getWorld(), 
 						p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
 						p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
-						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ()));
+						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
+						p.getLocation().getYaw(),
+						p.getLocation().getPitch()));
 			}		
 	}
 }
