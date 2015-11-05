@@ -138,7 +138,7 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException
+	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException
 	{
 		Selection s;
 		player.getWorld();
@@ -203,7 +203,7 @@ public class Ship
 		sm.shiftSelection(player, s, dir);
 		
 		//Paste
-		sm.loadSchematic(shipName, s, shipName + "\\ship");
+		sm.loadSchematic("ship", s, shipName + "\\");
 	}
 	
 	/**
@@ -214,6 +214,7 @@ public class Ship
 	public void cancelDestination(Player player)
 	{
 		SchematicManager sm = schemManagers.get(player.getName());
+		schemManagers.remove(player.getName());
 		sm.undoSession();
 	}
 	
@@ -324,12 +325,13 @@ public class Ship
 
 		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
 
-		//Paste schematic at new location
+		//Paste schematic at new location		
 		World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
 		double xThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
 		double yThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
 		double zThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
 		Location newLoc = new Location(newWorld, xThere, yThere, zThere);
+		sm = new SchematicManager(newWorld);		//Each schematic manager may only apply to one world.
 		sm.loadSchematic(newLoc, ship + "\\", "ship");
 
 		//Teleport all players from old to new location
@@ -340,7 +342,7 @@ public class Ship
 
 		//Reduce fuel by one
 		data.getConfig().set("ships." + ship + ".fuel", data.getConfig().getInt("ships." + ship + ".fuel") - 1);
-		
+
 		//Change current destination
 		data.getConfig().set("ships." + ship + ".currentDestination", destination);
 		data.saveConfig();

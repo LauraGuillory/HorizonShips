@@ -141,6 +141,8 @@ public class SchematicManager
 		
 		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
 		Vector origin = s.getNativeMinimumPoint();
+		
+		editSession.enableQueue();
 
 		//Load schematic into clipboard.
 		MCEditSchematicFormat.MCEDIT.load(file).paste(editSession, origin, true, true);

@@ -342,6 +342,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 						player.sendMessage(ChatColor.RED + "Ship too large!");
 						e.printStackTrace();
 						return false;
+					} catch (NullPointerException e) {
+						player.sendMessage(ChatColor.RED + e.getMessage());
+						e.printStackTrace();
 					}
 					
 					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
