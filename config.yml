@@ -1,0 +1,46 @@
+eventchance: 0.3
+refuel:
+  arrow:
+    name: "energy cell"
+    fills: 1
+events:
+  bumpyride:
+    damage: 8
+    profession: pilot
+    probability: 2
+    chanceofinjury:
+      tier1: 0.5
+      tier2: 0.1
+      tier3: 0
+  infestation:
+    number: 5
+    poisonous: false
+    probability: 1
+  breakdown:
+    profession: engineer
+    probability: 1
+    chanceofrepair:
+      tier1: 0.1
+      tier2: 0.5
+      tier3: 1
+    spareparts:
+      bedrock: 
+        name: "white Hull"
+        datavalue: 4
+      glass: 
+        name: "glass"
+      enchanting_table: 
+        name: "navigation screen"
+      piston: 
+        name: "piston"
+      redstone: 
+        name: "copper wire"
+    tools:
+      dye:
+        name: "wrench"
+        datavalue: 6
+      nether_star:
+        name: "soldering iron"
+      iron_sword: "crowbar"
+  fuel:
+    probability: 1
