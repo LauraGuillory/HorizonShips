@@ -213,7 +213,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				ship.listShips(sender);
 			}
 			
-			//TODO: ship pilot [destination]
+			//ship pilot [destination]
 			if (args[0].equalsIgnoreCase("pilot"))
 			{
 				//Check that the sender is a player
@@ -356,7 +356,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					confirmAdjustTimeout(sender);
 					confirmDestination.remove(name);
 				}
-				
+
 				//ship confirm adjust
 				if (args[1].equalsIgnoreCase("adjust"))
 				{

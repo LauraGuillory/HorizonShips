@@ -269,6 +269,18 @@ public class Ship
 		sender.sendMessage(ChatColor.YELLOW + list);
 	}
 	
+	/**
+	 * moveShip() handles all the actions required when a player pilots a ship from one destination to another.
+	 * It saves the schematic at current location, pastes the schematic at the new location, teleports all the players within the
+	 * ship's region to the new location, erases the old ship, and reduces the ship fuel by one.
+	 * 
+	 * @param player
+	 * @param destination
+	 * @throws DataException
+	 * @throws IOException
+	 * @throws MaxChangedBlocksException
+	 * @throws IllegalArgumentException
+	 */
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{		
 		//Determine the ship the player is trying to pilot.
@@ -350,6 +362,13 @@ public class Ship
 		//TODO: Event trigger
 	}
 	
+	/**
+	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
+	 * returns the name of that ship.
+	 * 
+	 * @param player
+	 * @return
+	 */
 	private String findCurrentShip(Player player)
 	{
 		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
@@ -364,7 +383,7 @@ public class Ship
 		String ship = null;
 				
 		for (String s: ships)
-		{			
+		{		
 			currentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
 			world = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + currentDestination + ".world"));
 			x = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".x");
@@ -373,7 +392,7 @@ public class Ship
 			length = data.getConfig().getDouble("ships." + s + ".length");
 			width = data.getConfig().getDouble("ships." + s + ".width");
 			height = data.getConfig().getDouble("ships." + s + ".height");
-				
+
 			if (player.getWorld().equals(world)
 					&& player.getLocation().getX() >= x && player.getLocation().getX() <= x + length
 					&& player.getLocation().getY() >= y && player.getLocation().getY() <= y + height
@@ -384,6 +403,16 @@ public class Ship
 		return ship;
 	}
 	
+	/**
+	 * teleportPlayers() teleports all players within the region defined by oldLocation and the length, width, and height
+	 * to newLocation. The position of all players teleported is offset by their offset at the original location.
+	 * 
+	 * @param oldLocation
+	 * @param newLocation
+	 * @param length
+	 * @param width
+	 * @param height
+	 */
 	private void teleportPlayers(Location oldLocation, Location newLocation, double length, double width, double height)
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();

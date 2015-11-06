@@ -261,6 +261,13 @@ public class SchematicManager
 		return wep.getSelection(player);
 	}
 	
+	/**
+	 * eraseArea() sets all of the blocks inside the region defined by two locations to air.
+	 * 
+	 * @param world
+	 * @param loc1
+	 * @param loc2
+	 */
 	public void eraseArea(World world, Location loc1, Location loc2)
 	{
 		Location min = getMinLocation(loc1, loc2);
