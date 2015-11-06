@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -21,16 +22,17 @@ public class ShipsCommandExecutor implements CommandExecutor
 {
 	ConfigAccessor data;
 	Ship ship;
-	Plugin plugin;
+	JavaPlugin plugin;
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
 	HashMap<String, String> confirmDelete = new HashMap<String, String>();
 	HashMap<String, String> confirmDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	
-    public ShipsCommandExecutor(ConfigAccessor data, Plugin plugin) 
+    public ShipsCommandExecutor(ConfigAccessor data, JavaPlugin plugin) 
     {
 		this.data = data;
+		this.plugin = plugin;
 		ship = new Ship(data, plugin);
 	}
 

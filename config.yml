@@ -4,7 +4,7 @@ refuel:
     name: "energy cell"
     fills: 1
 events:
-  bumpyride:
+  bumpyRide:
     damage: 8
     profession: pilot
     probability: 2

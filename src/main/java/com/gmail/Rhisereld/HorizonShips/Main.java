@@ -10,7 +10,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class Main extends JavaPlugin implements CommandExecutor
 {
-	static Plugin plugin;						//Some functions require a reference to the plugin in args.
+	static JavaPlugin plugin;						//Some functions require a reference to the plugin in args.
 	WorldEditPlugin worldEditPlugin;
 	
 	ConfigAccessor config;						//Configuration file.

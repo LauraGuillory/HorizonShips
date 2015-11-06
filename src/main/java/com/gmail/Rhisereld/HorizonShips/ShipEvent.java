@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 
 public class ShipEvent 
 {
-	private String[] EVENTS = {"bumpyride", "infestation", "breakdown", "fuelleak"};
+	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelleak"};
 	private ConfigAccessor config;
 	private String chosenEvent;
 	
@@ -37,32 +37,27 @@ public class ShipEvent
 		while (sum < randomNum)
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
-		chosenEvent = EVENTS[i];
-		Bukkit.getServer().getLogger().info(chosenEvent);
+		//chosenEvent = EVENTS[i];
+		chosenEvent = "bumpyRide";
 	}
 	
-	public void trigger(Player player, Location location, int length, int width, int height)
+	public String trigger(Player player, Location location, int length, int width, int height)
 	{
 		switch(chosenEvent) {
-			case "bumpyride": triggerBumpyRide(player, location, length, width, height);
-							break;
-			case "infestation": triggerInfestation(player);
-							break;
-			case "breakdown": triggerBreakdown(player);
-							break;
-			case "fuelleak": triggerFuelLeak(player);
-							break;
+			case "bumpyRide": return triggerBumpyRide(player, location, length, width, height);
+			case "infestation": return triggerInfestation(player);
+			case "breakdown": return triggerBreakdown(player);
+			case "fuelleak": return triggerFuelLeak(player);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
-						break;
+						return null;
 		}
-		
 	}
 	
 	//TODO
 	private String triggerBumpyRide(Player player, Location location, int length, int width, int height)
 	{
 		//Configuration options
-		String path = "events.bumpyride.";
+		String path = "events.bumpyRide.";
 		int damage = config.getConfig().getInt(path + "damage");
 		String profession = config.getConfig().getString(path + "profession");
 		Set<String> tiers = config.getConfig().getConfigurationSection(path + "injuryChance").getKeys(false);
@@ -111,20 +106,22 @@ public class ShipEvent
 	}
 	
 	//TODO
-	private void triggerInfestation(Player player)
+	private String triggerInfestation(Player player)
 	{
+		return chosenEvent;
+	}
+	
+	//TODO
+	private String triggerBreakdown(Player player)
+	{
+		return chosenEvent;
 		
 	}
 	
 	//TODO
-	private void triggerBreakdown(Player player)
+	private String triggerFuelLeak(Player player)
 	{
-		
-	}
-	
-	//TODO
-	private void triggerFuelLeak(Player player)
-	{
+		return chosenEvent;
 		
 	}
 
