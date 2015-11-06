@@ -2,9 +2,11 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -55,6 +57,10 @@ public class ShipsCommandExecutor implements CommandExecutor
 			//ship test - used for testing during development.
 			if (args[0].equalsIgnoreCase("test"))
 			{
+				player = Bukkit.getPlayer(sender.getName());
+				ShipEvent shipEvent = new ShipEvent(Main.config);
+				shipEvent.chooseEvent();
+				player.sendMessage(shipEvent.trigger(player, player.getLocation(), 8, 20, 6));
 			}
 			
 			//ship create [shipName] [destinationName]

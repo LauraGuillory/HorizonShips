@@ -13,7 +13,7 @@ public class Main extends JavaPlugin implements CommandExecutor
 	static JavaPlugin plugin;						//Some functions require a reference to the plugin in args.
 	WorldEditPlugin worldEditPlugin;
 	
-	ConfigAccessor config;						//Configuration file.
+	static ConfigAccessor config;						//Configuration file.
 	ConfigAccessor data;						//Data file.
 
 	/**

@@ -39,7 +39,8 @@ public class ShipEvent
 		while (sum < randomNum)
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
-		chosenEvent = EVENTS[i];
+		//chosenEvent = EVENTS[i];
+		chosenEvent = "infestation";
 	}
 	
 	public String trigger(Player player, Location location, int length, int width, int height)
@@ -122,7 +123,7 @@ public class ShipEvent
 		
 		for (int x = location.getBlockX(); x < location.getX() + length; x++)
 			for (int y = location.getBlockY(); y < location.getY() + height; y++)
-				for (int z = location.getBlockZ(); x < location.getX() + length; x++)
+				for (int z = location.getBlockZ(); z < location.getZ() + length; z++)
 					if (location.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)
 							&& !location.getWorld().getBlockAt(x, y-1, z).getType().equals(Material.AIR))
 					{
@@ -134,28 +135,45 @@ public class ShipEvent
 						}
 						
 						if (hasBlockAbove)
+						{
 							potentialLocations.add(new Location(location.getWorld(), x, y, z));
+							player.sendMessage(location.getWorld() + " " + x + " " + y + " " + z);
+						}
+
 					}
 		
 		//If no potential locations, look only for locations with a block directly underneath.
-		if (potentialLocations.isEmpty())
-			for (int x = location.getBlockX(); x < location.getX() + length; x++)
-				for (int y = location.getBlockY(); y < location.getY() + height; y++)
-					for (int z = location.getBlockZ(); x < location.getX() + length; x++)
-						if (location.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)
-								&& !location.getWorld().getBlockAt(x, y-1, z).getType().equals(Material.AIR))
-							potentialLocations.add(new Location(location.getWorld(), x, y, z));
+		Location testLoc;
 		
+		if (potentialLocations.isEmpty())
+			for (int x = location.getBlockX(); x < location.getBlockX() + length; x++)
+				for (int y = location.getBlockY(); y < location.getBlockY() + height; y++)
+					for (int z = location.getBlockZ(); z < location.getBlockZ() + width; z++)
+					{
+						testLoc = new Location(location.getWorld(), x, y, z);
+						if (testLoc.getBlock().getType().isSolid())
+						{
+							testLoc.add(0, 1, 0);
+							if (!testLoc.getBlock().getType().isSolid())
+								potentialLocations.add(new Location(location.getWorld(), x, y, z));
+						}
+					}
+
 		//Randomly choose spawn point. If still no potential locations, spawn on player.
 		Location spawnPoint;
-		
+
 		if (potentialLocations.isEmpty())
+		{
 			spawnPoint = player.getLocation();
+			player.sendMessage("Spawning on player");
+		}
+
 		else
 		{
 			Random rand = new Random();
 			int randomNum = rand.nextInt(potentialLocations.size());
 			spawnPoint = potentialLocations.get(randomNum);
+			player.sendMessage(spawnPoint.getBlockX() + " " + spawnPoint.getBlockY() + " " + spawnPoint.getBlockZ());
 		}
 		
 		//Spawn spiders
