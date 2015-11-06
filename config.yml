@@ -8,7 +8,7 @@ events:
     damage: 8
     profession: pilot
     probability: 2
-    chanceofinjury:
+    injuryChance:
       tier1: 0.5
       tier2: 0.1
       tier3: 0
@@ -42,5 +42,5 @@ events:
       nether_star:
         name: "soldering iron"
       iron_sword: "crowbar"
-  fuel:
+  fuelLeak:
     probability: 1

@@ -41,6 +41,8 @@ public class Main extends JavaPlugin implements CommandExecutor
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        
+        //TODO HorizonProfessions integration
 
         //Register commands
     	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data, plugin));

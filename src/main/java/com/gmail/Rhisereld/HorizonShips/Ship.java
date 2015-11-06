@@ -360,6 +360,8 @@ public class Ship
 		data.saveConfig();
 		
 		//TODO: Event trigger
+		
+		//TODO: Event notify
 	}
 	
 	/**
