@@ -349,7 +349,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 					
 					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
 							+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
-							+ "'/ship adjust confirm'."); //TODO: fix order
+							+ "'/ship confirm adjust'.");
 					
 					//Remove confirmation for destination, add confirmation for tweaking
 					confirmAdjust.put(name, confirmDestination.get(name));
