@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 public class ShipEvent 
@@ -37,15 +39,14 @@ public class ShipEvent
 		while (sum < randomNum)
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
-		//chosenEvent = EVENTS[i];
-		chosenEvent = "bumpyRide";
+		chosenEvent = EVENTS[i];
 	}
 	
 	public String trigger(Player player, Location location, int length, int width, int height)
 	{
 		switch(chosenEvent) {
 			case "bumpyRide": return triggerBumpyRide(player, location, length, width, height);
-			case "infestation": return triggerInfestation(player);
+			case "infestation": return triggerInfestation(player, location, length, width, height);
 			case "breakdown": return triggerBreakdown(player);
 			case "fuelleak": return triggerFuelLeak(player);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
@@ -106,22 +107,80 @@ public class ShipEvent
 	}
 	
 	//TODO
-	private String triggerInfestation(Player player)
+	private String triggerInfestation(Player player, Location location, int length, int width, int height)
 	{
-		return chosenEvent;
+		//Configuration options
+		String path = "events.infestation.";
+		int number = config.getConfig().getInt(path + "number");
+		boolean poisonous = config.getConfig().getBoolean(path + "poisonous");
+		
+		//Determine spawn point
+		//Create list of locations that have a block directly below and somewhere above them.
+		List<Location> potentialLocations = new ArrayList<Location>();
+		boolean hasBlockAbove;
+		int yAbove = location.getBlockY() + 1;
+		
+		for (int x = location.getBlockX(); x < location.getX() + length; x++)
+			for (int y = location.getBlockY(); y < location.getY() + height; y++)
+				for (int z = location.getBlockZ(); x < location.getX() + length; x++)
+					if (location.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)
+							&& !location.getWorld().getBlockAt(x, y-1, z).getType().equals(Material.AIR))
+					{
+						hasBlockAbove = false;
+						while (yAbove < location.getBlockY() + height)
+						{
+							if (!location.getWorld().getBlockAt(x, yAbove, z).getType().equals(Material.AIR))
+								hasBlockAbove = true;
+						}
+						
+						if (hasBlockAbove)
+							potentialLocations.add(new Location(location.getWorld(), x, y, z));
+					}
+		
+		//If no potential locations, look only for locations with a block directly underneath.
+		if (potentialLocations.isEmpty())
+			for (int x = location.getBlockX(); x < location.getX() + length; x++)
+				for (int y = location.getBlockY(); y < location.getY() + height; y++)
+					for (int z = location.getBlockZ(); x < location.getX() + length; x++)
+						if (location.getWorld().getBlockAt(x, y, z).getType().equals(Material.AIR)
+								&& !location.getWorld().getBlockAt(x, y-1, z).getType().equals(Material.AIR))
+							potentialLocations.add(new Location(location.getWorld(), x, y, z));
+		
+		//Randomly choose spawn point. If still no potential locations, spawn on player.
+		Location spawnPoint;
+		
+		if (potentialLocations.isEmpty())
+			spawnPoint = player.getLocation();
+		else
+		{
+			Random rand = new Random();
+			int randomNum = rand.nextInt(potentialLocations.size());
+			spawnPoint = potentialLocations.get(randomNum);
+		}
+		
+		//Spawn spiders
+		if (poisonous)
+			for (int i = 0; i < number; i++)
+				spawnPoint.getWorld().spawnEntity(spawnPoint, EntityType.CAVE_SPIDER);
+		else
+			for (int i = 0; i < number; i++)
+				spawnPoint.getWorld().spawnEntity(spawnPoint, EntityType.SPIDER);
+		
+		return "Something shuffles inside the walls of the ship. Looks like you've picked up some unwelcome passengers, and "
+				+ "they've grown to an unprecedented size!";
 	}
 	
 	//TODO
 	private String triggerBreakdown(Player player)
 	{
-		return chosenEvent;
+		return null;
 		
 	}
 	
 	//TODO
 	private String triggerFuelLeak(Player player)
 	{
-		return chosenEvent;
+		return null;
 		
 	}
 
