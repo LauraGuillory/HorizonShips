@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 public class ShipEvent 
 {
-	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelleak"};
+	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak"};
 	private ConfigAccessor config;
 	private ConfigAccessor data;
 	private String chosenEvent;
@@ -42,7 +42,7 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
 		//chosenEvent = EVENTS[i];
-		chosenEvent = "breakdown";
+		chosenEvent = "fuelLeak";
 	}
 	
 	public String trigger(Player player, String ship, Location location, int length, int width, int height)
@@ -51,7 +51,7 @@ public class ShipEvent
 			case "bumpyRide": return triggerBumpyRide(player, location, length, width, height);
 			case "infestation": return triggerInfestation(player, location, length, width, height);
 			case "breakdown": return triggerBreakdown(player, ship);
-			case "fuelleak": return triggerFuelLeak(player);
+			case "fuelLeak": return triggerFuelLeak(player, ship);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
 						return null;
 		}
@@ -231,10 +231,12 @@ public class ShipEvent
 	}
 	
 	//TODO
-	private String triggerFuelLeak(Player player)
+	private String triggerFuelLeak(Player player, String ship)
 	{
-		return null;
-		
+		data.getConfig().set("ships." + ship + ".fuel", 0);
+		data.saveConfig();
+		return "During the flight, you notice a leak in the fuel line. A little duct tape fixes the problem for now, "
+				+ "but the ship barely has enough fuel left to reach its destination.";
 	}
 
 }
