@@ -60,7 +60,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 				player = Bukkit.getPlayer(sender.getName());
 				ShipEvent shipEvent = new ShipEvent(Main.config);
 				shipEvent.chooseEvent();
-				player.sendMessage(shipEvent.trigger(player, player.getLocation(), 8, 20, 6));
+				player.sendMessage(shipEvent.trigger(player, new Location(Bukkit.getWorld("test"), -572, 3, -523), 7, 6, 6));
 			}
 			
 			//ship create [shipName] [destinationName]

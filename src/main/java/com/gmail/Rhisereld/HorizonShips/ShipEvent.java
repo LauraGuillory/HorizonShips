@@ -120,6 +120,7 @@ public class ShipEvent
 		List<Location> potentialLocations = new ArrayList<Location>();
 		boolean hasBlockAbove;
 		Location testLoc;
+		int yAbove;
 		
 		for (int x = location.getBlockX(); x < location.getX() + length; x++)
 			for (int y = location.getBlockY(); y < location.getY() + height; y++)
@@ -127,41 +128,43 @@ public class ShipEvent
 				{
 					testLoc = new Location(location.getWorld(), x, y, z);
 					if (testLoc.getBlock().getType().isSolid())
-					{
-						testLoc.add(0, 1, 0);
-						if (!testLoc.getBlock().getType().isSolid())
+						if (!testLoc.add(0, 1, 0).getBlock().getType().isSolid())
 						{
 							hasBlockAbove = false;
-							for (int yAbove = location.getBlockY() + 1; yAbove < location.getBlockY() + height; yAbove++)
-							{
-								testLoc = new Location(location.getWorld(), x, yAbove, z);
-								if (!testLoc.getBlock().getType().isSolid())
+							for (yAbove = y + 1; yAbove < location.getBlockY() + height; yAbove++)
+								if (testLoc.add(0, 1, 0).getBlock().getType().isSolid())
 									hasBlockAbove = true;
-							}
+							
+							testLoc.add(0, -(yAbove - y - 1), 0);
 
 							if (hasBlockAbove)
 							{
-								potentialLocations.add(new Location(location.getWorld(), x, y, z));
-								player.sendMessage(x + " " + y + " " + z);
+								if (!testLoc.add(1, 0, 0).getBlock().getType().isSolid()
+										&& !testLoc.add(0, 0, 1).getBlock().getType().isSolid()
+										&& !testLoc.add(-1, 0, 0).getBlock().getType().isSolid())
+									potentialLocations.add(new Location(location.getWorld(), x, y+1, z));
 							}
 						}
-					}
 				}
 		
 		//If no potential locations, look only for locations with a block directly underneath.		
 		if (potentialLocations.isEmpty())
+		{
+			player.sendMessage("backup selection");
 			for (int x = location.getBlockX(); x < location.getBlockX() + length; x++)
 				for (int y = location.getBlockY(); y < location.getBlockY() + height; y++)
 					for (int z = location.getBlockZ(); z < location.getBlockZ() + width; z++)
 					{
 						testLoc = new Location(location.getWorld(), x, y, z);
 						if (testLoc.getBlock().getType().isSolid())
-						{
-							testLoc.add(0, 1, 0);
-							if (!testLoc.getBlock().getType().isSolid())
-								potentialLocations.add(new Location(location.getWorld(), x, y, z));
-						}
+							if (!testLoc.add(0, 1, 0).getBlock().getType().isSolid())
+								if (!testLoc.add(1, 0, 0).getBlock().getType().isSolid()
+										&& !testLoc.add(0, 0, 1).getBlock().getType().isSolid()
+										&& !testLoc.add(-1, 0, 0).getBlock().getType().isSolid())
+									potentialLocations.add(new Location(location.getWorld(), x, y+1, z));
 					}
+		}
+
 
 		//Randomly choose spawn point. If still no potential locations, spawn on player.
 		Location spawnPoint;
@@ -178,6 +181,7 @@ public class ShipEvent
 		}
 		
 		//Spawn spiders
+		spawnPoint.add(1, 0, 1);
 		if (poisonous)
 			for (int i = 0; i < number; i++)
 				spawnPoint.getWorld().spawnEntity(spawnPoint, EntityType.CAVE_SPIDER);
@@ -192,6 +196,15 @@ public class ShipEvent
 	//TODO
 	private String triggerBreakdown(Player player)
 	{
+		//Configuration options
+		
+		//Set ship to broken
+		
+		//Choose item needed for repair
+		
+		//Set item needed for repair and isConsumed
+		
+		
 		return null;
 		
 	}
