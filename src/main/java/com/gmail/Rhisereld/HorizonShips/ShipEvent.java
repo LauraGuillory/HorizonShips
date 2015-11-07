@@ -41,8 +41,7 @@ public class ShipEvent
 		while (sum < randomNum)
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
-		//chosenEvent = EVENTS[i];
-		chosenEvent = "fuelLeak";
+		chosenEvent = EVENTS[i];
 	}
 	
 	public String trigger(Player player, String ship, Location location, int length, int width, int height)
@@ -151,8 +150,6 @@ public class ShipEvent
 		
 		//If no potential locations, look only for locations with a block directly underneath.		
 		if (potentialLocations.isEmpty())
-		{
-			player.sendMessage("backup selection");
 			for (int x = location.getBlockX(); x < location.getBlockX() + length; x++)
 				for (int y = location.getBlockY(); y < location.getBlockY() + height; y++)
 					for (int z = location.getBlockZ(); z < location.getBlockZ() + width; z++)
@@ -165,7 +162,6 @@ public class ShipEvent
 										&& !testLoc.add(-1, 0, 0).getBlock().getType().isSolid())
 									potentialLocations.add(new Location(location.getWorld(), x, y+1, z));
 					}
-		}
 
 
 		//Randomly choose spawn point. If still no potential locations, spawn on player.
@@ -179,7 +175,6 @@ public class ShipEvent
 			Random rand = new Random();
 			int randomNum = rand.nextInt(potentialLocations.size());
 			spawnPoint = potentialLocations.get(randomNum);
-			player.sendMessage(spawnPoint.getBlockX() + " " + spawnPoint.getBlockY() + " " + spawnPoint.getBlockZ());
 		}
 		
 		//Spawn spiders

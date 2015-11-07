@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,14 +28,16 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 public class Ship 
 {	
 	ConfigAccessor data;
+	ConfigAccessor config;
 	Plugin plugin;
 	
 	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
 	
-	public Ship(ConfigAccessor data, Plugin plugin) 
+	public Ship(ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
 	{
 		this.data = data;
 		this.plugin = plugin;
+		this.config = config;
 	}
 
 	/**
@@ -330,9 +333,9 @@ public class Ship
 		double zHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".z");
 		Location loc1 = new Location(world, xHere, yHere, zHere);
 		
-		double length = data.getConfig().getDouble("ships." + ship + ".length");
-		double width = data.getConfig().getDouble("ships." + ship + ".width");
-		double height = data.getConfig().getDouble("ships." + ship + ".height");
+		int length = data.getConfig().getInt("ships." + ship + ".length");
+		int width = data.getConfig().getInt("ships." + ship + ".width");
+		int height = data.getConfig().getInt("ships." + ship + ".height");
 		Location loc2 = new Location(world, xHere + length, yHere + height, zHere + width);
 
 		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
@@ -359,9 +362,13 @@ public class Ship
 		data.getConfig().set("ships." + ship + ".currentDestination", destination);
 		data.saveConfig();
 		
-		//TODO: Event trigger
-		
-		//TODO: Event notify
+		//Event trigger
+		ShipEvent shipEvent = new ShipEvent(config, data);
+		shipEvent.chooseEvent();
+		String message = shipEvent.trigger(player, ship, newLoc, length, width, height);
+		Set<Player> playersToNotify = getPlayersInsideRegion(newLoc, length, width, height);
+		for (Player p: playersToNotify)
+			p.sendMessage(ChatColor.YELLOW + message);
 	}
 	
 	/**
@@ -375,12 +382,12 @@ public class Ship
 	{
 		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
 		World world;
-		double x;
-		double y;
-		double z;
-		double length;
-		double width;
-		double height;
+		int x;
+		int y;
+		int z;
+		int length;
+		int width;
+		int height;
 		String currentDestination;
 		String ship = null;
 				
@@ -388,17 +395,15 @@ public class Ship
 		{		
 			currentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
 			world = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + currentDestination + ".world"));
-			x = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".x");
-			y = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".y");
-			z = data.getConfig().getDouble("ships." + s + ".destinations." + currentDestination + ".z");
-			length = data.getConfig().getDouble("ships." + s + ".length");
-			width = data.getConfig().getDouble("ships." + s + ".width");
-			height = data.getConfig().getDouble("ships." + s + ".height");
+			x = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".x");
+			y = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".y");
+			z = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".z");
+			length = data.getConfig().getInt("ships." + s + ".length");
+			width = data.getConfig().getInt("ships." + s + ".width");
+			height = data.getConfig().getInt("ships." + s + ".height");
 
-			if (player.getWorld().equals(world)
-					&& player.getLocation().getX() >= x && player.getLocation().getX() <= x + length
-					&& player.getLocation().getY() >= y && player.getLocation().getY() <= y + height
-					&& player.getLocation().getZ() >= z && player.getLocation().getZ() <= z + width)
+			Set<Player> playersInside = getPlayersInsideRegion(new Location(world, x, y, z), length, width, height);
+			if (playersInside.contains(player))
 				ship = s;		
 		}
 
@@ -415,23 +420,32 @@ public class Ship
 	 * @param width
 	 * @param height
 	 */
-	private void teleportPlayers(Location oldLocation, Location newLocation, double length, double width, double height)
+	private void teleportPlayers(Location oldLocation, Location newLocation, int length, int width, int height)
+	{
+		Set<Player> playersInside = getPlayersInsideRegion(newLocation, length, width, height);
+		
+		for (Player p: playersInside)
+			//Determine new player location based on existing offset to ship location.			
+			p.teleport(new Location(newLocation.getWorld(), 
+				p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
+				p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
+				p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
+				p.getLocation().getYaw(),
+				p.getLocation().getPitch()));
+	}
+	
+	private Set<Player> getPlayersInsideRegion(Location location, int length, int width, int height)
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
+		Set<Player> playersInside = new HashSet<Player>();
 
 		for (Player p: onlinePlayers)
-			if (p.getWorld().equals(oldLocation.getWorld())
-					&& p.getLocation().getX() >= oldLocation.getX() && p.getLocation().getX() <= oldLocation.getX() + length
-					&& p.getLocation().getY() >= oldLocation.getY() && p.getLocation().getY() <= oldLocation.getY() + height
-					&& p.getLocation().getZ() >= oldLocation.getZ() && p.getLocation().getZ() <= oldLocation.getZ() + width)
-			{		
-				//Determine new player location based on existing offset to ship location.			
-				p.teleport(new Location(newLocation.getWorld(), 
-						p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
-						p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
-						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
-						p.getLocation().getYaw(),
-						p.getLocation().getPitch()));
-			}		
+			if (p.getWorld().equals(location.getWorld())
+					&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + length
+					&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + height
+					&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + width)
+				playersInside.add(p);
+		
+		return playersInside;
 	}
 }

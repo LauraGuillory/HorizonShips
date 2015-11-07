@@ -13,8 +13,8 @@ public class Main extends JavaPlugin implements CommandExecutor
 	static JavaPlugin plugin;						//Some functions require a reference to the plugin in args.
 	WorldEditPlugin worldEditPlugin;
 	
-	static ConfigAccessor config;						//Configuration file.
-	static ConfigAccessor data;						//Data file.
+	ConfigAccessor config;						//Configuration file.
+	ConfigAccessor data;						//Data file.
 
 	/**
 	 * onEnable() is called when the server is started or the plugin is enabled.
@@ -45,7 +45,7 @@ public class Main extends JavaPlugin implements CommandExecutor
         //TODO HorizonProfessions integration
 
         //Register commands
-    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data, plugin));
+    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data, config, plugin));
 	}
 
 	/**

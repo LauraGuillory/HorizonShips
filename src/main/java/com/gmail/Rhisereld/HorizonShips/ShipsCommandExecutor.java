@@ -23,6 +23,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 public class ShipsCommandExecutor implements CommandExecutor 
 {
 	ConfigAccessor data;
+	ConfigAccessor config;
 	Ship ship;
 	JavaPlugin plugin;
 	
@@ -31,11 +32,12 @@ public class ShipsCommandExecutor implements CommandExecutor
 	HashMap<String, String> confirmDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	
-    public ShipsCommandExecutor(ConfigAccessor data, JavaPlugin plugin) 
+    public ShipsCommandExecutor(ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
     {
 		this.data = data;
+		this.config = config;
 		this.plugin = plugin;
-		ship = new Ship(data, plugin);
+		ship = new Ship(data, config, plugin);
 	}
 
 	/**
@@ -57,10 +59,6 @@ public class ShipsCommandExecutor implements CommandExecutor
 			//ship test - used for testing during development.
 			if (args[0].equalsIgnoreCase("test"))
 			{
-				player = Bukkit.getPlayer(sender.getName());
-				ShipEvent shipEvent = new ShipEvent(Main.config, Main.data);
-				shipEvent.chooseEvent();
-				player.sendMessage(shipEvent.trigger(player, "NSS_Example", new Location(Bukkit.getWorld("test"), -572, 3, -523), 7, 6, 6));
 			}
 			
 			//ship create [shipName] [destinationName]
