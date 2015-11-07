@@ -23,7 +23,7 @@ events:
       tier1: 0.1
       tier2: 0.5
       tier3: 1
-    spareparts:
+    spareParts:
       bedrock: 
         name: "white Hull"
         datavalue: 4

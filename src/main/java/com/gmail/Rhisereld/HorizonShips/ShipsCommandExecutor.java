@@ -58,9 +58,9 @@ public class ShipsCommandExecutor implements CommandExecutor
 			if (args[0].equalsIgnoreCase("test"))
 			{
 				player = Bukkit.getPlayer(sender.getName());
-				ShipEvent shipEvent = new ShipEvent(Main.config);
+				ShipEvent shipEvent = new ShipEvent(Main.config, Main.data);
 				shipEvent.chooseEvent();
-				player.sendMessage(shipEvent.trigger(player, new Location(Bukkit.getWorld("test"), -572, 3, -523), 7, 6, 6));
+				player.sendMessage(shipEvent.trigger(player, "NSS_Example", new Location(Bukkit.getWorld("test"), -572, 3, -523), 7, 6, 6));
 			}
 			
 			//ship create [shipName] [destinationName]

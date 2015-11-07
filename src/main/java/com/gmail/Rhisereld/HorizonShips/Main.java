@@ -14,7 +14,7 @@ public class Main extends JavaPlugin implements CommandExecutor
 	WorldEditPlugin worldEditPlugin;
 	
 	static ConfigAccessor config;						//Configuration file.
-	ConfigAccessor data;						//Data file.
+	static ConfigAccessor data;						//Data file.
 
 	/**
 	 * onEnable() is called when the server is started or the plugin is enabled.

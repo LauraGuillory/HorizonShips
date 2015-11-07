@@ -16,11 +16,13 @@ public class ShipEvent
 {
 	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelleak"};
 	private ConfigAccessor config;
+	private ConfigAccessor data;
 	private String chosenEvent;
 	
-	public ShipEvent(ConfigAccessor config)
+	public ShipEvent(ConfigAccessor config, ConfigAccessor data)
 	{
 		this.config = config;
+		this.data = data;
 	}
 
 	public void chooseEvent()
@@ -40,15 +42,15 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
 		//chosenEvent = EVENTS[i];
-		chosenEvent = "infestation";
+		chosenEvent = "breakdown";
 	}
 	
-	public String trigger(Player player, Location location, int length, int width, int height)
+	public String trigger(Player player, String ship, Location location, int length, int width, int height)
 	{
 		switch(chosenEvent) {
 			case "bumpyRide": return triggerBumpyRide(player, location, length, width, height);
 			case "infestation": return triggerInfestation(player, location, length, width, height);
-			case "breakdown": return triggerBreakdown(player);
+			case "breakdown": return triggerBreakdown(player, ship);
 			case "fuelleak": return triggerFuelLeak(player);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
 						return null;
@@ -194,19 +196,38 @@ public class ShipEvent
 	}
 	
 	//TODO
-	private String triggerBreakdown(Player player)
+	private String triggerBreakdown(Player player, String ship)
 	{
 		//Configuration options
+		String path = "events.breakdown.";
+		List<String> spareParts = new ArrayList<String>();
+		spareParts.addAll(config.getConfig().getConfigurationSection(path + "spareParts").getKeys(false));
+		List<String> tools = new ArrayList<String>();
+		tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false));
 		
 		//Set ship to broken
+		data.getConfig().set("ships." + ship + ".broken", true);
 		
 		//Choose item needed for repair
+		Random rand = new Random();
+		int randomNum = rand.nextInt(spareParts.size() + tools.size());
 		
 		//Set item needed for repair and isConsumed
+		boolean consumePart = false;
+		String repairItem;
+		if (randomNum < spareParts.size())
+		{
+			consumePart = true;
+			repairItem = spareParts.get(randomNum);
+		}
+		else
+			repairItem = tools.get(randomNum - spareParts.size());
 		
+		data.getConfig().set("ships." + ship + ".consumePart", consumePart);
+		data.getConfig().set("ships." + ship + ".repairItem", repairItem);
+		data.saveConfig();
 		
-		return null;
-		
+		return "As you touch down, the ship engine splutters and dies. It's broken down!";
 	}
 	
 	//TODO
