@@ -422,11 +422,11 @@ public class Ship
 	 */
 	private void teleportPlayers(Location oldLocation, Location newLocation, int length, int width, int height)
 	{
-		Set<Player> playersInside = getPlayersInsideRegion(newLocation, length, width, height);
+		Set<Player> playersInside = getPlayersInsideRegion(oldLocation, length, width, height);
 		
 		for (Player p: playersInside)
 			//Determine new player location based on existing offset to ship location.			
-			p.teleport(new Location(newLocation.getWorld(), 
+			p.teleport(new Location(newLocation.getWorld(),
 				p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
 				p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
 				p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
@@ -445,7 +445,7 @@ public class Ship
 					&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + height
 					&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + width)
 				playersInside.add(p);
-		
+
 		return playersInside;
 	}
 }
