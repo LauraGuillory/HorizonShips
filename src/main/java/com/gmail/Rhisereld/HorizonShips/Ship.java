@@ -434,6 +434,16 @@ public class Ship
 				p.getLocation().getPitch()));
 	}
 	
+	/**
+	 * getPlayersInsideRegion() returns a set containing all the players whose locations are
+	 * within the region defined by a location, length, width and height.
+	 * 
+	 * @param location
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	private Set<Player> getPlayersInsideRegion(Location location, int length, int width, int height)
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();

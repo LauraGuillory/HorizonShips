@@ -12,6 +12,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+/**
+ * ShipEvent handles all things related to the set of events that may occur during a journey.
+ * chooseEvent() must be called before trigger() is called.
+ */
 public class ShipEvent 
 {
 	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak"};
@@ -25,6 +29,9 @@ public class ShipEvent
 		this.data = data;
 	}
 
+	/**
+	 * chooseEvent() randomly selects an event from the EVENTS array.
+	 */
 	public void chooseEvent()
 	{
 		Random rand = new Random();
@@ -44,6 +51,17 @@ public class ShipEvent
 		chosenEvent = EVENTS[i];
 	}
 	
+	/**
+	 * trigger() calls the methods necessary to trigger the event based on which event has been selected.
+	 * 
+	 * @param player
+	 * @param ship
+	 * @param location
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @return A string detailing the events of the trip.
+	 */
 	public String trigger(Player player, String ship, Location location, int length, int width, int height)
 	{
 		switch(chosenEvent) {
@@ -56,7 +74,18 @@ public class ShipEvent
 		}
 	}
 	
-	//TODO
+	/**
+	 * triggerBumpyRide() completes all of the actions required for the Bumpy Ride event.
+	 * - Decides whether an injury occurs based on pilot's skill and a random number
+	 * - If yes, randomly selects a player and damages their health.
+	 * 
+	 * @param player
+	 * @param location
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @return A string detailing the events of the trip.
+	 */
 	private String triggerBumpyRide(Player player, Location location, int length, int width, int height)
 	{
 		//Configuration options
@@ -108,7 +137,18 @@ public class ShipEvent
 		}
 	}
 	
-	//TODO
+	/**
+	 * triggerInfestation() completes all of the actions required for the Infestation event.
+	 * - Determines the spawn point (must be air, with a solid block underneath and preferably with a roof overhead)
+	 * - Spawns a number of spiders specified in configuration
+	 * 
+	 * @param player
+	 * @param location
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @return A string detailing the events of the trip.
+	 */
 	private String triggerInfestation(Player player, Location location, int length, int width, int height)
 	{
 		//Configuration options
@@ -190,7 +230,17 @@ public class ShipEvent
 				+ "they've grown to an unprecedented size!";
 	}
 	
-	//TODO
+	/**
+	 * triggerBreakdown() completes all of the actions required for the Breakdown event.
+	 * - Sets the ship status to broken.
+	 * - Chooses the item needed for repair
+	 * - Sets the item needed to repair
+	 * - Sets isConsumed value for that repair
+	 * 
+	 * @param player
+	 * @param ship
+	 * @return A string detailing the events of the trip.
+	 */
 	private String triggerBreakdown(Player player, String ship)
 	{
 		//Configuration options
@@ -225,7 +275,14 @@ public class ShipEvent
 		return "As you touch down, the ship engine splutters and dies. It's broken down!";
 	}
 	
-	//TODO
+	/**
+	 * triggerFuelLeak() completes all the actions required for the Fuel Leak event.
+	 * - Sets the ship's fuel level to zero.
+	 * 
+	 * @param player
+	 * @param ship
+	 * @return A string detailing the events of the trip.
+	 */
 	private String triggerFuelLeak(Player player, String ship)
 	{
 		data.getConfig().set("ships." + ship + ".fuel", 0);
@@ -233,5 +290,4 @@ public class ShipEvent
 		return "During the flight, you notice a leak in the fuel line. A little duct tape fixes the problem for now, "
 				+ "but the ship barely has enough fuel left to reach its destination.";
 	}
-
 }
