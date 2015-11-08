@@ -20,7 +20,7 @@ import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
 @SuppressWarnings("deprecation")
-public class ShipsCommandExecutor implements CommandExecutor 
+public class HorizonCommandParser implements CommandExecutor 
 {
 	ConfigAccessor data;
 	ConfigAccessor config;
@@ -32,7 +32,7 @@ public class ShipsCommandExecutor implements CommandExecutor
 	HashMap<String, String> confirmDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	
-    public ShipsCommandExecutor(ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
+    public HorizonCommandParser(ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
     {
 		this.data = data;
 		this.config = config;

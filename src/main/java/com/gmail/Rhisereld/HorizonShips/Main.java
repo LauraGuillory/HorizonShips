@@ -5,7 +5,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.Rhisereld.HorizonShips.ConfigAccessor;
-import com.gmail.Rhisereld.HorizonShips.ShipsCommandExecutor;
+import com.gmail.Rhisereld.HorizonShips.HorizonCommandParser;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class Main extends JavaPlugin implements CommandExecutor
@@ -45,7 +45,7 @@ public class Main extends JavaPlugin implements CommandExecutor
         //TODO HorizonProfessions integration
 
         //Register commands
-    	this.getCommand("ship").setExecutor(new ShipsCommandExecutor(data, config, plugin));
+    	this.getCommand("ship").setExecutor(new HorizonCommandParser(data, config, plugin));
 	}
 
 	/**
