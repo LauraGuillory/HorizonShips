@@ -25,7 +25,7 @@ import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.regions.RegionOperationException;
 
 @SuppressWarnings("deprecation")
-public class Ship 
+public class ShipHandler 
 {	
 	ConfigAccessor data;
 	ConfigAccessor config;
@@ -33,7 +33,7 @@ public class Ship
 	
 	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
 	
-	public Ship(ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
+	public ShipHandler(ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
 	{
 		this.data = data;
 		this.plugin = plugin;
@@ -106,7 +106,7 @@ public class Ship
 			if (s.equalsIgnoreCase(shipName))
 				shipFound = true;
 		if (!shipFound)
-			throw new IllegalArgumentException("Ship not found.");
+			throw new IllegalArgumentException("ShipHandler not found.");
 		
 		//Check that the person has permission
 		if (!sender.hasPermission("horizonships.admin.delete") && sender instanceof Player)
