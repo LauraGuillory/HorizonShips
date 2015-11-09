@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -20,13 +19,11 @@ public class ShipEvent
 {
 	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak"};
 	private ConfigAccessor config;
-	private ConfigAccessor data;
 	private String chosenEvent;
 	
 	public ShipEvent(ConfigAccessor config, ConfigAccessor data)
 	{
 		this.config = config;
-		this.data = data;
 	}
 
 	/**
@@ -62,11 +59,11 @@ public class ShipEvent
 	 * @param height
 	 * @return A string detailing the events of the trip.
 	 */
-	public String trigger(Player player, String ship, Location location, int length, int width, int height)
+	public String trigger(Player player, Ship ship)
 	{
 		switch(chosenEvent) {
-			case "bumpyRide": return triggerBumpyRide(player, location, length, width, height);
-			case "infestation": return triggerInfestation(player, location, length, width, height);
+			case "bumpyRide": return triggerBumpyRide(player, ship);
+			case "infestation": return triggerInfestation(player, ship);
 			case "breakdown": return triggerBreakdown(player, ship);
 			case "fuelLeak": return triggerFuelLeak(player, ship);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
@@ -86,7 +83,7 @@ public class ShipEvent
 	 * @param height
 	 * @return A string detailing the events of the trip.
 	 */
-	private String triggerBumpyRide(Player player, Location location, int length, int width, int height)
+	private String triggerBumpyRide(Player player, Ship ship)
 	{
 		//Configuration options
 		String path = "events.bumpyRide.";
@@ -117,12 +114,13 @@ public class ShipEvent
 			//Choose a player to damage
 			Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 			List<Player> playersOnShip = new ArrayList<Player>();
+			Location location = ship.getCurrentDestination().getLocation();
 
 			for (Player p: onlinePlayers)
 				if (p.getWorld().equals(location.getWorld())
-						&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + length
-						&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + height
-						&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + width)
+						&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + ship.getLength()
+						&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + ship.getHeight()
+						&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + ship.getWidth())
 					playersOnShip.add(p);
 			
 			int randomInt = rand.nextInt(playersOnShip.size());
@@ -149,7 +147,7 @@ public class ShipEvent
 	 * @param height
 	 * @return A string detailing the events of the trip.
 	 */
-	private String triggerInfestation(Player player, Location location, int length, int width, int height)
+	private String triggerInfestation(Player player, Ship ship)
 	{
 		//Configuration options
 		String path = "events.infestation.";
@@ -160,12 +158,16 @@ public class ShipEvent
 		//Create list of locations that have a block directly below and somewhere above them.
 		List<Location> potentialLocations = new ArrayList<Location>();
 		boolean hasBlockAbove;
+		Location location = ship.getCurrentDestination().getLocation();
 		Location testLoc;
 		int yAbove;
+		int length = ship.getLength();
+		int width = ship.getWidth();
+		int height = ship.getHeight();
 		
 		for (int x = location.getBlockX(); x < location.getX() + length; x++)
 			for (int y = location.getBlockY(); y < location.getY() + height; y++)
-				for (int z = location.getBlockZ(); z < location.getZ() + length; z++)
+				for (int z = location.getBlockZ(); z < location.getZ() + width; z++)
 				{
 					testLoc = new Location(location.getWorld(), x, y, z);
 					if (testLoc.getBlock().getType().isSolid())
@@ -241,7 +243,7 @@ public class ShipEvent
 	 * @param ship
 	 * @return A string detailing the events of the trip.
 	 */
-	private String triggerBreakdown(Player player, String ship)
+	private String triggerBreakdown(Player player, Ship ship)
 	{
 		//Configuration options
 		String path = "events.breakdown.";
@@ -251,7 +253,7 @@ public class ShipEvent
 		tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false));
 		
 		//Set ship to broken
-		data.getConfig().set("ships." + ship + ".broken", true);
+		ship.setBroken(true);
 		
 		//Choose item needed for repair
 		Random rand = new Random();
@@ -268,9 +270,9 @@ public class ShipEvent
 		else
 			repairItem = tools.get(randomNum - spareParts.size());
 		
-		data.getConfig().set("ships." + ship + ".consumePart", consumePart);
-		data.getConfig().set("ships." + ship + ".repairItem", repairItem);
-		data.saveConfig();
+		
+		ship.setRepairItem(repairItem);
+		ship.setConsumePart(consumePart);
 		
 		return "As you touch down, the ship engine splutters and dies. It's broken down!";
 	}
@@ -283,10 +285,9 @@ public class ShipEvent
 	 * @param ship
 	 * @return A string detailing the events of the trip.
 	 */
-	private String triggerFuelLeak(Player player, String ship)
+	private String triggerFuelLeak(Player player, Ship ship)
 	{
-		data.getConfig().set("ships." + ship + ".fuel", 0);
-		data.saveConfig();
+		ship.setFuel(0);
 		return "During the flight, you notice a leak in the fuel line. A little duct tape fixes the problem for now, "
 				+ "but the ship barely has enough fuel left to reach its destination.";
 	}
