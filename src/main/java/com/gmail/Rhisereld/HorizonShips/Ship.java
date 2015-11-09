@@ -161,6 +161,9 @@ public class Ship
 		currentDestination = new Destination(data, name, destination);
 		if (currentDestination == null)
 			return false;
+		data.getConfig().set("ships." + name + ".currentDestination", destination);
+		data.saveConfig();
+		
 		return true;
 	}
 	
