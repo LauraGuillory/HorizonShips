@@ -54,7 +54,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Location loc1, Location loc2, String schematicName, String path) throws DataException, IOException
+	public void saveSchematic(Location loc1, Location loc2, String path, String schematicName) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
@@ -81,7 +81,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Selection selection, String schematicName, String path) throws DataException, IOException
+	public void saveSchematic(Selection selection, String path, String schematicName) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
@@ -134,7 +134,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(String schematicName, Selection s, String path) throws MaxChangedBlocksException, DataException, IOException
+	public void loadSchematic(Selection s, String path, String schematicName) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		

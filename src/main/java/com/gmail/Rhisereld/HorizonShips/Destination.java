@@ -53,10 +53,10 @@ public class Destination
 		this.destinationName = destinationName;
 		this.location = location;
 		
-		data.getConfig().set("ships." + shipName + ".destinations." + ".world", location.getWorld().getName());
-		data.getConfig().set("ships." + shipName + ".destinations." + ".x", location.getBlockX());
-		data.getConfig().set("ships." + shipName + ".destinations." + ".y", location.getBlockY());
-		data.getConfig().set("ships." + shipName + ".destinations." + ".z", location.getBlockZ());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", location.getWorld().getName());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
+		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
 		data.saveConfig();
 	}
 	

@@ -2,10 +2,12 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
@@ -21,12 +23,12 @@ public class Ship
 	private ConfigAccessor data;
 	private String name;
 	private Destination currentDestination;
-	private Set<String> destinations;
+	private Set<String> destinations = new HashSet<String>();
 	private int fuel;
 	private boolean broken;
 	private String repairItem;
 	private boolean consumePart;
-	private List<String> pilots;
+	private List<String> pilots = new ArrayList<String>();
 	private int length;
 	private int width;
 	private int height;
@@ -44,14 +46,14 @@ public class Ship
 		this.data = data;
 		this.name = name;
 		this.currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
-		this.destinations = data.getConfig().getConfigurationSection(path + "destinations.").getKeys(false);
+		this.destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
 		this.fuel = data.getConfig().getInt(path + "fuel");
 		this.broken = data.getConfig().getBoolean(path + "broken");
 		this.repairItem = data.getConfig().getString(path + "partRequired");
 		this.consumePart = data.getConfig().getBoolean(path + consumePart);
 		this.pilots = data.getConfig().getStringList(path + "pilots");
 	}
-	
+
 	/**
 	 * Constructor for creating an entirely new ship.
 	 * 
@@ -66,21 +68,24 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public Ship(ConfigAccessor data, String name, String destinationName, Selection selection, Location location, int length, int width, int height) throws DataException, IOException
+	public Ship(ConfigAccessor data, String name, String destinationName, Selection selection) throws DataException, IOException
 	{
 		this.data = data;
 		this.name = name;
-		this.currentDestination = new Destination(data, name, destinationName, location);
-		this.destinations.add(currentDestination.getDestinationName());
-		this.fuel = 10;
-		this.broken = false;
-		this.pilots = new ArrayList<String>();
-		this.length = length;
-		this.width = width;
-		this.height = height;
+		currentDestination = new Destination(data, name, destinationName, selection.getMinimumPoint());
+		destinations.add(destinationName);
+		fuel = 10;
+		broken = false;
+		pilots = new ArrayList<String>();
+		
+		Location min = selection.getMinimumPoint();
+		Location max = selection.getMaximumPoint();
+		length = max.getBlockX() - min.getBlockX();
+		width = max.getBlockZ() - min.getBlockZ();
+		height = max.getBlockY() - min.getBlockY();
 		
 		data.getConfig().set("ships." + name + ".currentDestination", destinationName);
-		data.getConfig().set("ships." + name + ".fuel", 0);
+		data.getConfig().set("ships." + name + ".fuel", fuel);
 		data.getConfig().set("ships." + name + ".broken", broken);
 		data.getConfig().set("ships." + name + ".pilots", pilots);
 		data.getConfig().set("ships." + name + ".length", length);
@@ -88,8 +93,8 @@ public class Ship
 		data.getConfig().set("ships." + name + ".height", height);
 		data.saveConfig();
 		
-		SchematicManager sm = new SchematicManager(location.getWorld());
-		sm.saveSchematic(selection, "ship", name + "\\");
+		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
+		sm.saveSchematic(selection, name + "\\", "ship");
 	}
 	
 	/**
@@ -102,8 +107,8 @@ public class Ship
 		data.saveConfig();
 		
 		//Delete ship schematic
-		SchematicManager sm = new SchematicManager(null);
-		sm.deleteSchematic(name, "ship");
+		SchematicManager sm = new SchematicManager(Bukkit.getWorld("world"));
+		sm.deleteSchematic(name + "\\", "ship");
 	}
 	
 	/**

@@ -53,21 +53,18 @@ public class ShipHandler
 	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
-		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
-		for (String sh : shipNames)
-			if (sh.equalsIgnoreCase(shipName))
-				throw new IllegalArgumentException("A ship already exists by that name.");	
+		if (data.getConfig().contains("ships."))
+		{
+			Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+			for (String sh : shipNames)
+				if (sh.equalsIgnoreCase(shipName))
+					throw new IllegalArgumentException("A ship already exists by that name.");
+		}
 				
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		
-		Location min = s.getMinimumPoint();
-		Location max = s.getMaximumPoint();
-		int length = max.getBlockX() - min.getBlockX();
-		int width = max.getBlockZ() - min.getBlockZ();
-		int height = max.getBlockY() - min.getBlockY();
-		
-		Ship ship = new Ship(data, shipName, destinationName, s, min, length, width, height);
+		Ship ship = new Ship(data, shipName, destinationName, s);
 	}
 
 	/**
@@ -87,7 +84,7 @@ public class ShipHandler
 			if (s.equalsIgnoreCase(shipName))
 				shipFound = true;
 		if (!shipFound)
-			throw new IllegalArgumentException("ShipHandler not found.");
+			throw new IllegalArgumentException("Ship not found.");
 		
 		//Check that the person has permission
 		if (!sender.hasPermission("horizonships.admin.delete") && sender instanceof Player)
@@ -128,7 +125,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
 
 		s = sm.getPlayerSelection(player);
-		sm.loadSchematic("ship", s, shipName + "\\");
+		sm.loadSchematic(s, shipName + "\\", "ship");
 	}
 	
 	/**
@@ -176,7 +173,7 @@ public class ShipHandler
 		sm.shiftSelection(player, s, dir);
 		
 		//Paste
-		sm.loadSchematic("ship", s, shipName + "\\");
+		sm.loadSchematic(s, shipName + "\\", "ship");
 	}
 	
 	/**
@@ -276,7 +273,7 @@ public class ShipHandler
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Destination currentDestination = ship.getCurrentDestination();
 		Location loc2 = currentDestination.getLocation().add(ship.getLength(), ship.getWidth(), ship.getHeight());
-		sm.saveSchematic(currentDestination.getLocation(), loc2, "ship", ship + "\\");
+		sm.saveSchematic(currentDestination.getLocation(), loc2, ship + "\\", "ship");
 
 		//Paste schematic at new location
 		Destination newDestination = ship.getDestination(destination);
