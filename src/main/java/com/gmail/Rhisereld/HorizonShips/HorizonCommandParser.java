@@ -2,16 +2,13 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Vector;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -24,7 +21,7 @@ public class HorizonCommandParser implements CommandExecutor
 {
 	ConfigAccessor data;
 	ConfigAccessor config;
-	ShipHandler ship;
+	ShipHandler shipHandler;
 	JavaPlugin plugin;
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
@@ -37,7 +34,7 @@ public class HorizonCommandParser implements CommandExecutor
 		this.data = data;
 		this.config = config;
 		this.plugin = plugin;
-		ship = new ShipHandler(data, config, plugin);
+		shipHandler = new ShipHandler(data, config, plugin);
 	}
 
 	/**
@@ -189,9 +186,9 @@ public class HorizonCommandParser implements CommandExecutor
 				arguments = confirmAdjust.get(name).split(" ");
 				
 				try {
-					ship.adjustDestination(player, args[1], arguments[0]);
+					shipHandler.adjustDestination(player, args[1], arguments[0]);
 				} catch (MaxChangedBlocksException e) {
-					sender.sendMessage(ChatColor.RED + "ShipHandler too large!");
+					sender.sendMessage(ChatColor.RED + "Ship too large!");
 					return false;
 				} catch (DataException | RegionOperationException | IncompleteRegionException | IOException e) {
 					sender.sendMessage(ChatColor.RED + e.getMessage());
@@ -216,7 +213,7 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 				
-				ship.listShips(sender);
+				shipHandler.listShips(sender);
 			}
 			
 			//ship pilot [destination]
@@ -246,12 +243,12 @@ public class HorizonCommandParser implements CommandExecutor
 				}
 				
 				try {
-					ship.moveShip(player, args[1]);
+					shipHandler.moveShip(player, args[1]);
 				} catch (DataException | IOException e) {
 					player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Adminstrator.");
 					e.printStackTrace();
 				} catch (MaxChangedBlocksException e) {
-					player.sendMessage(ChatColor.RED + "ShipHandler too large!");
+					player.sendMessage(ChatColor.RED + "Ship too large!");
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
 					player.sendMessage(ChatColor.RED + e.getMessage());
@@ -282,8 +279,8 @@ public class HorizonCommandParser implements CommandExecutor
 					player = Bukkit.getPlayer(sender.getName());
 
 					try {
-						ship.createShip(arguments[0], player, arguments[1]);
-						player.sendMessage(ChatColor.YELLOW + "ShipHandler " + arguments[0] + " created!");
+						shipHandler.createShip(arguments[0], player, arguments[1]);
+						player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
 					} catch (DataException | IOException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
@@ -309,7 +306,7 @@ public class HorizonCommandParser implements CommandExecutor
 					}
 					
 					try {
-					ship.deleteShip(sender, confirmDelete.get(name));
+					shipHandler.deleteShip(sender, confirmDelete.get(name));
 					} catch (IllegalArgumentException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						return false;
@@ -320,7 +317,7 @@ public class HorizonCommandParser implements CommandExecutor
 						return false;
 					}
 					
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler deleted.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
 					confirmDelete.remove(name);
 					return true;
 				}
@@ -338,14 +335,14 @@ public class HorizonCommandParser implements CommandExecutor
 					player = Bukkit.getPlayer(sender.getName());
 					arguments = confirmDestination.get(name).split(" ");
 					try {
-						ship.testDestination(player, arguments[0], arguments[1]);
+						shipHandler.testDestination(player, arguments[0], arguments[1]);
 					} catch (DataException | IOException e) {
 						sender.sendMessage(ChatColor.RED + e.getMessage());
 						player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
 						e.printStackTrace();
 						return false;
 					} catch (MaxChangedBlocksException e) {
-						player.sendMessage(ChatColor.RED + "ShipHandler too large!");
+						player.sendMessage(ChatColor.RED + "Ship too large!");
 						e.printStackTrace();
 						return false;
 					} catch (NullPointerException | IllegalArgumentException e) {
@@ -353,7 +350,7 @@ public class HorizonCommandParser implements CommandExecutor
 						e.printStackTrace();
 					}
 					
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler pasted for reference. Adjust the destination of the ship using "
+					sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
 							+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
 							+ "'/ship confirm adjust'.");
 					
@@ -375,10 +372,10 @@ public class HorizonCommandParser implements CommandExecutor
 					//Add destination
 					player = Bukkit.getPlayer(sender.getName());
 					arguments = confirmAdjust.get(name).split(" ");
-					ship.addDestination(player, arguments[0], arguments[1]);
+					shipHandler.addDestination(player, arguments[0], arguments[1]);
 					confirmAdjust.remove(name);
 
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler destination created.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
 				}
 			}
 			
@@ -388,29 +385,29 @@ public class HorizonCommandParser implements CommandExecutor
 				if (confirmCreate.containsKey(name))
 				{
 					confirmCreate.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler creation cancelled.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
 					return true;
 				}
 				
 				if (confirmDelete.containsKey(name))
 				{
 					confirmDelete.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler deletion cancelled.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship deletion cancelled.");
 					return true;
 				}
 				
 				if (confirmDestination.containsKey(name))
 				{
 					confirmDestination.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler destination cancelled.");
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
 				}
 				
 				if (confirmAdjust.containsKey(name))
 				{
 					confirmAdjust.remove(name);
-					ship.cancelDestination(name);
-					sender.sendMessage(ChatColor.YELLOW + "ShipHandler destination cancelled.");
+					shipHandler.cancelDestination(name);
+					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
 					return true;
 				}
 				
@@ -500,7 +497,7 @@ public class HorizonCommandParser implements CommandExecutor
 			{
 				if (confirmAdjust.containsKey(sender.getName()))
 				{
-					ship.cancelDestination(sender.getName());
+					shipHandler.cancelDestination(sender.getName());
 					confirmAdjust.remove(sender.getName());
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}

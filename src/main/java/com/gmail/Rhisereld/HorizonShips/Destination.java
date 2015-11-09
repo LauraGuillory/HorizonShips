@@ -8,9 +8,6 @@ import org.bukkit.Location;
 /**
  * This class contains all the information pertaining to a single destination.
  * A ship always has one or more destinations.
- * 
- * @author Laura
- *
  */
 public class Destination 
 {
