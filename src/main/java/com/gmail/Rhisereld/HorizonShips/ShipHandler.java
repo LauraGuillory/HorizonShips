@@ -284,7 +284,7 @@ public class ShipHandler
 		teleportPlayers(ship, newDestination.getLocation());
 
 		//Erase old location
-		sm.eraseArea(currentDestination.getLocation(), newDestination.getLocation());
+		sm.eraseArea(currentDestination.getLocation(), currentDestination.getLocation().add(ship.getLength(), ship.getHeight(), ship.getWidth()));
 
 		//Reduce fuel by one
 		ship.reduceFuel();
@@ -317,7 +317,7 @@ public class ShipHandler
 			ships.add(new Ship(data, ss));
 				
 		for (Ship s: ships)
-		{		
+		{
 			Set<Player> playersInside = getPlayersInsideRegion(s);
 			if (playersInside.contains(player))
 				return s;		
@@ -366,13 +366,25 @@ public class ShipHandler
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		Set<Player> playersInside = new HashSet<Player>();
 		Location location = ship.getCurrentDestination().getLocation();
+		
+		Bukkit.getLogger().info(ship.getName());
+		Bukkit.getLogger().info(ship.getCurrentDestination().getLocation().getWorld().getName());
+		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockX()));
+		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockY()));
+		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockZ()));
+		Bukkit.getLogger().info(Integer.toString(ship.getLength()));
+		Bukkit.getLogger().info(Integer.toString(ship.getHeight()));
+		Bukkit.getLogger().info(Integer.toString(ship.getWidth()));
 
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(location.getWorld())
-					&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + ship.getLength()
-					&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + ship.getHeight()
-					&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + ship.getWidth())
+					&& p.getLocation().getBlockX() >= location.getBlockX() && p.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
+					&& p.getLocation().getBlockY() >= location.getBlockY() && p.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
+					&& p.getLocation().getBlockZ() >= location.getBlockZ() && p.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
 				playersInside.add(p);
+		
+		for (Player p: playersInside)
+			Bukkit.getLogger().info(p.getName());
 
 		return playersInside;
 	}

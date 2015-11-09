@@ -45,13 +45,17 @@ public class Ship
 		
 		this.data = data;
 		this.name = name;
-		this.currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
-		this.destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
-		this.fuel = data.getConfig().getInt(path + "fuel");
-		this.broken = data.getConfig().getBoolean(path + "broken");
-		this.repairItem = data.getConfig().getString(path + "partRequired");
-		this.consumePart = data.getConfig().getBoolean(path + consumePart);
-		this.pilots = data.getConfig().getStringList(path + "pilots");
+		currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
+		destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
+		fuel = data.getConfig().getInt(path + "fuel");
+		broken = data.getConfig().getBoolean(path + "broken");
+		repairItem = data.getConfig().getString(path + "partRequired");
+		consumePart = data.getConfig().getBoolean(path + consumePart);
+		pilots = data.getConfig().getStringList(path + "pilots");
+		length = data.getConfig().getInt(path + "length");
+		width = data.getConfig().getInt(path + "width");
+		height = data.getConfig().getInt(path + "height");
+		
 	}
 
 	/**
