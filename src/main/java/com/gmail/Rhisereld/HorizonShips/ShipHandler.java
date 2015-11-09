@@ -253,6 +253,8 @@ public class ShipHandler
 		if (ship == null)
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
+		Bukkit.getLogger().info(ship.getName());
+		
 		//Make sure the player is a permitted pilot
 		if (!ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.ship.move"))
 			throw new IllegalArgumentException("You don't have permission to pilot this ship.");
@@ -271,20 +273,24 @@ public class ShipHandler
 		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		Destination currentDestination = ship.getCurrentDestination();
-		Location loc2 = currentDestination.getLocation().add(ship.getLength(), ship.getWidth(), ship.getHeight());
-		sm.saveSchematic(currentDestination.getLocation(), loc2, ship + "\\", "ship");
+		Location currentLocation = ship.getCurrentDestination().getLocation();
+		Location loc2 = new Location(currentLocation.getWorld(), 
+				currentLocation.getBlockX() + ship.getLength(), 
+				currentLocation.getBlockY() + ship.getHeight(), 
+				currentLocation.getBlockZ() + ship.getWidth());
+		
+		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\", "ship");
 
 		//Paste schematic at new location
 		Destination newDestination = ship.getDestination(destination);
 		sm = new SchematicManager(newDestination.getLocation().getWorld());		//Each schematic manager may only apply to one world.
-		sm.loadSchematic(newDestination.getLocation(), ship + "\\", "ship");
+		sm.loadSchematic(newDestination.getLocation(), ship.getName() + "\\", "ship");
 
 		//Teleport all players from old to new location
 		teleportPlayers(ship, newDestination.getLocation());
 
 		//Erase old location
-		sm.eraseArea(currentDestination.getLocation(), currentDestination.getLocation().add(ship.getLength(), ship.getHeight(), ship.getWidth()));
+		sm.eraseArea(currentLocation, loc2);
 
 		//Reduce fuel by one
 		ship.reduceFuel();
@@ -319,8 +325,9 @@ public class ShipHandler
 		for (Ship s: ships)
 		{
 			Set<Player> playersInside = getPlayersInsideRegion(s);
-			if (playersInside.contains(player))
-				return s;		
+			for (Player p: playersInside)
+				if (p.equals(player))
+					return s;
 		}
 
 		return null;
@@ -366,15 +373,6 @@ public class ShipHandler
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		Set<Player> playersInside = new HashSet<Player>();
 		Location location = ship.getCurrentDestination().getLocation();
-		
-		Bukkit.getLogger().info(ship.getName());
-		Bukkit.getLogger().info(ship.getCurrentDestination().getLocation().getWorld().getName());
-		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockX()));
-		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockY()));
-		Bukkit.getLogger().info(Integer.toString(ship.getCurrentDestination().getLocation().getBlockZ()));
-		Bukkit.getLogger().info(Integer.toString(ship.getLength()));
-		Bukkit.getLogger().info(Integer.toString(ship.getHeight()));
-		Bukkit.getLogger().info(Integer.toString(ship.getWidth()));
 
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(location.getWorld())
@@ -382,9 +380,6 @@ public class ShipHandler
 					&& p.getLocation().getBlockY() >= location.getBlockY() && p.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
 					&& p.getLocation().getBlockZ() >= location.getBlockZ() && p.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
 				playersInside.add(p);
-		
-		for (Player p: playersInside)
-			Bukkit.getLogger().info(p.getName());
 
 		return playersInside;
 	}
