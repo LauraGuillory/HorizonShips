@@ -29,7 +29,6 @@ public class SchematicManager
 	private final WorldEditPlugin wep;
 	private final WorldEdit worldEdit;
 	private final EditSession editSession;
-
 	/**
 	 * Constructor: Creates a SchematicManager object that contains an EditSession detailing all the changes that have been made.
 	 * 				The object can be retained for purposes of undoing/redoing.
@@ -40,7 +39,7 @@ public class SchematicManager
 	 */
 	public SchematicManager(World world)
 	{
-    	wep = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+		wep = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
 		worldEdit = wep.getWorldEdit();
 		editSession = worldEdit.getEditSessionFactory().getEditSession(new BukkitWorld(world), 10000000);
 	}
@@ -147,6 +146,17 @@ public class SchematicManager
 		//Load schematic into clipboard.
 		MCEditSchematicFormat.MCEDIT.load(file).paste(editSession, origin, true, true);
 		editSession.flushQueue();
+	}
+	
+	//TODO
+	public void deleteSchematic(String path, String name)
+	{
+		File file = new File("plugins\\HorizonShips\\schematics\\" + path + name + ".schematic");
+		file.delete();
+		
+		//Delete directory
+		file = new File("plugins\\HorizonShips\\schematics\\" + name);
+		file.delete();	
 	}
 	
 	/**
@@ -264,11 +274,10 @@ public class SchematicManager
 	/**
 	 * eraseArea() sets all of the blocks inside the region defined by two locations to air.
 	 * 
-	 * @param world
 	 * @param loc1
 	 * @param loc2
 	 */
-	public void eraseArea(World world, Location loc1, Location loc2)
+	public void eraseArea(Location loc1, Location loc2)
 	{
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);
@@ -276,6 +285,6 @@ public class SchematicManager
 		for (int x = (int) min.getX(); x <= max.getX(); x++)
 			for (int y = (int) min.getY(); y <= max.getY(); y++)
 				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
-					world.getBlockAt(x, y, z).setType(Material.AIR);
+					loc1.getWorld().getBlockAt(x, y, z).setType(Material.AIR);
 	}
 }
