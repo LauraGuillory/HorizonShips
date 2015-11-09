@@ -1,18 +1,14 @@
 package com.gmail.Rhisereld.HorizonShips;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -53,6 +49,7 @@ public class ShipHandler
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
+	@SuppressWarnings("unused")
 	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
@@ -66,27 +63,11 @@ public class ShipHandler
 		
 		Location min = s.getMinimumPoint();
 		Location max = s.getMaximumPoint();
-		double length = max.getX() - min.getX();
-		double width = max.getZ() - min.getZ();
-		double height = max.getY() - min.getY();
-
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", min.getWorld().getName());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", min.getX());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", min.getY());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", min.getZ());
-		data.getConfig().set("ships." + shipName + ".currentDestination", destinationName);
-		data.getConfig().set("ships." + shipName + ".fuel", 0);
-		data.getConfig().set("ships." + shipName + ".broken", false);
-		data.getConfig().set("ships." + shipName + ".partRequired", null);
-		data.getConfig().set("ships." + shipName + ".consumePart", false);
-		data.getConfig().set("ships." + shipName + ".pilots", new ArrayList<String>());
-		data.getConfig().set("ships." + shipName + ".length", length);
-		data.getConfig().set("ships." + shipName + ".width", width);
-		data.getConfig().set("ships." + shipName + ".height", height);
-
-		data.saveConfig();
-
-		sm.saveSchematic(s, "ship", shipName + "\\");
+		int length = max.getBlockX() - min.getBlockX();
+		int width = max.getBlockZ() - min.getBlockZ();
+		int height = max.getBlockY() - min.getBlockY();
+		
+		Ship ship = new Ship(data, shipName, destinationName, s, min, length, width, height);
 	}
 
 	/**
@@ -113,19 +94,8 @@ public class ShipHandler
 			throw new IllegalArgumentException("You don't have permission to delete that ship.");
 		
 		//Delete all information on the ship.
-		data.getConfig().getConfigurationSection("ships.").set(shipName, null);
-		data.saveConfig();
-		
-		//Delete ship schematic
-		File file = new File(plugin.getDataFolder() + "\\schematics\\" + shipName + "\\ship.schematic");
-		file.delete();
-		
-		//Delete all dock schematics
-		//TODO: When dock schematics are implemented.
-		
-		//Delete directory
-		file = new File(plugin.getDataFolder() + "\\schematics\\" + shipName);
-		file.delete();	
+		Ship ship = new Ship(data, shipName);
+		ship.deleteShip();
 	}
 
 	/**
@@ -233,14 +203,9 @@ public class ShipHandler
 	public void addDestination(Player player, String shipName, String destinationName)
 	{
 		SchematicManager sm = schemManagers.get(player.getName());
-		destinationName = destinationName.toLowerCase();
-		
-		//Save all the information about the new destination.
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", sm.getPlayerSelection(player).getWorld().getName());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", sm.getPlayerSelection(player).getMinimumPoint().getX());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", sm.getPlayerSelection(player).getMinimumPoint().getY());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", sm.getPlayerSelection(player).getMinimumPoint().getZ());
-		data.saveConfig();
+
+		Ship ship = new Ship(data, shipName);
+		ship.addDestination(destinationName, sm.getPlayerSelection(player).getMinimumPoint());
 		
 		//Undo paste.
 		sm.undoSession();
@@ -287,86 +252,54 @@ public class ShipHandler
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{		
 		//Determine the ship the player is trying to pilot.
-		String ship = findCurrentShip(player);
+		Ship ship = findCurrentShip(player);
 		if (ship == null)
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Make sure the player is a permitted pilot
-		List <String> pilots = data.getConfig().getStringList("ships." + ship + ".pilots");
-		boolean isPilot = false;
-		
-		for (String p : pilots)
-			if (player.getUniqueId().toString().equalsIgnoreCase(p))
-				isPilot = true;
-		
-		if (!isPilot && !player.hasPermission("horizonships.admin.ship.move"))
+		if (!ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.ship.move"))
 			throw new IllegalArgumentException("You don't have permission to pilot this ship.");
 		
 		//Make sure the ship isn't broken
-		if (data.getConfig().getBoolean("ships." + ship + ".broken"))
+		if (ship.isBroken())
 			throw new IllegalArgumentException("The ship has broken down.");
 		
 		//Make sure the ship has enough fuel
-		if (data.getConfig().getInt("ships." + ship + ".fuel") == 0)
+		if (ship.getFuel() == 0)
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
-		//Make sure the destination is valid.
-		boolean destinationExists = false;
-		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + ship + ".destinations").getKeys(false);
-		
-		for (String d: destinations)
-			if (d.equalsIgnoreCase(destination))
-			{
-				destination = d;	//configuration fetching is case sensitive - use string from config for case insensitivity
-				destinationExists = true;
-			}
-		
-		if (!destinationExists)
+		//Make sure the destination is valid.		
+		if (ship.getDestination(destination) == null)
 			throw new IllegalArgumentException("That destination does not exist.");
 		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		String currentDestination = data.getConfig().getString("ships." + ship + ".currentDestination");
-		World world = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + currentDestination + ".world"));
-		double xHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".x");
-		double yHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".y");
-		double zHere = data.getConfig().getDouble("ships." + ship + ".destinations."  + currentDestination + ".z");
-		Location loc1 = new Location(world, xHere, yHere, zHere);
-		
-		int length = data.getConfig().getInt("ships." + ship + ".length");
-		int width = data.getConfig().getInt("ships." + ship + ".width");
-		int height = data.getConfig().getInt("ships." + ship + ".height");
-		Location loc2 = new Location(world, xHere + length, yHere + height, zHere + width);
+		Destination currentDestination = ship.getCurrentDestination();
+		Location loc2 = currentDestination.getLocation().add(ship.getLength(), ship.getWidth(), ship.getHeight());
+		sm.saveSchematic(currentDestination.getLocation(), loc2, "ship", ship + "\\");
 
-		sm.saveSchematic(loc1, loc2, "ship", ship + "\\");
-
-		//Paste schematic at new location		
-		World newWorld = Bukkit.getWorld(data.getConfig().getString("ships." + ship + ".destinations." + destination + ".world"));
-		double xThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".x");
-		double yThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".y");
-		double zThere = data.getConfig().getDouble("ships." + ship + ".destinations."  + destination + ".z");
-		Location newLoc = new Location(newWorld, xThere, yThere, zThere);
-		sm = new SchematicManager(newWorld);		//Each schematic manager may only apply to one world.
-		sm.loadSchematic(newLoc, ship + "\\", "ship");
+		//Paste schematic at new location
+		Destination newDestination = ship.getDestination(destination);
+		sm = new SchematicManager(newDestination.getLocation().getWorld());		//Each schematic manager may only apply to one world.
+		sm.loadSchematic(newDestination.getLocation(), ship + "\\", "ship");
 
 		//Teleport all players from old to new location
-		teleportPlayers(loc1, newLoc, length, width, height);
+		teleportPlayers(ship, newDestination.getLocation());
 
 		//Erase old location
-		sm.eraseArea(world, loc1, loc2);
+		sm.eraseArea(currentDestination.getLocation(), newDestination.getLocation());
 
 		//Reduce fuel by one
-		data.getConfig().set("ships." + ship + ".fuel", data.getConfig().getInt("ships." + ship + ".fuel") - 1);
+		ship.reduceFuel();
 
 		//Change current destination
-		data.getConfig().set("ships." + ship + ".currentDestination", destination);
-		data.saveConfig();
+		ship.setCurrentDestination(destination);
 		
 		//Event trigger
 		ShipEvent shipEvent = new ShipEvent(config, data);
 		shipEvent.chooseEvent();
-		String message = shipEvent.trigger(player, ship, newLoc, length, width, height);
-		Set<Player> playersToNotify = getPlayersInsideRegion(newLoc, length, width, height);
+		String message = shipEvent.trigger(player, ship);
+		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
 	}
@@ -378,36 +311,22 @@ public class ShipHandler
 	 * @param player
 	 * @return
 	 */
-	private String findCurrentShip(Player player)
+	private Ship findCurrentShip(Player player)
 	{
-		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
-		World world;
-		int x;
-		int y;
-		int z;
-		int length;
-		int width;
-		int height;
-		String currentDestination;
-		String ship = null;
+		Set<String> shipStrings = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		Set<Ship> ships = new HashSet<Ship>();
+		
+		for (String ss: shipStrings)
+			ships.add(new Ship(data, ss));
 				
-		for (String s: ships)
+		for (Ship s: ships)
 		{		
-			currentDestination = data.getConfig().getString("ships." + s + ".currentDestination");
-			world = Bukkit.getWorld(data.getConfig().getString("ships." + s + ".destinations." + currentDestination + ".world"));
-			x = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".x");
-			y = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".y");
-			z = data.getConfig().getInt("ships." + s + ".destinations." + currentDestination + ".z");
-			length = data.getConfig().getInt("ships." + s + ".length");
-			width = data.getConfig().getInt("ships." + s + ".width");
-			height = data.getConfig().getInt("ships." + s + ".height");
-
-			Set<Player> playersInside = getPlayersInsideRegion(new Location(world, x, y, z), length, width, height);
+			Set<Player> playersInside = getPlayersInsideRegion(s);
 			if (playersInside.contains(player))
-				ship = s;		
+				return s;		
 		}
 
-		return ship;
+		return null;
 	}
 	
 	/**
@@ -420,9 +339,10 @@ public class ShipHandler
 	 * @param width
 	 * @param height
 	 */
-	private void teleportPlayers(Location oldLocation, Location newLocation, int length, int width, int height)
+	private void teleportPlayers(Ship ship, Location newLocation)
 	{
-		Set<Player> playersInside = getPlayersInsideRegion(oldLocation, length, width, height);
+		Location oldLocation = ship.getCurrentDestination().getLocation();
+		Set<Player> playersInside = getPlayersInsideRegion(ship);
 		
 		for (Player p: playersInside)
 			//Determine new player location based on existing offset to ship location.			
@@ -444,16 +364,17 @@ public class ShipHandler
 	 * @param height
 	 * @return
 	 */
-	private Set<Player> getPlayersInsideRegion(Location location, int length, int width, int height)
+	private Set<Player> getPlayersInsideRegion(Ship ship)
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		Set<Player> playersInside = new HashSet<Player>();
+		Location location = ship.getCurrentDestination().getLocation();
 
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(location.getWorld())
-					&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + length
-					&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + height
-					&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + width)
+					&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + ship.getLength()
+					&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + ship.getHeight()
+					&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + ship.getWidth())
 				playersInside.add(p);
 
 		return playersInside;
