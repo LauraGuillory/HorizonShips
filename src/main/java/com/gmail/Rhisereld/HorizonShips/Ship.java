@@ -7,11 +7,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 
+/**
+ * This class contains all the information pertaining to a ship. It is controlled by a ShipHandler
+ * and always has one or more Destinations.
+ */
 @SuppressWarnings("deprecation")
 public class Ship 
 {
@@ -21,13 +24,19 @@ public class Ship
 	private Set<String> destinations;
 	private int fuel;
 	private boolean broken;
-	private Material partRequired;
+	private String repairItem;
 	private boolean consumePart;
 	private List<String> pilots;
 	private int length;
 	private int width;
 	private int height;
 	
+	/**
+	 * Constructor for fetching an existing ship from the data file.
+	 * 
+	 * @param data
+	 * @param name
+	 */
 	public Ship(ConfigAccessor data, String name)
 	{
 		String path = "ships." + name + ".";
@@ -38,11 +47,25 @@ public class Ship
 		this.destinations = data.getConfig().getConfigurationSection(path + "destinations.").getKeys(false);
 		this.fuel = data.getConfig().getInt(path + "fuel");
 		this.broken = data.getConfig().getBoolean(path + "broken");
-		this.partRequired = Material.getMaterial(data.getConfig().getString(path + "partRequired"));
+		this.repairItem = data.getConfig().getString(path + "partRequired");
 		this.consumePart = data.getConfig().getBoolean(path + consumePart);
 		this.pilots = data.getConfig().getStringList(path + "pilots");
 	}
 	
+	/**
+	 * Constructor for creating an entirely new ship.
+	 * 
+	 * @param data
+	 * @param name
+	 * @param destinationName
+	 * @param selection
+	 * @param location
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @throws DataException
+	 * @throws IOException
+	 */
 	public Ship(ConfigAccessor data, String name, String destinationName, Selection selection, Location location, int length, int width, int height) throws DataException, IOException
 	{
 		this.data = data;
@@ -69,6 +92,10 @@ public class Ship
 		sm.saveSchematic(selection, "ship", name + "\\");
 	}
 	
+	/**
+	 * deleteShip() removes all the information about the ship and its destinations.
+	 * The instance or its destinations should NOT continue to be used after this is called.
+	 */
 	public void deleteShip()
 	{
 		data.getConfig().getConfigurationSection("ships.").set(name, null);
@@ -79,26 +106,61 @@ public class Ship
 		sm.deleteSchematic(name, "ship");
 	}
 	
+	/**
+	 * getDestination() attempts to return a Destination object identified by its string name.
+	 * Not case sensitive. Returns null upon fail.
+	 * 
+	 * @param destinationName
+	 * @return
+	 */
 	public Destination getDestination(String destinationName)
 	{
 		return new Destination(data, name, destinationName);
 	}
 	
-	public void addDestination(String destinationName, Location location)
+	/**
+	 * addDestination() creates, saves and returns a new destination.
+	 * 
+	 * @param destinationName
+	 * @param location
+	 */
+	public Destination addDestination(String destinationName, Location location)
 	{
-		new Destination(data, name, destinationName, location);
+		return new Destination(data, name, destinationName, location);
 	}
 	
+	/**
+	 * getCurrentDestination() returns the current destination.
+	 * 
+	 * @return
+	 */
 	public Destination getCurrentDestination()
 	{
 		return currentDestination;
 	}
 	
-	public void setCurrentDestination(String destination)
+	/**
+	 * setCurrentDestination() attempts to fetch the destination by string name, and sets the current
+	 * destination to the destination fetched.
+	 * Not case sensitive.
+	 * Returns false upon fail.
+	 * 
+	 * @param destination
+	 */
+	public boolean setCurrentDestination(String destination)
 	{
 		currentDestination = new Destination(data, name, destination);
+		if (currentDestination == null)
+			return false;
+		return true;
 	}
 	
+	/**
+	 * isPilot() checks if the Player provided is allowed to pilot the ship.
+	 * 
+	 * @param player
+	 * @return
+	 */
 	public boolean isPilot(UUID player)
 	{
 		List <String> pilots = data.getConfig().getStringList("ships." + name + ".pilots");
@@ -109,63 +171,119 @@ public class Ship
 		return false;
 	}
 	
+	/**
+	 * isBroken() returns true if the ship is broken, false otherwise.
+	 * 
+	 * @return
+	 */
 	public boolean isBroken()
 	{
 		return broken;
 	}
 	
+	/**
+	 * setBroken() sets the broken status of the ship.
+	 * 
+	 * @param broken
+	 */
 	public void setBroken(boolean broken)
 	{
 		data.getConfig().set("ships." + name + ".broken", broken);
 		data.saveConfig();
 	}
-	
-	public int getFuel()
-	{
-		return fuel;
-	}
 
-	
+	/**
+	 * getLength() returns the length of the ship.
+	 * 
+	 * @return
+	 */
 	public int getLength()
 	{
 		return length;
 	}
 	
+	/**
+	 * getWidth() returns the width of the ship.
+	 * 
+	 * @return
+	 */
 	public int getWidth()
 	{
 		return width;
 	}
 	
+	/**
+	 * getHeight() returns the height of the ship.
+	 * 
+	 * @return
+	 */
 	public int getHeight()
 	{
 		return height;
 	}
 	
+	/**
+	 * getFuel() returns the fuel level of the ship.
+	 * 
+	 * @return
+	 */
+	public int getFuel()
+	{
+		return fuel;
+	}
+	
+	/**
+	 * setFuel() sets the fuel level of the ship.
+	 * 
+	 * @param fuel
+	 */
 	public void setFuel(int fuel)
 	{
 		data.getConfig().set("ships." + name + ".fuel", fuel);
 		data.saveConfig();
 	}
 	
+	/**
+	 * reduceFuel() reduces the fuel level by one.
+	 * 
+	 */
 	public void reduceFuel()
 	{
-		data.getConfig().set("ships." + name + ".fuel",fuel - 1);
+		data.getConfig().set("ships." + name + ".fuel", --fuel);
 		data.saveConfig();
 	}
 	
+	/**
+	 * getName() returns the name of the ship.
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return name;
 	}
 	
+	/**
+	 * setRepairItem() sets the item required to repair the ship.
+	 * 
+	 * @param item
+	 */
 	public void setRepairItem(String item)
 	{
+		this.repairItem = item;
 		data.getConfig().set("ships." + name + ".repairItem", item);
 		data.saveConfig();
 	}
 	
+	/**
+	 * setConsumePart() sets whether the item required to repair the ship is
+	 * consumed upon repair.
+	 * 
+	 * @param consumePart
+	 */
 	public void setConsumePart(boolean consumePart)
 	{
+		this.consumePart = consumePart;
 		data.getConfig().set("ships." + name + ".consumePart", consumePart);
 		data.saveConfig();
 	}
