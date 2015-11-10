@@ -106,7 +106,7 @@ public class ShipEvent
 		if (randomDoub < injuryChances.get(pilotSkill-1))
 		{
 			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + " expertly manouevres"
-					 + " the ship through the storm, and the tremors fade away.";
+					 + " the ship through the storm, and the tremors fade away."; //TODO: text color not maintained throughout string.
 		}
 		//If yes,
 		else 

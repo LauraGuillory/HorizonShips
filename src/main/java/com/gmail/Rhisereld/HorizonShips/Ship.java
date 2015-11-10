@@ -49,7 +49,7 @@ public class Ship
 		destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
 		fuel = data.getConfig().getInt(path + "fuel");
 		broken = data.getConfig().getBoolean(path + "broken");
-		repairItem = data.getConfig().getString(path + "partRequired");
+		repairItem = data.getConfig().getString(path + "repairItem");
 		consumePart = data.getConfig().getBoolean(path + consumePart);
 		pilots = data.getConfig().getStringList(path + "pilots");
 		length = data.getConfig().getInt(path + "length");
@@ -276,6 +276,16 @@ public class Ship
 	}
 	
 	/**
+	 * getRepairItem() returns the item required to repair the ship.
+	 * 
+	 * @return
+	 */
+	public String getRepairItem()
+	{
+		return repairItem;
+	}
+	
+	/**
 	 * setRepairItem() sets the item required to repair the ship.
 	 * 
 	 * @param item
@@ -285,6 +295,18 @@ public class Ship
 		this.repairItem = item;
 		data.getConfig().set("ships." + name + ".repairItem", item);
 		data.saveConfig();
+	}
+	
+	/**
+	 * getConsumePart() returns whether the item required to repair the ship
+	 * is confumsed upon repair
+	 * @return 
+	 * 
+	 * @return
+	 */
+	public boolean getConsumePart()
+	{
+		return consumePart;
 	}
 	
 	/**

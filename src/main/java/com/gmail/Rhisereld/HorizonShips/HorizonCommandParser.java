@@ -256,6 +256,37 @@ public class HorizonCommandParser implements CommandExecutor
 				
 			}
 			
+			//ship diagnose
+			if (args[0].equalsIgnoreCase("diagnose"))
+			{
+				if (args.length != 1)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship diagnose");
+				}
+				
+				//Check that the sender is a player
+				if (sender instanceof Player)
+					player = Bukkit.getPlayer(sender.getName());
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					return false;
+				}
+				
+				//Check that the player has permission
+				if (!player.hasPermission("horizonships.diagnose"))
+				{
+					sender.sendMessage("You don't have permission to diagnose a ship.");
+					return false;
+				}
+				
+				try {
+					shipHandler.diagnose(player);
+				} catch (IllegalArgumentException e) {
+					player.sendMessage(ChatColor.RED + e.getMessage());
+				}
+			}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{

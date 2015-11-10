@@ -1,6 +1,7 @@
 package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -247,13 +248,11 @@ public class ShipHandler
 	 * @throws IllegalArgumentException
 	 */
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
-	{		
+	{		//TODO: should not allow current destination
 		//Determine the ship the player is trying to pilot.
 		Ship ship = findCurrentShip(player);
 		if (ship == null)
 			throw new IllegalArgumentException("You are not inside a ship.");
-		
-		Bukkit.getLogger().info(ship.getName());
 		
 		//Make sure the player is a permitted pilot
 		if (!ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.ship.move"))
@@ -305,6 +304,44 @@ public class ShipHandler
 		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
+	}
+	
+	/**
+	 * diagnose() reveals to the player which item is required to fix a broken ship.
+	 * 
+	 * @param player
+	 */
+	public void diagnose(Player player) throws IllegalArgumentException
+	{
+		//Determine the ship the player is trying to diagnose.
+		Ship ship = findCurrentShip(player);
+		if (ship == null)
+			throw new IllegalArgumentException("You are not inside a ship.");
+		
+		//Check that the ship is actually broken down.
+		if (!ship.isBroken())
+			throw new IllegalArgumentException("The ship is functioning perfectly.");
+		
+		//Get required item
+		String repairItem = ship.getRepairItem();
+		
+		//Use custom name for item.
+		Boolean consumePart = ship.getConsumePart();
+		if (consumePart)
+			repairItem = config.getConfig().getString("events.breakdown.spareParts." + repairItem + ".name", repairItem);
+		else
+			repairItem = config.getConfig().getString("events.breakdown.tools." + repairItem + ".name", repairItem);
+		
+		String article;
+		Set<Character> vowels = new HashSet<Character>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
+
+		if(vowels.contains(Character.toLowerCase(repairItem.charAt(0)))) 
+			article = "an ";
+		else
+			article = "a ";
+
+		//Notify
+		player.sendMessage(ChatColor.YELLOW + "To repair this ship, you need " + article + repairItem + ".");
 	}
 	
 	/**
