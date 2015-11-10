@@ -10,6 +10,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -342,6 +343,39 @@ public class ShipHandler
 
 		//Notify
 		player.sendMessage(ChatColor.YELLOW + "To repair this ship, you need " + article + repairItem + ".");
+	}
+	
+	public void repair(Player player)
+	{
+		//Determine the ship the player is trying to repair.
+		Ship ship = findCurrentShip(player);
+		if (ship == null)
+			throw new IllegalArgumentException("You are not inside a ship.");
+				
+		//Check that the ship is actually broken down.
+		if (!ship.isBroken())
+			throw new IllegalArgumentException("The ship is already fully functional.");
+				
+		//Get required item
+		String repairItem = ship.getRepairItem();
+		Material repairItemMaterial = Material.matchMaterial(repairItem);
+		
+		//Check player is holding the correct item.
+		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial))
+			throw new IllegalArgumentException("You don't have the correct item.");
+		
+		//If they are, remove one of that item.
+		int numItemsInHand = player.getItemInHand().getAmount();
+		if (numItemsInHand <= 1)
+			player.setItemInHand(null);
+		else
+			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+		
+		//Repair the ship
+		ship.setBroken(false);
+		
+		//Notify
+		player.sendMessage(ChatColor.YELLOW + "You repaired the ship.");
 	}
 	
 	/**

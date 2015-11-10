@@ -262,6 +262,7 @@ public class HorizonCommandParser implements CommandExecutor
 				if (args.length != 1)
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship diagnose");
+					return false;
 				}
 				
 				//Check that the sender is a player
@@ -285,6 +286,38 @@ public class HorizonCommandParser implements CommandExecutor
 				} catch (IllegalArgumentException e) {
 					player.sendMessage(ChatColor.RED + e.getMessage());
 				}
+			}
+			
+			//ship repair
+			if (args[0].equalsIgnoreCase("repair"))
+			{
+				if (args.length != 1)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship repair");
+					return false;
+				}
+				
+				//Check that the sender is a player
+				if (sender instanceof Player)
+					player = Bukkit.getPlayer(sender.getName());
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					return false;
+				}
+				
+				//Check that the player has permission
+				if (!player.hasPermission("horizonships.repair"))
+				{
+					sender.sendMessage("You don't have permission to repair a ship.");
+					return false;
+				}
+				
+				try {
+					shipHandler.repair(player);
+				} catch (IllegalArgumentException e) {
+					player.sendMessage(ChatColor.RED + e.getMessage());
+				}	
 			}
 			
 			//ship confirm
