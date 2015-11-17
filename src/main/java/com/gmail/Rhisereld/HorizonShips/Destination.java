@@ -75,7 +75,7 @@ public class Destination
 	 * 
 	 * @return
 	 */
-	public String getDestinationName()
+	public String getName()
 	{
 		return destinationName;
 	}

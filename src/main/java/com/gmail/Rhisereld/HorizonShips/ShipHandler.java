@@ -13,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -249,11 +251,15 @@ public class ShipHandler
 	 * @throws IllegalArgumentException
 	 */
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
-	{		//TODO: should not allow current destination
+	{
 		//Determine the ship the player is trying to pilot.
 		Ship ship = findCurrentShip(player);
 		if (ship == null)
 			throw new IllegalArgumentException("You are not inside a ship.");
+		
+		//Make sure they are not trying to fly to the current destination
+		if (ship.getCurrentDestination().getName().equalsIgnoreCase(destination))
+			throw new IllegalArgumentException("You are already at that destination!");
 		
 		//Make sure the player is a permitted pilot
 		if (!ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.ship.move"))
