@@ -54,9 +54,11 @@ public class HorizonCommandParser implements CommandExecutor
 		//All commands that fall under /ship [additional arguments]
 		if (commandLabel.equalsIgnoreCase("ship"))
 		{
-			//ship test - used for testing during development.
-			if (args[0].equalsIgnoreCase("test"))
+			//ship
+			if (args.length <= 0)
 			{
+				showCommands(sender);
+				return true;
 			}
 			
 			//ship create [shipName] [destinationName]
@@ -97,7 +99,7 @@ public class HorizonCommandParser implements CommandExecutor
 			if (args[0].equalsIgnoreCase("delete"))
 			{
 				//Check the player has permission OR is the console
-				if (!sender.hasPermission("horizonships.admin.ship.create") && !(sender instanceof Player))
+				if (!sender.hasPermission("horizonships.admin.ship.delete") && !(sender instanceof Player))
 				{
 					sender.sendMessage(ChatColor.RED + "You don't have permission to delete a ship.");
 					return false;
@@ -138,7 +140,7 @@ public class HorizonCommandParser implements CommandExecutor
 					}
 					
 					//Check that the player has permission
-					if (!player.hasPermission("horizonships.admin.destination.create"))
+					if (!player.hasPermission("horizonships.admin.destination.add"))
 					{
 						sender.sendMessage("You don't have permission to create a destination.");
 						return false;
@@ -666,5 +668,57 @@ public class HorizonCommandParser implements CommandExecutor
 				}
 			}			
 		} , 6000);
+	}
+	
+	private void showCommands(CommandSender sender)
+	{
+		if (!(sender instanceof Player))
+			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
+		else
+			sender.sendMessage("--------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">--------------");
+		sender.sendMessage(ChatColor.GOLD + "Horizon Ships allows you to maintain and travel in ships!");
+		if (sender.hasPermission("horizonships.admin.ship.create"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship create [shipName] [destinationName]");
+			sender.sendMessage("Create a new ship at a starter destination, using your current WorldEdit selection.");
+		}
+		if (sender.hasPermission("horizonships.admin.ship.delete"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship delete [shipName]");
+			sender.sendMessage("Delete a ship.");
+		}
+		if (sender.hasPermission("horizonships.admin.destination.add"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship add destination [shipName] [destinationName]");
+			sender.sendMessage("Add a destination to the given ship, using your current WorldEdit selection.");
+		}
+		if (sender.hasPermission("horizonships.admin.destination.remove"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove [shipName] [destinationName]");
+			sender.sendMessage("Remove a destination from the given ship.");
+		}
+		if (sender.hasPermission("horizonships.list"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship list");
+			sender.sendMessage("Provides a list of all current ships.");
+		}
+		if (sender.hasPermission("horizonships.pilot"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship pilot [destination]");
+			sender.sendMessage("Pilot the ship that you are currently within to a destination of your choice.");
+		}
+		if (sender.hasPermission("horizonships.diagnose"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship diagnose");
+			sender.sendMessage("Examine the ship you are currently within to discover any mechanical defects.");
+		}
+		if (sender.hasPermission("horizonships.repair"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship diagnose");
+			sender.sendMessage("Use the item in your active hand to repair the ship.");
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "/ship cancel");
+		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
 	}
 }

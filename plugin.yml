@@ -6,3 +6,38 @@ softdepend: [Horizon_Professions]
 commands:
   ship:
     description: All Horizon Ships commands.
+    aliases: hs
+
+permissions:
+  horizonships.*:
+    description: Gives access to all Horizon Ships commands.
+    children:
+      horizonships.admin.ship.create: true
+      horizonships.admin.ship.delete: true
+      horizonships.admin.destination.add: true
+      horizonships.admin.destination.remove: true
+      horizonships.list: true
+      horizonships.pilot: true
+      horizonships.diagnose: true
+      horizonships.repair: true    
+    
+  horizonships.common:
+    description: Gives access to Horizon Ships for normal players.
+    children:
+      horizonships.list: true
+      horizonships.pilot: true
+      horizonships.diagnose: true
+      horizonships.repair: true
+    
+  horizonships.admin:
+    description: Gives access to all Horizon Ships commands for admins and normal players.
+    children:
+      horizonships.admin.ship.create: true
+      horizonships.admin.ship.delete: true
+      horizonships.admin.destination.add: true
+      horizonships.admin.destination.remove: true
+      horizonships.list: true
+      horizonships.pilot: true
+      horizonships.diagnose: true
+      horizonships.repair: true
+  
