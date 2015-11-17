@@ -672,12 +672,17 @@ public class HorizonCommandParser implements CommandExecutor
 	
 	private void showCommands(CommandSender sender)
 	{
-		if (!(sender instanceof Player))
+		Player player = null;
+		
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName()); //Some commands are not available to console - which is not a player
+		
+		if (player != null)
 			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
 		else
 			sender.sendMessage("--------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">--------------");
 		sender.sendMessage(ChatColor.GOLD + "Horizon Ships allows you to maintain and travel in ships!");
-		if (sender.hasPermission("horizonships.admin.ship.create"))
+		if (sender.hasPermission("horizonships.admin.ship.create") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship create [shipName] [destinationName]");
 			sender.sendMessage("Create a new ship at a starter destination, using your current WorldEdit selection.");
@@ -687,7 +692,7 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.YELLOW + "/ship delete [shipName]");
 			sender.sendMessage("Delete a ship.");
 		}
-		if (sender.hasPermission("horizonships.admin.destination.add"))
+		if (sender.hasPermission("horizonships.admin.destination.add") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship add destination [shipName] [destinationName]");
 			sender.sendMessage("Add a destination to the given ship, using your current WorldEdit selection.");
@@ -702,17 +707,17 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.YELLOW + "/ship list");
 			sender.sendMessage("Provides a list of all current ships.");
 		}
-		if (sender.hasPermission("horizonships.pilot"))
+		if (sender.hasPermission("horizonships.pilot") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship pilot [destination]");
 			sender.sendMessage("Pilot the ship that you are currently within to a destination of your choice.");
 		}
-		if (sender.hasPermission("horizonships.diagnose"))
+		if (sender.hasPermission("horizonships.diagnose") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship diagnose");
 			sender.sendMessage("Examine the ship you are currently within to discover any mechanical defects.");
 		}
-		if (sender.hasPermission("horizonships.repair"))
+		if (sender.hasPermission("horizonships.repair") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship diagnose");
 			sender.sendMessage("Use the item in your active hand to repair the ship.");
