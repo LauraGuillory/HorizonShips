@@ -139,6 +139,17 @@ public class Ship
 	}
 	
 	/**
+	 * removeDestination() removes the destination given and all its information from this ship.
+	 * 
+	 * @param destinationName
+	 */
+	public void removeDestination(String destinationName)
+	{
+		Destination destination = new Destination(data, name, destinationName);
+		destination.delete();
+	}
+	
+	/**
 	 * getCurrentDestination() returns the current destination.
 	 * 
 	 * @return

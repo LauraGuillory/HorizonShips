@@ -211,6 +211,18 @@ public class ShipHandler
 	}
 	
 	/**
+	 * removeDestination() removes the destination and all its information from the ship given.
+	 * 
+	 * @param shipName
+	 * @param destinationName
+	 */
+	public void removeDestination(String shipName, String destinationName)
+	{
+		Ship ship = new Ship(data, shipName);
+		ship.removeDestination(destinationName);
+	}
+	
+	/**
 	 * listShips() sends the sender a list of names of all the existing ships.
 	 * 
 	 * @param sender

@@ -11,6 +11,7 @@ import org.bukkit.Location;
  */
 public class Destination 
 {
+	private ConfigAccessor data;
 	private String shipName;
 	private String destinationName;
 	private Location location;
@@ -40,6 +41,7 @@ public class Destination
 		
 		this.shipName = shipName;
 		this.destinationName = destinationName;
+		this.data = data;
 		location = new Location(Bukkit.getWorld(data.getConfig().getString("ships." + shipName + ".destinations." + destinationName + ".world")),
 								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".x"),
 								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".y"),
@@ -59,11 +61,23 @@ public class Destination
 		this.shipName = shipName;
 		this.destinationName = destinationName;
 		this.location = location;
+		this.data = data;
 		
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", location.getWorld().getName());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
+		data.saveConfig();
+	}
+	
+	/**
+	 * delete() removes all information pertaining to this destination.
+	 * The instance should not continue to be used after this is called.
+	 * 
+	 */
+	public void delete()
+	{
+		data.getConfig().getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
 		data.saveConfig();
 	}
 	
