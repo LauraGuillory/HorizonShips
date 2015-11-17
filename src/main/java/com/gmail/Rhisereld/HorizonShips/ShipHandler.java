@@ -13,8 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.Plugin;
 
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -274,7 +272,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
 		//Make sure the destination is valid.		
-		if (ship.getDestination(destination) == null)
+		if (ship.getDestination(destination).getName() == null)
 			throw new IllegalArgumentException("That destination does not exist.");
 		
 		//Save schematic at current location

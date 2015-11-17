@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -105,8 +107,8 @@ public class ShipEvent
 		//If not, notify and exit
 		if (randomDoub < injuryChances.get(pilotSkill-1))
 		{
-			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + " expertly manouevres"
-					 + " the ship through the storm, and the tremors fade away."; //TODO: text color not maintained throughout string.
+			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + ChatColor.YELLOW + 
+					" expertly manouevres the ship through the storm, and the tremors fade away.";
 		}
 		//If yes,
 		else 
@@ -129,9 +131,9 @@ public class ShipEvent
 			playersOnShip.get(randomInt).setHealth(playersOnShip.get(randomInt).getHealth() - damage);
 			
 			//Notify
-			return "The ship creaks and shudders, battered with whorls of wind as " + player.getDisplayName() + " struggles to manouevre"
-			 + " the ship. Suddenly it lurches to one side, throwing everyone to the floor. " + playersOnShip.get(randomInt).getDisplayName()
-			 + " is injured!";
+			return "The ship creaks and shudders, battered with whorls of wind as " + player.getDisplayName() + ChatColor.YELLOW + 
+					" struggles to manouevre the ship. Suddenly it lurches to one side, throwing everyone to the floor. " 
+			+ playersOnShip.get(randomInt).getDisplayName() + ChatColor.YELLOW + " is injured!";
 		}
 	}
 	

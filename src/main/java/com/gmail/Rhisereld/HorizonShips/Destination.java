@@ -24,15 +24,22 @@ public class Destination
 	 */
 	public Destination(ConfigAccessor data, String shipName, String destinationName)
 	{
-		this.shipName = shipName;
-		this.destinationName = destinationName;
-		
 		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false);
+		
+		boolean foundDestination = false;
 		
 		for (String d: destinations)
 			if (d.equalsIgnoreCase(destinationName))
+			{
 				destinationName = d;	//configuration fetching is case sensitive - use string from config for case insensitivity
+				foundDestination = true;
+			}
 		
+		if (!foundDestination)
+			return;
+		
+		this.shipName = shipName;
+		this.destinationName = destinationName;
 		location = new Location(Bukkit.getWorld(data.getConfig().getString("ships." + shipName + ".destinations." + destinationName + ".world")),
 								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".x"),
 								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".y"),
