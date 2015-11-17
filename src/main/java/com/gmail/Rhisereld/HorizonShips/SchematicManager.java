@@ -148,7 +148,12 @@ public class SchematicManager
 		editSession.flushQueue();
 	}
 	
-	//TODO
+	/**
+	 * deleteSchematic() removes the schematic file and its parent directory.
+	 * 
+	 * @param path
+	 * @param name
+	 */
 	public void deleteSchematic(String path, String name)
 	{
 		File file = new File("plugins\\HorizonShips\\schematics\\" + path + name + ".schematic");
