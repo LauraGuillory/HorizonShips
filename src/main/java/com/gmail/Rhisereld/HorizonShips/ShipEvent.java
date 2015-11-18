@@ -128,7 +128,12 @@ public class ShipEvent
 			int randomInt = rand.nextInt(playersOnShip.size());
 			
 			//Damage player
-			playersOnShip.get(randomInt).setHealth(playersOnShip.get(randomInt).getHealth() - damage);
+			double newHealth = playersOnShip.get(randomInt).getHealth() - damage;
+			
+			if (newHealth < 2)
+				playersOnShip.get(randomInt).setHealth(2);
+			else
+				playersOnShip.get(randomInt).setHealth(newHealth);
 			
 			//Notify
 			return "The ship creaks and shudders, battered with whorls of wind as " + player.getDisplayName() + ChatColor.YELLOW + 
