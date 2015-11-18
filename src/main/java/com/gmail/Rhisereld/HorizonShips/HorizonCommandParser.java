@@ -556,6 +556,7 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		Player player = Bukkit.getPlayer(sender.getName());
+		confirmDelete.remove(sender.getName());
 		
 		try {
 		shipHandler.deleteShip(sender, confirmDelete.get(sender.getName()));
@@ -570,7 +571,6 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
-		confirmDelete.remove(sender.getName());
 		return true;
 	}
 	
@@ -600,14 +600,17 @@ public class HorizonCommandParser implements CommandExecutor
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
+			confirmAddDestination.remove(name);
 			e.printStackTrace();
 			return false;
 		} catch (MaxChangedBlocksException e) {
 			player.sendMessage(ChatColor.RED + "Ship too large!");
+			confirmAddDestination.remove(name);
 			e.printStackTrace();
 			return false;
 		} catch (NullPointerException | IllegalArgumentException e) {
 			player.sendMessage(ChatColor.RED + e.getMessage());
+			confirmAddDestination.remove(name);
 			e.printStackTrace();
 		}
 	
@@ -641,12 +644,17 @@ public class HorizonCommandParser implements CommandExecutor
 
 		//Remove destination
 		String[] arguments = confirmRemoveDestination.get(name).split(" ");
-		shipHandler.removeDestination(arguments[0], arguments[1]);
+		confirmRemoveDestination.remove(name);
+		try {
+			shipHandler.removeDestination(arguments[0], arguments[1]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
 
 		sender.sendMessage(ChatColor.YELLOW + "Destination removed.");
 	
 		//Remove confirmation for destination.
-		confirmRemoveDestination.remove(name);
 		return true;
 	}
 	

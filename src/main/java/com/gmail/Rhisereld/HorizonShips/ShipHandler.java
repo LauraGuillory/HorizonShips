@@ -216,9 +216,18 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	public void removeDestination(String shipName, String destinationName)
+	public void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
 	{
+		//Check that the destination exists
 		Ship ship = new Ship(data, shipName);
+		Destination destination = ship.getDestination(destinationName);
+		if (destination.getName() == null)
+			throw new IllegalArgumentException("That destination does not exist!");
+		
+		//Check that the ship isn't currently at that destination
+		if (destinationName.equalsIgnoreCase(ship.getCurrentDestination().getName()))
+			throw new IllegalArgumentException("You are currently at that destination! You have to leave it first.");
+		
 		ship.removeDestination(destinationName);
 	}
 	
