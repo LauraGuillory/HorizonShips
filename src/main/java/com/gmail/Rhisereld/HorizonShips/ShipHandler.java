@@ -383,11 +383,7 @@ public class ShipHandler
 				
 		//Get required item
 		String repairItem = ship.getRepairItem();
-		Material repairItemMaterial = Material.getMaterial(repairItem);
-		
-		//TODO: Materials aren't being found correctly.
-		player.sendMessage(repairItem);
-		player.sendMessage(repairItemMaterial.name());
+		Material repairItemMaterial = Material.matchMaterial(repairItem);
 		
 		//Check player is holding the correct item.
 		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial))
@@ -405,6 +401,52 @@ public class ShipHandler
 		
 		//Notify
 		player.sendMessage(ChatColor.YELLOW + "You repaired the ship.");
+	}
+	
+	public void refuel(Player player) throws IllegalArgumentException
+	{
+		//Determine the ship the player is trying to refuel
+		Ship ship = findCurrentShip(player);
+		if (ship == null)
+			throw new IllegalArgumentException("You are not inside a ship.");
+		
+		//Check if the ship tank is full
+		if (ship.getFuel() >= 10)
+			throw new IllegalArgumentException("The ship's tank is already full.");
+		
+		//Get required items
+		Set<String> refuelItemStrings = config.getConfig().getConfigurationSection("refuel").getKeys(false);
+		
+		//Check player is holding the correct item
+		String itemInHand = player.getItemInHand().getType().name();
+		String refuelItemString = null;
+		for (String r: refuelItemStrings)
+			if (itemInHand.equalsIgnoreCase(r))
+				refuelItemString = r;
+		
+		if (refuelItemString == null)
+			throw new IllegalArgumentException("You do not have the correct item.");
+		
+		//If they are, remove all of them (unless this would overfill the tank)
+		int numItemsInHand = player.getItemInHand().getAmount();
+		int fills = config.getConfig().getInt("refuel." + refuelItemString + ".fills");
+		int numToUse;
+		if (10 - ship.getFuel() < numItemsInHand * fills)
+			numToUse = (config.getConfig().getInt("refuel.maxtank") - ship.getFuel()) / fills;
+		else
+			numToUse = player.getItemInHand().getAmount();
+		
+		int newNum = player.getItemInHand().getAmount() - numToUse;
+		if (newNum <= 0)
+			player.getItemInHand().setType(Material.AIR);
+		else
+			player.getItemInHand().setAmount(newNum);
+		
+		//Raise the fuel level that amount.
+		ship.setFuel(ship.getFuel() + numToUse * fills);
+		
+		//Notify
+		player.sendMessage(ChatColor.YELLOW + "You refilled the ship by " + numToUse * fills + " units.");
 	}
 	
 	/**

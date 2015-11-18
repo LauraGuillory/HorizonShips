@@ -144,6 +144,16 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
+			//ship refuel
+			if (args[0].equalsIgnoreCase("refuel"))
+				if (args.length == 1)
+					return refuelShip(sender, args);
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship refuel");
+					return false;
+				}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -407,8 +417,6 @@ public class HorizonCommandParser implements CommandExecutor
 		for (int i = 2; i < args.length; i++)
 			destination = destination + " " + args[i];
 		
-		sender.sendMessage(destination);
-		
 		try {
 			shipHandler.moveShip(player, destination);
 		} catch (DataException | IOException e) {
@@ -493,7 +501,38 @@ public class HorizonCommandParser implements CommandExecutor
 			shipHandler.repair(player);
 		} catch (IllegalArgumentException e) {
 			player.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
 		}	
+		
+		return true;
+	}
+	
+	private boolean refuelShip(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!player.hasPermission("horizonships.refuel"))
+		{
+			sender.sendMessage("You don't have permission to refuel a ship.");
+			return false;
+		}
+		
+		try {
+		shipHandler.refuel(player);
+		} catch (IllegalArgumentException e) {
+			player.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
 		
 		return true;
 	}

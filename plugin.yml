@@ -19,7 +19,8 @@ permissions:
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
-      horizonships.repair: true    
+      horizonships.repair: true   
+      horizonships.refuel: true 
     
   horizonships.common:
     description: Gives access to Horizon Ships for normal players.
@@ -28,6 +29,7 @@ permissions:
       horizonships.pilot: true
       horizonships.diagnose: true
       horizonships.repair: true
+      horizonships.refuel: true
     
   horizonships.admin:
     description: Gives access to all Horizon Ships commands for admins and normal players.
