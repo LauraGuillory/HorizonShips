@@ -411,7 +411,8 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Check if the ship tank is full
-		if (ship.getFuel() >= 10)
+		int maxTank = config.getConfig().getInt("refuel.maxtank");
+		if (ship.getFuel() >= maxTank)
 			throw new IllegalArgumentException("The ship's tank is already full.");
 		
 		//Get required items
@@ -427,18 +428,20 @@ public class ShipHandler
 		if (refuelItemString == null)
 			throw new IllegalArgumentException("You do not have the correct item.");
 		
-		//If they are, remove all of them (unless this would overfill the tank)
+		//Remove the correct number of the item.
 		int numItemsInHand = player.getItemInHand().getAmount();
 		int fills = config.getConfig().getInt("refuel." + refuelItemString + ".fills");
 		int numToUse;
-		if (10 - ship.getFuel() < numItemsInHand * fills)
-			numToUse = (config.getConfig().getInt("refuel.maxtank") - ship.getFuel()) / fills;
+		
+		if ((10 - ship.getFuel()) < (numItemsInHand * fills))
+			numToUse = (maxTank - ship.getFuel()) / fills;
 		else
 			numToUse = player.getItemInHand().getAmount();
 		
 		int newNum = player.getItemInHand().getAmount() - numToUse;
+		
 		if (newNum <= 0)
-			player.getItemInHand().setType(Material.AIR);
+			player.setItemInHand(null);
 		else
 			player.getItemInHand().setAmount(newNum);
 		
