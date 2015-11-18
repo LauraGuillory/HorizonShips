@@ -374,7 +374,11 @@ public class ShipHandler
 				
 		//Get required item
 		String repairItem = ship.getRepairItem();
-		Material repairItemMaterial = Material.matchMaterial(repairItem);
+		Material repairItemMaterial = Material.getMaterial(repairItem);
+		
+		//TODO: Materials aren't being found correctly.
+		player.sendMessage(repairItem);
+		player.sendMessage(repairItemMaterial.name());
 		
 		//Check player is holding the correct item.
 		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial))

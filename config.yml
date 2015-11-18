@@ -1,4 +1,5 @@
 eventchance: 0.3
+limbo: "deepSpace"
 refuel:
   arrow:
     name: "energy cell"

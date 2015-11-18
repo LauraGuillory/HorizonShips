@@ -55,7 +55,6 @@ public class Ship
 		length = data.getConfig().getInt(path + "length");
 		width = data.getConfig().getInt(path + "width");
 		height = data.getConfig().getInt(path + "height");
-		
 	}
 
 	/**

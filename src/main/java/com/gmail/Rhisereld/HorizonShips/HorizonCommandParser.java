@@ -46,321 +46,103 @@ public class HorizonCommandParser implements CommandExecutor
      */
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
-	{
-		String[] arguments;
-		Player player = null;
-		String name = sender.getName();
-		
+	{	
 		//All commands that fall under /ship [additional arguments]
 		if (commandLabel.equalsIgnoreCase("ship"))
 		{
 			//ship
-			if (args.length <= 0)
-			{
-				showCommands(sender);
-				return true;
-			}
+			if (args.length == 0)
+				return showCommands(sender);
 			
 			//ship create [shipName] [destinationName]
 			if (args[0].equalsIgnoreCase("create"))
-			{				
-				//Check that the sender is a player
-				if (sender instanceof Player)
-					player = Bukkit.getPlayer(sender.getName());
+				if (args.length == 3)
+					return shipCreate(sender, args);
 				else
-				{
-					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
-					return false;
-				}
-				
-				//Check the player has permission
-				if (!player.hasPermission("horizonships.admin.ship.create"))
-				{
-					sender.sendMessage(ChatColor.RED + "You don't have permission to create a ship.");
-					return false;
-				}
-				
-				//Check for correct number of arguments.
-				if (args.length != 3)
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName] [destinationName]");
 					return false;
 				}
-
-				sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
-						+ " Type '/ship confirm create' to confirm.");
-				confirmCreate.put(name, args[1] + " " + args[2]);
-				confirmCreateTimeout(sender);
-				
-				return true;
-			}
 			
 			//ship delete [shipName]
 			if (args[0].equalsIgnoreCase("delete"))
-			{
-				//Check the player has permission OR is the console
-				if (!sender.hasPermission("horizonships.admin.ship.delete") && !(sender instanceof Player))
-				{
-					sender.sendMessage(ChatColor.RED + "You don't have permission to delete a ship.");
-					return false;
-				}
-				
-				//Check for correct number of arguments.
-				if (args.length != 2)
+				if (args.length == 2)
+					return shipDelete(sender, args);
+				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete [shipName]");
 					return false;
 				}
-				
-				sender.sendMessage(ChatColor.YELLOW + "Are you sure you want to delete the ship " + args[1] + "?"
-						+ " Type '/ship confirm delete' to confirm.");
-				confirmDelete.put(name, args[1]);
-				confirmDeleteTimeout(sender);
-			}
 			
 			//ship add
 			if (args[0].equalsIgnoreCase("add"))
-			{
-				if (args.length < 2)
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments!");
-					return false;
-				}
-				
+			{	
 				//ship add destination [shipName] [destinationName]
-				if (args[1].equalsIgnoreCase("destination"))
-				{
-					//Check that the sender is a player
-					if (sender instanceof Player)
-						player = Bukkit.getPlayer(sender.getName());
-					else
-					{
-						sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
-						return false;
-					}
-					
-					//Check that the player has permission
-					if (!player.hasPermission("horizonships.admin.destination.add"))
-					{
-						sender.sendMessage("You don't have permission to create a destination.");
-						return false;
-					}
-					
-					//Check for correct number of arguments
-					if (args.length != 4)
-					{
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
-								+ "[destinationName]");
-						return false;
-					}
-					
-					sender.sendMessage(ChatColor.YELLOW + "The ship will be pasted inside your current WorldEdit selection. Is this correct? "
-							+ " Type '/ship confirm add destination' to confirm.");
-					confirmAddDestination.put(name, args[2] + " " + args[3]);
-					confirmAddDestinationTimeout(sender);
-				}
-				else
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format.");
-					return false;
-				}
+				if (args.length >= 4 && args[1].equalsIgnoreCase("destination"))
+					return addDestination(sender, args);
+				
+				sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
+									+ "[destinationName]");
+				return false;
 			}
 			
 			//ship remove
 			if (args[0].equalsIgnoreCase("remove"))
 			{
-				if (args.length < 2)
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments!");
-					return false;
-				}
-				
 				//ship remove destination [shipName] [destinationName]
-				if (args[1].equalsIgnoreCase("destination"))
-				{	
-					//Check the player has permission OR is the console
-					if (!sender.hasPermission("horizonships.admin.destination.remove") && !(sender instanceof Player))
-					{
-						sender.sendMessage(ChatColor.RED + "You don't have permission to remove a destination.");
-						return false;
-					}
-					
-					//Check for correct number of arguments
-					if (args.length != 4)
-					{
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove destination [shipName] "
-								+ "[destinationName]");
-						return false;
-					}
-					
-					sender.sendMessage(ChatColor.YELLOW + "Are you sure you wish to remove the destination " + args[3] + " from "
-							+ args[2] + "? Type '/ship confirm remove destination' to confirm.");
-					confirmRemoveDestination.put(name, args[2] + " " + args[3]);
-					confirmRemoveDestinationTimeout(sender);
-				}
-				else
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format.");
-					return false;
-				}
+				if (args.length >= 4 && args[1].equalsIgnoreCase("destination"))
+					return removeDestination(sender, args);
+				
+				sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove destination [shipName] "
+									+ "[destinationName]");
+				return false;
 			}
 			
 			//ship adjust [north/east/south/west/up/down]
 			if (args[0].equalsIgnoreCase("adjust"))
-			{
-				//Check argument length
-				if (args.length != 2)
+				if (args.length == 2)
+					return adjustDestination(sender, args);
+				else
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship adjust "
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship adjust "
 							+ "[north/east/south/west/up/down]");
 					return false;
 				}
-				
-				//Check there's something to adjust
-				if (!confirmAdjust.containsKey(name))
-				{
-					sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
-					return false;
-				}
-				
-				//Adjust
-				player = Bukkit.getPlayer(sender.getName());
-				arguments = confirmAdjust.get(name).split(" ");
-				
-				try {
-					shipHandler.adjustDestination(player, args[1], arguments[0]);
-				} catch (MaxChangedBlocksException e) {
-					sender.sendMessage(ChatColor.RED + "Ship too large!");
-					return false;
-				} catch (DataException | RegionOperationException | IncompleteRegionException | IOException e) {
-					sender.sendMessage(ChatColor.RED + e.getMessage());
-					sender.sendMessage(ChatColor.RED + "Unable to adjust destination. Please contact an administrator.");
-					e.printStackTrace();
-					return false;
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage(ChatColor.RED + e.getMessage());
-					return false;
-				}
-				
-				return true;
-			}
 			
 			//ship list
 			if (args[0].equalsIgnoreCase("list"))
-			{
-				//Check that the player has permission OR is the console
-				if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
-				{
-					sender.sendMessage("You don't have permission to view this.");
-					return false;
-				}
-				
-				shipHandler.listShips(sender);
-			}
+				return listShips(sender, args);
 			
 			//ship pilot [destination]
 			if (args[0].equalsIgnoreCase("pilot"))
-			{
-				//Check that the sender is a player
-				if (sender instanceof Player)
-					player = Bukkit.getPlayer(sender.getName());
+				if (args.length >= 2)
+					return pilotShip(sender, args);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
-					return false;
-				}
-				
-				//Check that the player has permission
-				if (!sender.hasPermission("horizonships.pilot"))
-				{
-					sender.sendMessage(ChatColor.RED + "You don't have permission to pilot a ship.");
-					return false;
-				}
-				
-				//Check for correct number of args.
-				if (args.length != 2)
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format.");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship pilot "
+							+ "[destinationName]");
 					return true;
 				}
-				
-				try {
-					shipHandler.moveShip(player, args[1]);
-				} catch (DataException | IOException e) {
-					player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Adminstrator.");
-					e.printStackTrace();
-				} catch (MaxChangedBlocksException e) {
-					player.sendMessage(ChatColor.RED + "Ship too large!");
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					player.sendMessage(ChatColor.RED + e.getMessage());
-				}
-				
-			}
 			
 			//ship diagnose
 			if (args[0].equalsIgnoreCase("diagnose"))
-			{
-				if (args.length != 1)
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship diagnose");
-					return false;
-				}
-				
-				//Check that the sender is a player
-				if (sender instanceof Player)
-					player = Bukkit.getPlayer(sender.getName());
+				if (args.length == 1)
+					return diagnoseShip(sender, args);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship diagnose");
 					return false;
 				}
-				
-				//Check that the player has permission
-				if (!player.hasPermission("horizonships.diagnose"))
-				{
-					sender.sendMessage("You don't have permission to diagnose a ship.");
-					return false;
-				}
-				
-				try {
-					shipHandler.diagnose(player);
-				} catch (IllegalArgumentException e) {
-					player.sendMessage(ChatColor.RED + e.getMessage());
-				}
-			}
 			
 			//ship repair
 			if (args[0].equalsIgnoreCase("repair"))
-			{
-				if (args.length != 1)
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format number of arguments! Correct usage: /ship repair");
-					return false;
-				}
-				
-				//Check that the sender is a player
-				if (sender instanceof Player)
-					player = Bukkit.getPlayer(sender.getName());
+				if (args.length == 1)
+					return repairShip(sender, args);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship repair");
 					return false;
 				}
-				
-				//Check that the player has permission
-				if (!player.hasPermission("horizonships.repair"))
-				{
-					sender.sendMessage("You don't have permission to repair a ship.");
-					return false;
-				}
-				
-				try {
-					shipHandler.repair(player);
-				} catch (IllegalArgumentException e) {
-					player.sendMessage(ChatColor.RED + e.getMessage());
-				}	
-			}
 			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
@@ -368,197 +150,575 @@ public class HorizonCommandParser implements CommandExecutor
 				if (args.length < 2)
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect format.");
-					return true;
+					return false;
 				}
 				
 				//ship confirm create
 				if (args[1].equalsIgnoreCase("create"))
-				{					
-					if (confirmCreate.get(name) == null)
-					{
-						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-						return true;
-					}
-					
-					arguments = confirmCreate.get(name).split(" ");
-					confirmCreate.remove(name);
-					player = Bukkit.getPlayer(sender.getName());
-
-					try {
-						shipHandler.createShip(arguments[0], player, arguments[1]);
-						player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
-					} catch (DataException | IOException e) {
-						sender.sendMessage(ChatColor.RED + e.getMessage());
-						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
-						e.printStackTrace();
-						return false;
-					} catch (NullPointerException e) {
-						sender.sendMessage(ChatColor.RED + e.getMessage());
-						e.printStackTrace();
-						return false;
-					} catch (IllegalArgumentException e) {
-						sender.sendMessage(ChatColor.RED + e.getMessage());
-						e.printStackTrace();
-						return false;
-					}
-					return true;
-				}
+					return confirmCreate(sender, args);
 
 				//ship confirm delete
 				if (args[1].equalsIgnoreCase("delete"))
-				{
-					if (confirmDelete.get(name) == null)
-					{
-						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-						return true;
-					}
-					
-					try {
-					shipHandler.deleteShip(sender, confirmDelete.get(name));
-					} catch (IllegalArgumentException e) {
-						sender.sendMessage(ChatColor.RED + e.getMessage());
-						return false;
-					} catch (IOException e) {
-						sender.sendMessage(ChatColor.RED + e.getMessage());
-						player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
-						e.printStackTrace();
-						return false;
-					}
-					
-					sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
-					confirmDelete.remove(name);
-					return true;
-				}
+					return confirmDelete(sender, args);
 				
 				//ship confirm add destination
 				if (args[1].equalsIgnoreCase("add"))
-				{
-					if (args.length != 3)
+					if (args.length >= 3 && args[2].equalsIgnoreCase("destination"))
+						return confirmAddDestination(sender, args);
+					else
 					{
 						sender.sendMessage(ChatColor.RED + "Incorrect format.");
 						return true;
 					}
-					if (args[2].equalsIgnoreCase("destination"))
-					{			
-						if (confirmAddDestination.get(name) == null)
-						{
-							sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-							return true;
-						}
 
-						//Paste ship
-						player = Bukkit.getPlayer(sender.getName());
-						arguments = confirmAddDestination.get(name).split(" ");
-						try {
-							shipHandler.testDestination(player, arguments[0], arguments[1]);
-						} catch (DataException | IOException e) {
-							sender.sendMessage(ChatColor.RED + e.getMessage());
-							player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
-							e.printStackTrace();
-							return false;
-						} catch (MaxChangedBlocksException e) {
-							player.sendMessage(ChatColor.RED + "Ship too large!");
-							e.printStackTrace();
-							return false;
-						} catch (NullPointerException | IllegalArgumentException e) {
-							player.sendMessage(ChatColor.RED + e.getMessage());
-							e.printStackTrace();
-						}
-					
-						sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
-							+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
-							+ "'/ship confirm adjust'.");
-					
-						//Remove confirmation for destination, add confirmation for tweaking
-						confirmAdjust.put(name, confirmAddDestination.get(name));
-						confirmAdjustTimeout(sender);
-						confirmAddDestination.remove(name);
-					}
-				}
-
-				
 				//ship confirm remove destination
 				if (args[1].equalsIgnoreCase("remove"))
-				{
-					if (args.length != 3)
+					if (args.length >= 3 && args[2].equalsIgnoreCase("destination"))
+						confirmRemoveDestination(sender, args);
+					else
 					{
 						sender.sendMessage(ChatColor.RED + "Incorrect format.");
 						return true;
 					}
-					if (args[2].equalsIgnoreCase("destination"))
-					{			
-						if (confirmRemoveDestination.get(name) == null)
-						{
-							sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-							return true;
-						}
-
-						//Remove destination
-						arguments = confirmRemoveDestination.get(name).split(" ");
-						shipHandler.removeDestination(arguments[0], arguments[1]);
-
-						sender.sendMessage(ChatColor.YELLOW + "Destination removed.");
-					
-						//Remove confirmation for destination.
-						confirmRemoveDestination.remove(name);
-					}
-				}
 
 				//ship confirm adjust
 				if (args[1].equalsIgnoreCase("adjust"))
-				{
-					if (confirmAdjust.get(name) == null)
-					{
-						sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-						return true;
-					}
-
-					//Add destination
-					player = Bukkit.getPlayer(sender.getName());
-					arguments = confirmAdjust.get(name).split(" ");
-					shipHandler.addDestination(player, arguments[0], arguments[1]);
-					confirmAdjust.remove(name);
-
-					sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
-				}
+					return confirmAdjust(sender, args);
 			}
 			
 			//ship cancel
 			if (args[0].equalsIgnoreCase("cancel"))
-			{
-				if (confirmCreate.containsKey(name))
-				{
-					confirmCreate.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
-					return true;
-				}
-				
-				if (confirmDelete.containsKey(name))
-				{
-					confirmDelete.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "Ship deletion cancelled.");
-					return true;
-				}
-				
-				if (confirmAddDestination.containsKey(name))
-				{
-					confirmAddDestination.remove(name);
-					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
-					return true;
-				}
-				
-				if (confirmAdjust.containsKey(name))
-				{
-					confirmAdjust.remove(name);
-					shipHandler.cancelDestination(name);
-					sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
-					return true;
-				}
-				
-				sender.sendMessage(ChatColor.RED + "There is nothing to cancel.");
-				return false;
-			}
+				return cancelAction(sender, args);
 		}
+		
+		return false;
+	}
+	
+	/**
+	 * shipCreate() performs all the checks necessary for the /ship create command,
+	 * then sets aside the action to be carried out when it is confirmed.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean shipCreate(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check the player has permission
+		if (!player.hasPermission("horizonships.admin.ship.create"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to create a ship.");
+			return false;
+		}
+
+		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
+				+ " Type '/ship confirm create' to confirm.");
+		confirmCreate.put(player.getName(), args[1] + " " + args[2]);
+		confirmCreateTimeout(sender);
+		
+		return true;
+	}
+	
+	/**
+	 * shipDelete() performs all the checks necessary for the /ship delete command,
+	 * then sets aside the action to be carried out when it is confirmed.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean shipDelete(CommandSender sender, String[] args)
+	{
+		//Check the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.admin.ship.delete") && !(sender instanceof Player))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to delete a ship.");
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Are you sure you want to delete the ship " + args[1] + "?"
+				+ " Type '/ship confirm delete' to confirm.");
+		confirmDelete.put(sender.getName(), args[1]);
+		confirmDeleteTimeout(sender);
+		
+		return true;
+	}
+	
+	/**
+	 * addDestination() performs all the checks necessary for the /ship add destination command,
+	 * then sets aside the action to be carried out when it is confirmed.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean addDestination(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!player.hasPermission("horizonships.admin.destination.add"))
+		{
+			sender.sendMessage("You don't have permission to create a destination.");
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "The ship will be pasted inside your current WorldEdit selection. Is this correct? "
+				+ " Type '/ship confirm add destination' to confirm.");
+		confirmAddDestination.put(player.getName(), args[2] + " " + args[3]);
+		confirmAddDestinationTimeout(sender);
+		return true;
+	}
+	
+	/**
+	 * removeDestination() performs all the checks necessary for the /ship remove destination command,
+	 * then sets aside the action to be carried out when it is confirmed.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean removeDestination(CommandSender sender, String[] args)
+	{
+		//Check the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.admin.destination.remove") && !(sender instanceof Player))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a destination.");
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Are you sure you wish to remove the destination " + args[3] + " from "
+				+ args[2] + "? Type '/ship confirm remove destination' to confirm.");
+		confirmRemoveDestination.put(sender.getName(), args[2] + " " + args[3]);
+		confirmRemoveDestinationTimeout(sender);
+		return true;
+	}
+	
+	/**
+	 * adjustDestination() performs all the checks necessary for the /ship adjust [direction] command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean adjustDestination(CommandSender sender, String[] args)
+	{		
+		//Check there's something to adjust
+		if (!confirmAdjust.containsKey(sender.getName()))
+		{
+			sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
+			return false;
+		}
+		
+		//Adjust
+		Player player = Bukkit.getPlayer(sender.getName()); //Sender must be a player if their name is in the list.
+		String [] arguments = confirmAdjust.get(player.getName()).split(" ");
+		
+		try {
+			shipHandler.adjustDestination(player, args[1], arguments[0]);
+		} catch (MaxChangedBlocksException e) {
+			sender.sendMessage(ChatColor.RED + "Ship too large!");
+			return false;
+		} catch (DataException | RegionOperationException | IncompleteRegionException | IOException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			sender.sendMessage(ChatColor.RED + "Unable to adjust destination. Please contact an administrator.");
+			e.printStackTrace();
+			return false;
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * listShips() performs all the checks necessary for the /ship list command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean listShips(CommandSender sender, String[] args)
+	{
+		//Check that the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
+		{
+			sender.sendMessage("You don't have permission to view this.");
+			return false;
+		}
+		
+		shipHandler.listShips(sender);
+		return true;
+	}
+	
+	/**
+	 * pilotShip() performs all the checks necessary for the /ship pilot command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean pilotShip(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!sender.hasPermission("horizonships.pilot"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to pilot a ship.");
+			return false;
+		}
+		
+		String destination = args[1];
+		
+		for (int i = 2; i < args.length; i++)
+			destination = destination + " " + args[i];
+		
+		sender.sendMessage(destination);
+		
+		try {
+			shipHandler.moveShip(player, destination);
+		} catch (DataException | IOException e) {
+			player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Adminstrator.");
+			e.printStackTrace();
+		} catch (MaxChangedBlocksException e) {
+			player.sendMessage(ChatColor.RED + "Ship too large!");
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			player.sendMessage(ChatColor.RED + e.getMessage());
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * diagnoseShip() performs all the checks necessary for the /ship diagnose command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean diagnoseShip(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!player.hasPermission("horizonships.diagnose"))
+		{
+			sender.sendMessage("You don't have permission to diagnose a ship.");
+			return false;
+		}
+		
+		try {
+			shipHandler.diagnose(player);
+		} catch (IllegalArgumentException e) {
+			player.sendMessage(ChatColor.RED + e.getMessage());
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * repairShip() performs all the checks necessary for the /ship repair command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean repairShip(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!player.hasPermission("horizonships.repair"))
+		{
+			sender.sendMessage("You don't have permission to repair a ship.");
+			return false;
+		}
+		
+		try {
+			shipHandler.repair(player);
+		} catch (IllegalArgumentException e) {
+			player.sendMessage(ChatColor.RED + e.getMessage());
+		}	
+		
+		return true;
+	}
+	
+	/**
+	 * confirmCreate() performs the delayed action for the /ship create command.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean confirmCreate(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		if (confirmCreate.get(sender.getName()) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+		
+		String[] arguments = confirmCreate.get(sender.getName()).split(" ");
+		confirmCreate.remove(sender.getName());
+		player = Bukkit.getPlayer(sender.getName());
+
+		try {
+			shipHandler.createShip(arguments[0], player, arguments[1]);
+			player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
+		} catch (DataException | IOException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+			e.printStackTrace();
+			return false;
+		} catch (NullPointerException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
+			return false;
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * confirmDelete() performs the delayed action for the /ship delete command.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean confirmDelete(CommandSender sender, String[] args)
+	{	
+		if (confirmDelete.get(sender.getName()) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+		
+		Player player = Bukkit.getPlayer(sender.getName());
+		
+		try {
+		shipHandler.deleteShip(sender, confirmDelete.get(sender.getName()));
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		} catch (IOException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+			e.printStackTrace();
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
+		confirmDelete.remove(sender.getName());
+		return true;
+	}
+	
+	/**
+	 * confirmAddDestination() performs the delayed action for the /ship add destination command.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean confirmAddDestination(CommandSender sender, String[] args)
+	{
+		Player player;
+		String name = sender.getName();
+		
+		if (confirmAddDestination.get(name) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+
+		//Paste ship
+		player = Bukkit.getPlayer(name);
+		String[] arguments = confirmAddDestination.get(name).split(" ");
+		try {
+			shipHandler.testDestination(player, arguments[0], arguments[1]);
+		} catch (DataException | IOException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
+			e.printStackTrace();
+			return false;
+		} catch (MaxChangedBlocksException e) {
+			player.sendMessage(ChatColor.RED + "Ship too large!");
+			e.printStackTrace();
+			return false;
+		} catch (NullPointerException | IllegalArgumentException e) {
+			player.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
+		}
+	
+		sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
+			+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
+			+ "'/ship confirm adjust'.");
+	
+		//Remove confirmation for destination, add confirmation for tweaking
+		confirmAdjust.put(name, confirmAddDestination.get(name));
+		confirmAdjustTimeout(sender);
+		confirmAddDestination.remove(name);
+		return true;
+	}
+	
+	/**
+	 * confirmRemoveDestination() performs the delayed action for the /ship remove destination command.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean confirmRemoveDestination(CommandSender sender, String[] args)
+	{
+		String name = sender.getName();
+		
+		if (confirmRemoveDestination.get(name) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+
+		//Remove destination
+		String[] arguments = confirmRemoveDestination.get(name).split(" ");
+		shipHandler.removeDestination(arguments[0], arguments[1]);
+
+		sender.sendMessage(ChatColor.YELLOW + "Destination removed.");
+	
+		//Remove confirmation for destination.
+		confirmRemoveDestination.remove(name);
+		return true;
+	}
+	
+	/**
+	 * confirmAdjust() finalises the adjusted destination.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean confirmAdjust(CommandSender sender, String[] args)
+	{
+		String name = sender.getName();
+		
+		if (confirmAdjust.get(name) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+
+		//Add destination
+		Player player = Bukkit.getPlayer(sender.getName());
+		String[] arguments = confirmAdjust.get(name).split(" ");
+		shipHandler.addDestination(player, arguments[0], arguments[1]);
+		confirmAdjust.remove(name);
+
+		sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
+		return true;
+	}
+	
+	/**
+	 * cancelAction() cancels all pending actions by removing the player's name
+	 * from all pending action lists.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean cancelAction(CommandSender sender, String[] args)
+	{
+		String name = sender.getName();
+		
+		if (confirmCreate.containsKey(name))
+		{
+			confirmCreate.remove(name);
+			sender.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
+			return true;
+		}
+		
+		if (confirmDelete.containsKey(name))
+		{
+			confirmDelete.remove(name);
+			sender.sendMessage(ChatColor.YELLOW + "Ship deletion cancelled.");
+			return true;
+		}
+		
+		if (confirmAddDestination.containsKey(name))
+		{
+			confirmAddDestination.remove(name);
+			sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+			return true;
+		}
+		
+		if (confirmAdjust.containsKey(name))
+		{
+			confirmAdjust.remove(name);
+			shipHandler.cancelDestination(name);
+			sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+			return true;
+		}
+		
+		sender.sendMessage(ChatColor.RED + "There is nothing to cancel.");
 		return false;
 	}
 	
@@ -670,17 +830,18 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 6000);
 	}
 	
-	private void showCommands(CommandSender sender)
+	private boolean showCommands(CommandSender sender)
 	{
 		Player player = null;
 		
 		if (sender instanceof Player)
 			player = Bukkit.getPlayer(sender.getName()); //Some commands are not available to console - which is not a player
 		
-		if (player != null)
-			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
+		if (player == null)
+			sender.sendMessage("--------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">--------");
 		else
-			sender.sendMessage("--------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">--------------");
+			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
+			
 		sender.sendMessage(ChatColor.GOLD + "Horizon Ships allows you to maintain and travel in ships!");
 		if (sender.hasPermission("horizonships.admin.ship.create") && player != null)
 		{
@@ -725,5 +886,7 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		sender.sendMessage(ChatColor.YELLOW + "/ship cancel");
 		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
+		
+		return true;
 	}
 }
