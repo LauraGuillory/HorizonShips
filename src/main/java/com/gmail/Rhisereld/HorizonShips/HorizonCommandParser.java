@@ -541,6 +541,13 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
+	/**
+	 * shipInfo() displays some information about a ship to the sender.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
 	private boolean shipInfo(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
@@ -550,7 +557,12 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		shipHandler.shipInfo(sender, args[0]);
+		try {
+			shipHandler.shipInfo(sender, args[0]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
 		
 		return true;
 	}
@@ -895,6 +907,13 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 6000);
 	}
 	
+	/**
+	 * showCommands() displays all available commands to the sender.
+	 * Commands are only displayed if the sender has permission to use them.
+	 * 
+	 * @param sender
+	 * @return
+	 */
 	private boolean showCommands(CommandSender sender)
 	{
 		Player player = null;

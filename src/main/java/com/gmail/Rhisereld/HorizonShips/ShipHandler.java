@@ -370,6 +370,12 @@ public class ShipHandler
 		player.sendMessage(ChatColor.YELLOW + "To repair this ship, you need " + article + repairItem + ".");
 	}
 	
+	/**
+	 * repair() ensures the player has the correct item to repair the ship, and if it does,
+	 * it removes the item from the player and sets the ship's broken status to false.
+	 * 
+	 * @param player
+	 */
 	public void repair(Player player)
 	{
 		//Determine the ship the player is trying to repair.
@@ -403,6 +409,13 @@ public class ShipHandler
 		player.sendMessage(ChatColor.YELLOW + "You repaired the ship.");
 	}
 	
+	/**
+	 * refuel() checks that the player has the correct item to refuel the ship, and if they do,
+	 * it removes the item from the player and sets the ship's fuel level.
+	 * 
+	 * @param player
+	 * @throws IllegalArgumentException
+	 */
 	public void refuel(Player player) throws IllegalArgumentException
 	{
 		//Determine the ship the player is trying to refuel
@@ -452,6 +465,13 @@ public class ShipHandler
 		player.sendMessage(ChatColor.YELLOW + "You refilled the ship by " + numToUse * fills + " units.");
 	}
 	
+	/**
+	 * shipInfo() displays some information about the given ship to the player.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
 	public void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
 	{
 		//Get the ship
