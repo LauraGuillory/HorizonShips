@@ -531,16 +531,20 @@ public class ShipHandler
 		if (sender instanceof Player)
 		{
 			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Owner:                                       " + ChatColor.WHITE + 
+					Bukkit.getPlayer(ship.getOwner()).getName());
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:                                " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:                          " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:                                  " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:                            " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:                      " + ChatColor.WHITE + condition);
-			sender.sendMessage(ChatColor.YELLOW + "Fuel:                                          " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                                          " + ChatColor.WHITE + 
+					Integer.toString(ship.getFuel()));
 		}
 		else
 		{
 			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + Bukkit.getPlayer(ship.getOwner()).getName());
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
