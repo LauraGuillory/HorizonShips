@@ -110,30 +110,30 @@ The following options in the configuration file are explained:
 
 refuel:
   maxtank: 10				< --- Maximum tank size
-  arrow:					< --- Item that is used to refuel
-  									ships
+  arrow:				< --- Item that is used to refuel
+  							ships
     name: "energy cell"		< --- Custom name for the item when it is
-    								referred to inside the plugin
+    					referred to inside the plugin
     fills: 1				< --- Number of units one item fills
-events:						< --- All configuration pertaining 
-									to events
+events:					< --- All configuration pertaining 
+						to events
   bumpyRide:				< --- All configuration pertaining
-  									to "Bumpy Ride" event
+  						to "Bumpy Ride" event
     damage: 8				< --- Amount of health damaged
-    								by the event
+    					by the event
     probability: 3			< --- Probability of the event
   infestation:
     number: 2				< --- Number of spiders to spawn
-    poisonous: false		< --- Whether the spiders are
-    								poisonous
+    poisonous: false			< --- Whether the spiders are
+    						poisonous
     probability: 2
   breakdown:
     probability: 2
     spareParts:				< --- List of spare parts that
-    								may be selected as a requirement
-    								to repair the ship.
+    						may be selected as a requirement
+    						to repair the ship.
       bedrock: 				< --- Item type
-        name: "white Hull"	< --- Custom name
+        name: "white Hull"		< --- Custom name
       glass: 
         name: "glass"
       enchanting_table: 
@@ -149,7 +149,7 @@ events:						< --- All configuration pertaining
         name: "soldering iron"
       iron_sword: 
         name: "crowbar"
-  none:						< --- Probability of no event happening
+  none:					< --- Probability of no event happening
     probability: 5
   fuelLeak:
     probability: 1
