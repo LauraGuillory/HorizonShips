@@ -599,8 +599,7 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage("You don't have permission to set the owner of a ship.");
 			return false;
 		}
-		
-		sender.sendMessage(args[1] + args[2]);
+
 		try {
 			shipHandler.setOwner(sender, args[1], args[2]);
 		} catch (IllegalArgumentException e) {

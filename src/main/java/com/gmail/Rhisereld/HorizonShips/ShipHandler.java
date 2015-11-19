@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -552,13 +553,18 @@ public class ShipHandler
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Set the new owner
-		UUID uuid = Bukkit.getPlayer(owner).getUniqueId();
-		if (uuid == null)
-			uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
-		if (uuid == null)
-			throw new IllegalArgumentException("Player does not exist.");
-		
-		ship.setOwner(uuid);
+		Player player = Bukkit.getPlayer(owner);
+		if (player == null)
+		{
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+			
+			if (offlinePlayer == null)
+				throw new IllegalArgumentException("Player does not exist.");
+			
+			ship.setOwner(offlinePlayer.getUniqueId());
+		}
+		else
+			ship.setOwner(player.getUniqueId());		
 	}
 	
 	/**
