@@ -58,7 +58,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship test
 			if (args[0].equalsIgnoreCase("test"))
 			{
-				sender.sendMessage(Boolean.toString(data.getConfig().contains("ships." + "SS_Example" + ".destinations")));
+				return true;
 			}
 			
 			//ship create [shipName] [destinationName]
@@ -288,7 +288,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean shipDelete(CommandSender sender, String[] args)
 	{
 		//Check the player has permission OR is the console
-		if (!sender.hasPermission("horizonships.admin.ship.delete") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.admin.ship.delete") && sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to delete a ship.");
 			return false;
@@ -348,7 +348,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean removeDestination(CommandSender sender, String[] args)
 	{
 		//Check the player has permission OR is the console
-		if (!sender.hasPermission("horizonships.admin.destination.remove") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.admin.destination.remove") && sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a destination.");
 			return false;
@@ -411,7 +411,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean listShips(CommandSender sender, String[] args)
 	{
 		//Check that the player has permission OR is the console
-		if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.list") && sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
 			return false;
@@ -620,7 +620,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean setOwner(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
-		if (!sender.hasPermission("horizonships.admin.setowner") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.admin.setowner") && sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to set the owner of a ship.");
 			return false;
