@@ -544,7 +544,14 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	//TODO
+	/**
+	 * refuelShip() performs checks to ensure that the refuel command is valid, then calls
+	 * shipHandler to perform the action of refuelling the ship.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
 	private boolean refuelShip(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -602,7 +609,9 @@ public class HorizonCommandParser implements CommandExecutor
 	}
 	
 	/**
-	 * setOwner() performs checks to ensure the setowner command is valid, then calls the action.
+	 * setOwner() performs checks to ensure the setowner command is valid, then calls shipHandler
+	 * to perform the action of setting the owner.
+	 * It is an administrator-only command.
 	 * 
 	 * @param sender
 	 * @param args
@@ -629,7 +638,14 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	//TODO
+	/**
+	 * transferShip() performs checks to ensure that the command is valid, then
+	 * sets aside the action to be performed when it is confirmed.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
 	public boolean transferShip(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -845,7 +861,14 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	//TODO 
+	/**
+	 * confirmTransfer() calls shipHandler to perform the action of transferring ownership
+	 * of a ship, that has previously been set aside by transferShip()
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
 	private boolean confirmTransfer(CommandSender sender, String[] args)
 	{
 		String name = sender.getName();

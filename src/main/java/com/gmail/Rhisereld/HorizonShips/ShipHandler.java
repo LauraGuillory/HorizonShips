@@ -568,6 +568,14 @@ public class ShipHandler
 			ship.setOwner(player.getUniqueId());		
 	}
 	
+	/**
+	 * transfer() sets the new owner of a ship, but also ensures that the player
+	 * performing the command owns the ship.
+	 * 
+	 * @param owner
+	 * @param shipName
+	 * @param newOwner
+	 */
 	public void transfer(Player owner, String shipName, String newOwner)
 	{
 		//Get the ship
