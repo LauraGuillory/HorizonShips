@@ -957,7 +957,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}
-		} , 200);
+		} , 400);
 	}
 
 	/**
@@ -979,7 +979,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
-		} , 200);
+		} , 400);
 	}
 	
 	/**
@@ -1000,7 +1000,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
-		} , 200);
+		} , 400);
 	}
 	
 	/**
@@ -1021,7 +1021,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
-		} , 200); //TODO: Adjust timeout length
+		} , 400);
 	}
 	
 	/**
@@ -1064,7 +1064,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
-		} , 200);
+		} , 400);
 	}
 	
 	/**
