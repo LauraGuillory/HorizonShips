@@ -1002,6 +1002,11 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.YELLOW + "/ship list");
 			sender.sendMessage("Provides a list of all current ships.");
 		}
+		if (sender.hasPermission("horizonships.info"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship [shipName]");
+			sender.sendMessage("Provides general information about a ship.");
+		}
 		if (sender.hasPermission("horizonships.pilot") && player != null)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship pilot [destination]");
