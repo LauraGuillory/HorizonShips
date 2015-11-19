@@ -13,6 +13,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.gmail.Rhisereld.Horizon_Professions.ProfessionAPI;
+
 /**
  * ShipEvent handles all things related to the set of events that may occur during a journey.
  * chooseEvent() must be called before trigger() is called.

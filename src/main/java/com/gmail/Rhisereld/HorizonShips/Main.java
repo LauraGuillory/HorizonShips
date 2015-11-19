@@ -2,11 +2,9 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gmail.Rhisereld.HorizonShips.ConfigAccessor;
-import com.gmail.Rhisereld.HorizonShips.HorizonCommandParser;
+import com.gmail.Rhisereld.Horizon_Professions.ProfessionAPI;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 public class Main extends JavaPlugin implements CommandExecutor
@@ -43,8 +41,6 @@ public class Main extends JavaPlugin implements CommandExecutor
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        
-        //TODO HorizonProfessions integration
 
         //Register commands
         hcp = new HorizonCommandParser(data, config, plugin);
@@ -74,10 +70,10 @@ public class Main extends JavaPlugin implements CommandExecutor
 		hcp.cancelDestinationsInProgress();
 		data.saveConfig();
 		
-		plugin = null;
 		worldEditPlugin = null;
 		config = null;
 		data = null;
 		hcp = null;
+		plugin = null;
 	}
 }

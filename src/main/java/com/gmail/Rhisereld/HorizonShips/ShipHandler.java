@@ -487,7 +487,7 @@ public class ShipHandler
 		if (ship.getName() == null)
 			throw new IllegalArgumentException("Ship not found.");
 		
-		//TODO: Check that the person checking is the owner, a permitted pilot, an admin, or the console
+		//Check that the person checking is the owner, a permitted pilot, an admin, or the console
 		Player player = null;
 		if (sender instanceof Player)
 			player = Bukkit.getPlayer(sender.getName());

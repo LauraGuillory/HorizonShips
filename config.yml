@@ -3,21 +3,10 @@ refuel:
   arrow:
     name: "energy cell"
     fills: 1
-repair:
-  profession: engineer
-  chanceofrepair:
-    tier1: 0.1
-    tier2: 0.5
-    tier3: 1
 events:
   bumpyRide:
     damage: 8
-    profession: pilot
     probability: 3
-    injuryChance:
-      tier1: 0.5
-      tier2: 0.1
-      tier3: 0
   infestation:
     number: 2
     poisonous: false
@@ -27,7 +16,6 @@ events:
     spareParts:
       bedrock: 
         name: "white Hull"
-        datavalue: 4
       glass: 
         name: "glass"
       enchanting_table: 
@@ -39,7 +27,6 @@ events:
     tools:
       ink_sack:
         name: "wrench"
-        datavalue: 6
       nether_star:
         name: "soldering iron"
       iron_sword: 
