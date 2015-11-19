@@ -568,7 +568,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean shipInfo(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
-		if (!sender.hasPermission("horizonships.info") && !(sender instanceof Player)) //TODO: incorrect permission
+		if (!sender.hasPermission("horizonships.info") && !(sender instanceof Player))
 		{
 			sender.sendMessage("You don't have permission to view this.");
 			return false;
@@ -991,6 +991,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship remove [shipName] [destinationName]");
 			sender.sendMessage("Remove a destination from the given ship.");
+		}
+		if (sender.hasPermission("horizonships.admin.setowner"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship setowner [shipName] [playerName]");
+			sender.sendMessage("Sets the player as the owner of the ship.");
 		}
 		if (sender.hasPermission("horizonships.list"))
 		{
