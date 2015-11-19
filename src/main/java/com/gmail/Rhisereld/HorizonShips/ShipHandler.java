@@ -498,12 +498,9 @@ public class ShipHandler
 			destinationString = destinationString.concat(d + ", ");
 		
 		if (destinations.size() == 0)
-			destinationString = destinationString.concat("None.");
+			destinationString = destinationString.concat("None");
 		else if (destinationString.length() > 0)
-		{
 			destinationString = destinationString.substring(0, destinationString.length() - 2);
-			destinationString = destinationString.concat(".");
-		}
 		
 		//Condition
 		String condition;
@@ -531,13 +528,27 @@ public class ShipHandler
 		String dimensions = ship.getLength() + "x" + ship.getHeight() + "x" + ship.getWidth();
 		
 		//Displaying
-		sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
-		sender.sendMessage(ChatColor.YELLOW + "Destinations:  " + ChatColor.WHITE + destinationString);
-		sender.sendMessage(ChatColor.YELLOW + "Current location:  " + ChatColor.WHITE + currentDestination);
-		sender.sendMessage(ChatColor.YELLOW + "Dimensions:  " + ChatColor.WHITE + dimensions);
-		sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:  " + ChatColor.WHITE + pilotsString);
-		sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + ChatColor.WHITE + condition);
-		sender.sendMessage(ChatColor.YELLOW + "Fuel:  " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+		if (sender instanceof Player)
+		{
+			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Destinations:                                " + ChatColor.WHITE + destinationString);
+			sender.sendMessage(ChatColor.YELLOW + "Current location:                          " + ChatColor.WHITE + currentDestination);
+			sender.sendMessage(ChatColor.YELLOW + "Dimensions:                                  " + ChatColor.WHITE + dimensions);
+			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:                            " + ChatColor.WHITE + pilotsString);
+			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:                      " + ChatColor.WHITE + condition);
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                                          " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+		}
+		else
+		{
+			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
+			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
+			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
+			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:      " + ChatColor.WHITE + pilotsString);
+			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + ChatColor.WHITE + condition);
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+		}
+
 	}
 	
 	/**
