@@ -1,29 +1,29 @@
-eventchance: 0.3
-limbo: "deepSpace"
 refuel:
+  maxtank: 10
   arrow:
     name: "energy cell"
     fills: 1
+repair:
+  profession: engineer
+  chanceofrepair:
+    tier1: 0.1
+    tier2: 0.5
+    tier3: 1
 events:
   bumpyRide:
     damage: 8
     profession: pilot
-    probability: 2
+    probability: 3
     injuryChance:
       tier1: 0.5
       tier2: 0.1
       tier3: 0
   infestation:
-    number: 5
+    number: 2
     poisonous: false
-    probability: 1
+    probability: 2
   breakdown:
-    profession: engineer
-    probability: 1
-    chanceofrepair:
-      tier1: 0.1
-      tier2: 0.5
-      tier3: 1
+    probability: 2
     spareParts:
       bedrock: 
         name: "white Hull"
@@ -32,16 +32,19 @@ events:
         name: "glass"
       enchanting_table: 
         name: "navigation screen"
-      piston: 
+      piston:
         name: "piston"
       redstone: 
         name: "copper wire"
     tools:
-      dye:
+      ink_sack:
         name: "wrench"
         datavalue: 6
       nether_star:
         name: "soldering iron"
-      iron_sword: "crowbar"
+      iron_sword: 
+        name: "crowbar"
+  none:
+    probability: 5
   fuelLeak:
     probability: 1

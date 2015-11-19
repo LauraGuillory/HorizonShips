@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
  */
 public class ShipEvent 
 {
-	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak"};
+	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak", "none"};
 	private ConfigAccessor config;
 	private String chosenEvent;
 	
@@ -41,13 +41,13 @@ public class ShipEvent
 		
 		for (String e: EVENTS)
 			totalSum += config.getConfig().getInt("events." + e + ".probability");
-		
+
 		randomNum = rand.nextInt(totalSum);
 		
 		while (sum < randomNum)
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		
-		chosenEvent = EVENTS[i];
+		chosenEvent = EVENTS[i-1];
 	}
 	
 	/**
@@ -68,6 +68,7 @@ public class ShipEvent
 			case "infestation": return triggerInfestation(player, ship);
 			case "breakdown": return triggerBreakdown(player, ship);
 			case "fuelLeak": return triggerFuelLeak(player, ship);
+			case "none": return triggerNone(player, ship);
 			default:	Bukkit.getLogger().severe("Invalid event. Event cancelled.");
 						return null;
 		}
@@ -297,5 +298,18 @@ public class ShipEvent
 		ship.setFuel(0);
 		return "During the flight, you notice a leak in the fuel line. A little duct tape fixes the problem for now, "
 				+ "but the ship barely has enough fuel left to reach its destination.";
+	}
+	
+	/**
+	 * triggerNone() is the event where nothing happens. Really.
+	 * 
+	 * @param player
+	 * @param ship
+	 * @return
+	 */
+	private String triggerNone(Player player, Ship ship)
+	{
+		return "The journey is uneventful, and " + player.getDisplayName() + ChatColor.YELLOW + " touches down at " 
+					+ ship.getCurrentDestination().getName() + " without any problems.";
 	}
 }
