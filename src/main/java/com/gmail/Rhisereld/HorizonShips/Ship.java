@@ -114,7 +114,7 @@ public class Ship
 	 */
 	public void deleteShip()
 	{
-		data.getConfig().getConfigurationSection("ships.").set(name, null);
+		data.getConfig().set("ships." + name, null);
 		data.saveConfig();
 		
 		//Delete ship schematic

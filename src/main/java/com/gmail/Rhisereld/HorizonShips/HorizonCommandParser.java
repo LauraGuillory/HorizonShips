@@ -731,20 +731,22 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		Player player = Bukkit.getPlayer(sender.getName());
-		confirmDelete.remove(sender.getName());
 		
 		try {
 		shipHandler.deleteShip(sender, confirmDelete.get(sender.getName()));
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
+			confirmDelete.remove(sender.getName());
 			return false;
 		} catch (IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+			confirmDelete.remove(sender.getName());
 			e.printStackTrace();
 			return false;
 		}
 		
+		confirmDelete.remove(sender.getName());
 		sender.sendMessage(ChatColor.YELLOW + "Ship deleted.");
 		return true;
 	}
@@ -1135,7 +1137,11 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.YELLOW + "/ship repair");
 			sender.sendMessage("Use the item in your active hand to repair the ship.");
 		}
-		
+		if (sender.hasPermission("horizonships.transfer") && player != null)
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship transfer [shipName] [playerName]");
+			sender.sendMessage("Transfer ownership of a ship to another player.");
+		}		
 		sender.sendMessage(ChatColor.YELLOW + "/ship cancel");
 		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
 		
