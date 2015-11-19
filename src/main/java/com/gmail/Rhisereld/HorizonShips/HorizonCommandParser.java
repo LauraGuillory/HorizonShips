@@ -326,7 +326,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the player has permission
 		if (!player.hasPermission("horizonships.admin.destination.add"))
 		{
-			sender.sendMessage("You don't have permission to create a destination.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to create a destination.");
 			return false;
 		}
 		
@@ -413,7 +413,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the player has permission OR is the console
 		if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
 		{
-			sender.sendMessage("You don't have permission to view this.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
 			return false;
 		}
 		
@@ -493,7 +493,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the player has permission
 		if (!player.hasPermission("horizonships.diagnose"))
 		{
-			sender.sendMessage("You don't have permission to diagnose a ship."); //TODO: needs colour
+			sender.sendMessage(ChatColor.RED + "You don't have permission to diagnose a ship.");
 			return false;
 		}
 		
@@ -568,7 +568,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the player has permission
 		if (!player.hasPermission("horizonships.refuel"))
 		{
-			sender.sendMessage("You don't have permission to refuel a ship.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to refuel a ship.");
 			return false;
 		}
 		
@@ -594,7 +594,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the sender has permission OR is the console
 		if (!sender.hasPermission("horizonships.info") && !(sender instanceof Player))
 		{
-			sender.sendMessage("You don't have permission to view this.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
 			return false;
 		}
 		
@@ -622,7 +622,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the sender has permission OR is the console
 		if (!sender.hasPermission("horizonships.admin.setowner") && !(sender instanceof Player))
 		{
-			sender.sendMessage("You don't have permission to set the owner of a ship.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to set the owner of a ship.");
 			return false;
 		}
 
@@ -662,7 +662,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that they have permission
 		if (!player.hasPermission("horizonships.transfer"))
 		{
-			sender.sendMessage("You don't have permission to transfer a ship to someone else.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to transfer a ship to someone else.");
 			return false;
 		}
 		
