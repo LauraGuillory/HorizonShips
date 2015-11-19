@@ -924,11 +924,26 @@ public class HorizonCommandParser implements CommandExecutor
 			return true;
 		}
 		
+		if (confirmRemoveDestination.containsKey(name))
+		{
+			confirmRemoveDestination.remove(name);
+			sender.sendMessage(ChatColor.YELLOW + "Destination removal cancelled.");
+			return true;
+		}
+		
 		if (confirmAdjust.containsKey(name))
 		{
 			confirmAdjust.remove(name);
 			shipHandler.cancelDestination(name);
 			sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
+			return true;
+		}
+		
+		if (confirmTransfer.containsKey(name))
+		{
+			confirmTransfer.remove(name);
+			shipHandler.cancelDestination(name);
+			sender.sendMessage(ChatColor.YELLOW + "Ship ownership transfer cancelled.");
 			return true;
 		}
 		
