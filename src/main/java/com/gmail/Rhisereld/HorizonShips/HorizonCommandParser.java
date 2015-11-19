@@ -592,9 +592,9 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean shipInfo(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
-		if (!sender.hasPermission("horizonships.info") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.info") && sender instanceof Player)
 		{
-			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
+			sender.sendMessage(ChatColor.RED + "You don't have permission to view ship information.");
 			return false;
 		}
 		

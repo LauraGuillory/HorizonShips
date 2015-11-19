@@ -488,7 +488,14 @@ public class ShipHandler
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//TODO: Check that the person checking is the owner, a permitted pilot, an admin, or the console
+		Player player = null;
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
 		
+		if (player != null && (!ship.isPilot(player.getUniqueId()) && !ship.getOwner().equals(player.getUniqueId())
+				&& !player.hasPermission("horizonships.admin.info")))
+				throw new IllegalArgumentException("You don't have permission to view that ship.");
+
 		//Organise some information
 		//Destinations
 		Set<String> destinations = ship.getAllDestinations();
@@ -527,12 +534,20 @@ public class ShipHandler
 		//Dimensions
 		String dimensions = ship.getLength() + "x" + ship.getHeight() + "x" + ship.getWidth();
 		
+		//Owner
+		Player ownerPlayer = Bukkit.getPlayer(ship.getOwner());
+		String owner;
+		if (ownerPlayer == null)
+			owner = Bukkit.getOfflinePlayer(ship.getOwner()).getName();
+		else
+			owner = ownerPlayer.getName();
+		
 		//Displaying
 		if (sender instanceof Player)
 		{
-			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
-			sender.sendMessage(ChatColor.YELLOW + "Owner:                                       " + ChatColor.WHITE + 
-					Bukkit.getPlayer(ship.getOwner()).getName());
+			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD + shipName + " " 
+								+ ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Owner:                                        " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:                                " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:                          " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:                                  " + ChatColor.WHITE + dimensions);
@@ -543,8 +558,9 @@ public class ShipHandler
 		}
 		else
 		{
-			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
-			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + Bukkit.getPlayer(ship.getOwner()).getName());
+			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD + shipName + " " 
+								+ ChatColor.WHITE + ">---------------");
+			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);

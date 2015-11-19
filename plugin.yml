@@ -17,12 +17,14 @@ permissions:
       horizonships.admin.destination.add: true
       horizonships.admin.destination.remove: true
       horizonships.admin.setowner: true
+      horizonships.admin.info: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
       horizonships.repair: true   
       horizonships.refuel: true
       horizonships.transfer: true
+      horizonships.info: true
     
   horizonships.common:
     description: Gives access to Horizon Ships for normal players.
@@ -33,6 +35,7 @@ permissions:
       horizonships.repair: true
       horizonships.refuel: true
       horizonships.transfer: true
+      horizonships.info: true
     
   horizonships.admin:
     description: Gives access to all Horizon Ships commands for admins and normal players.
@@ -42,9 +45,11 @@ permissions:
       horizonships.admin.destination.add: true
       horizonships.admin.destination.remove: true
       horizonships.admin.setowner: true
+      horizonships.admin.info: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
       horizonships.repair: true
       horizonships.transfer: true
+      horizonships.info: true
   
