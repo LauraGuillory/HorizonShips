@@ -542,6 +542,9 @@ public class ShipHandler
 		else
 			owner = ownerPlayer.getName();
 		
+		if (owner == null) //Sometimes player names can't be retrieved if the player has never joined the server.
+			owner = ship.getOwner().toString(); //At this point, give up and provide the UUID instead.
+		
 		//Displaying
 		if (sender instanceof Player)
 		{
