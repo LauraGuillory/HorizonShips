@@ -84,12 +84,25 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship add
 			if (args[0].equalsIgnoreCase("add"))
 			{	
-				//ship add destination [shipName] [destinationName]
-				if (args.length >= 4 && args[1].equalsIgnoreCase("destination"))
-					return addDestination(sender, args);
+				if (args.length < 3)
+					sender.sendMessage(ChatColor.RED + "Incorrect format!");
 				
-				sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
-									+ "[destinationName]");
+				//ship add destination [shipName] [destinationName]
+				if (args[1].equalsIgnoreCase("destination"))
+					if (args.length >= 4)
+						return addDestination(sender, args);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
+								+ "[destinationName]");
+				
+				//ship add pilot [shipName] [pilotName]
+				if (args[1].equalsIgnoreCase("pilot"))
+					if (args.length >= 4)
+						return addPilot(sender,args);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add pilot [shipName] "
+								+ "[pilotName]");
+				
 				return false;
 			}
 			
@@ -396,6 +409,36 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
+		
+		return true;
+	}
+	
+	/**
+	 * addPilot() performs all the checks necessary for the /ship add pilot command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean addPilot(CommandSender sender, String[] args)
+	{
+		//Check that the sender has permission to add a pilot OR is the console
+		if (!sender.hasPermission("horizonships.pilot.add") && sender instanceof Player)
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to add a pilot.");
+			return false;
+		}
+				
+		//Add pilot
+		try {
+			shipHandler.addPilot(sender, args[2], args[3]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Pilot added.");
 		
 		return true;
 	}
@@ -1119,6 +1162,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [shipName] [destinationName]");
 			sender.sendMessage("Remove a destination from the given ship.");
+		}
+		if (sender.hasPermission("horizonships.pilot.add"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship add pilot [shipName] [pilotName]");
+			sender.sendMessage("Add a pilot to the authentication list of the ship, allowing them to pilot it.");
 		}
 		if (sender.hasPermission("horizonships.admin.setowner"))
 		{

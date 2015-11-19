@@ -643,6 +643,38 @@ public class ShipHandler
 	}
 	
 	/**
+	 * addPilot() ensures that the sender is an owner of the ship or an administrator,
+	 * then adds the pilot given to the list of permitted pilots for the ship given.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @param pilot
+	 * @throws IllegalArgumentException
+	 */
+	public void addPilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Check that the sender is an administrator OR owns the ship
+		Player player = Bukkit.getPlayer(sender.getName());
+		
+		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null && player.getUniqueId().equals(ship.getOwner()))
+			throw new IllegalArgumentException("That ship does not belong to you.");
+		
+		Player pilotPlayer = Bukkit.getPlayer(pilot);
+		UUID pilotUUID;
+		if (pilotPlayer == null)
+			pilotUUID = Bukkit.getOfflinePlayer(pilot).getUniqueId();
+		else
+			pilotUUID = pilotPlayer.getUniqueId();
+		
+		ship.addPilot(pilotUUID);
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 

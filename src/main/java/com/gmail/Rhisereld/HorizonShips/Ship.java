@@ -196,22 +196,6 @@ public class Ship
 	}
 	
 	/**
-	 * isPilot() checks if the Player provided is allowed to pilot the ship.
-	 * 
-	 * @param player
-	 * @return
-	 */
-	public boolean isPilot(UUID player)
-	{
-		List <String> pilots = data.getConfig().getStringList("ships." + name + ".pilots");
-		
-		for (String p : pilots)
-			if (player.toString().equalsIgnoreCase(p))
-				return true;
-		return false;
-	}
-	
-	/**
 	 * isBroken() returns true if the ship is broken, false otherwise.
 	 * 
 	 * @return
@@ -358,6 +342,41 @@ public class Ship
 	public List<UUID> getPilots()
 	{
 		return pilots;
+	}
+	
+	/**
+	 * isPilot() checks if the Player provided is allowed to pilot the ship.
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public boolean isPilot(UUID player)
+	{
+		List <String> pilots = data.getConfig().getStringList("ships." + name + ".pilots");
+		
+		for (String p : pilots)
+			if (player.toString().equalsIgnoreCase(p))
+				return true;
+		return false;
+	}
+	
+	/**
+	 * addPilot() adds the uuid given to the list of permitted pilots for the ship.
+	 * 
+	 * @param uuid
+	 */
+	
+	public void addPilot(UUID uuid)
+	{
+		pilots.add(uuid);
+		
+		List<String> pilotStrings = new ArrayList<String>();
+		
+		for (UUID u: pilots)
+			pilotStrings.add(u.toString());
+		
+		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
+		data.saveConfig();
 	}
 	
 	/**
