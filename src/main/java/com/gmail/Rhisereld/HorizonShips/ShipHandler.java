@@ -568,6 +568,34 @@ public class ShipHandler
 			ship.setOwner(player.getUniqueId());		
 	}
 	
+	public void transfer(Player owner, String shipName, String newOwner)
+	{
+		//Get the ship
+		Ship ship = new Ship(data, shipName);
+		
+		//Ensure the ship actually exists
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Ensure the player is the owner of the ship
+		if (!owner.getUniqueId().equals(ship.getOwner()))
+			throw new IllegalArgumentException("You are not the owner of that ship.");
+		
+		//Set the new owner
+		Player player = Bukkit.getPlayer(newOwner);
+		if (player == null)
+		{
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(newOwner);
+			
+			if (offlinePlayer == null)
+				throw new IllegalArgumentException("Player does not exist.");
+			
+			ship.setOwner(offlinePlayer.getUniqueId());
+		}
+		else
+			ship.setOwner(player.getUniqueId());
+	}
+	
 	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.

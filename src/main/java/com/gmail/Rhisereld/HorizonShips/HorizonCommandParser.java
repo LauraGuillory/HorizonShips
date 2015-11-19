@@ -29,6 +29,7 @@ public class HorizonCommandParser implements CommandExecutor
 	HashMap<String, String> confirmAddDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmRemoveDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
+	HashMap<String, String> confirmTransfer = new HashMap<String, String>();
 	
     public HorizonCommandParser(ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
     {
@@ -171,6 +172,17 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
+			//ship transfer [shipName] [playerName]
+			if (args[0].equalsIgnoreCase("transfer"))
+				if (args.length == 3)
+					return transferShip(sender, args);
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship transfer "
+							+ "[shipName] [playerName]");
+					return false;
+				}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -211,6 +223,10 @@ public class HorizonCommandParser implements CommandExecutor
 				//ship confirm adjust
 				if (args[1].equalsIgnoreCase("adjust"))
 					return confirmAdjust(sender, args);
+				
+				//ship confirm transfer
+				if (args[1].equalsIgnoreCase("transfer"))
+					return confirmTransfer(sender, args);
 			}
 			
 			//ship cancel
@@ -528,6 +544,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
+	//TODO
 	private boolean refuelShip(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -609,6 +626,36 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		sender.sendMessage(ChatColor.YELLOW + "New owner set.");
 		
+		return true;
+	}
+	
+	//TODO
+	public boolean transferShip(CommandSender sender, String[] args)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that they have permission
+		if (!player.hasPermission("horizonships.transfer"))
+		{
+			sender.sendMessage("You don't have permission to transfer a ship to someone else.");
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Are you sure that you want to transfer ownership of "
+							+ args[1] + " to " + args[2] + "? You will lose all ownership rights and "
+							+ "access to the ship. This action cannot be undone. Type /ship confirm "
+							+ "transfer to confirm.");
+		confirmTransfer.put(sender.getName(), args[1] + " " + args[2]);
+		confirmTransferTimeout(sender);
 		return true;
 	}
 	
@@ -768,8 +815,6 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 
 		sender.sendMessage(ChatColor.YELLOW + "Destination removed.");
-	
-		//Remove confirmation for destination.
 		return true;
 	}
 	
@@ -791,13 +836,38 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 
 		//Add destination
-		Player player = Bukkit.getPlayer(sender.getName());
+		Player player = Bukkit.getPlayer(name);
 		String[] arguments = confirmAdjust.get(name).split(" ");
 		shipHandler.addDestination(player, arguments[0], arguments[1]);
 		confirmAdjust.remove(name);
 
 		sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
 		return true;
+	}
+	
+	//TODO 
+	private boolean confirmTransfer(CommandSender sender, String[] args)
+	{
+		String name = sender.getName();
+		
+		if (confirmTransfer.get(name) == null)
+		{
+			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
+			return false;
+		}
+		
+		Player player = Bukkit.getPlayer(name);
+		String[] arguments = confirmTransfer.get(name).split(" ");
+		confirmTransfer.remove(name);
+		
+		try {
+			shipHandler.transfer(player, arguments[0], arguments[1]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		sender.sendMessage(ChatColor.YELLOW + "You transfer ownership of " + arguments[0] + " to " + arguments[1] + ".");
+		return false;
 	}
 	
 	/**
@@ -928,7 +998,7 @@ public class HorizonCommandParser implements CommandExecutor
 					sender.sendMessage(ChatColor.RED + "You timed out.");
 				}
 			}			
-		} , 200);
+		} , 200); //TODO: Adjust timeout length
 	}
 	
 	/**
@@ -951,6 +1021,27 @@ public class HorizonCommandParser implements CommandExecutor
 				}
 			}			
 		} , 6000);
+	}
+	
+	/**
+	 * confirmTransferTimeout() removes the player from the list of players who are in the process
+	 * of transfering ownership of their ship.
+	 * 
+	 * @param sender
+	 */
+	private void confirmTransferTimeout(final CommandSender sender)
+	{
+		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
+		{
+			public void run()
+			{
+				if (confirmTransfer.containsKey(sender.getName()))
+				{
+					confirmTransfer.remove(sender.getName());
+					sender.sendMessage(ChatColor.RED + "You timed out.");
+				}
+			}			
+		} , 200);
 	}
 	
 	/**
