@@ -675,6 +675,49 @@ public class ShipHandler
 	}
 	
 	/**
+	 * removePilot() ensures that the sender is an owner of theship or an administrator,
+	 * then removes the pilot given from the list of permitted pilots for the ship given.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @param pilot
+	 * @throws IllegalArgumentException
+	 */
+	public void removePilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Check that the sender is an administrator OR owns the ship
+		Player player = Bukkit.getPlayer(sender.getName());
+		
+		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && player.getUniqueId().equals(ship.getOwner()))
+			throw new IllegalArgumentException("That ship does not belong to you.");
+		
+		//Check that the pilot is currently a pilot of the ship
+		List<UUID> pilots = ship.getPilots();
+		Player pilotPlayer = Bukkit.getPlayer(pilot);
+		UUID pilotUUID;
+		boolean pilotMatch = false;
+		
+		if (pilotPlayer == null)
+			pilotUUID = Bukkit.getOfflinePlayer(pilot).getUniqueId();
+		else
+			pilotUUID = pilotPlayer.getUniqueId();
+		
+		for (UUID u: pilots)
+			if (pilotUUID.equals(u))
+				pilotMatch = true;
+		
+		if (!pilotMatch)
+			throw new IllegalArgumentException("That player is not a pilot of that ship.");
+		
+		ship.removePilot(pilotUUID);
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 

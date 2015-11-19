@@ -379,6 +379,19 @@ public class Ship
 		data.saveConfig();
 	}
 	
+	public void removePilot(UUID uuid)
+	{
+		pilots.remove(uuid);
+		
+		List<String> pilotStrings = new ArrayList<String>();
+		
+		for (UUID u: pilots)
+			pilotStrings.add(u.toString());
+		
+		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
+		data.saveConfig();
+	}
+	
 	/**
 	 * getOwner() returns the UUID of the player who is considered to own the ship.
 	 * 

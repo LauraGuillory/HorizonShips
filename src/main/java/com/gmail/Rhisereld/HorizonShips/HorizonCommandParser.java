@@ -84,8 +84,11 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship add
 			if (args[0].equalsIgnoreCase("add"))
 			{	
-				if (args.length < 3)
+				if (args.length < 2)
+				{
 					sender.sendMessage(ChatColor.RED + "Incorrect format!");
+					return false;
+				}
 				
 				//ship add destination [shipName] [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
@@ -109,12 +112,28 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship remove
 			if (args[0].equalsIgnoreCase("remove"))
 			{
-				//ship remove destination [shipName] [destinationName]
-				if (args.length >= 4 && args[1].equalsIgnoreCase("destination"))
-					return removeDestination(sender, args);
+				if (args.length < 2)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format!");
+					return false;
+				}
 				
-				sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove destination [shipName] "
-									+ "[destinationName]");
+				//ship remove destination [shipName] [destinationName]
+				if (args[1].equalsIgnoreCase("destination"))
+					if (args.length >= 4)
+						return removeDestination(sender, args);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove destination [shipName] "
+								+ "[destinationName]");
+				
+				//ship remove pilot [shipName] [pilotName]
+				if (args[1].equalsIgnoreCase("pilot"))
+					if (args.length >= 4)
+						return removePilot(sender, args);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove pilot [shipName] "
+								+ "[pilotName]");
+				
 				return false;
 			}
 			
@@ -439,6 +458,36 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + "Pilot added.");
+		
+		return true;
+	}
+	
+	/**
+	 * removePilot() performs all the checks necessary for the /ship remove pilot command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean removePilot(CommandSender sender, String[] args)
+	{
+		//Check that the sender has permission to remove a pilot OR is the console
+		if (!sender.hasPermission("horizonships.pilot.remove") && sender instanceof Player)
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a pilot.");
+			return false;
+		}
+		
+		//Remove pilot
+		try {
+			shipHandler.removePilot(sender, args[2], args[3]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "Pilot removed.");
 		
 		return true;
 	}
@@ -1167,6 +1216,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship add pilot [shipName] [pilotName]");
 			sender.sendMessage("Add a pilot to the authentication list of the ship, allowing them to pilot it.");
+		}
+		if (sender.hasPermission("horizonships.pilot.remove"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove pilot [shipName] [pilotName]");
+			sender.sendMessage("Remove a pilot from the authentication list of the ship that allows them to pilot it.");
 		}
 		if (sender.hasPermission("horizonships.admin.setowner"))
 		{
