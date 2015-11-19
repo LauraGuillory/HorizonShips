@@ -70,13 +70,14 @@ public class Main extends JavaPlugin implements CommandExecutor
 	@Override
 	public void onDisable()
 	{
+		//Remove all destinations in the middle of being defined.
+		hcp.cancelDestinationsInProgress();
+		data.saveConfig();
+		
 		plugin = null;
 		worldEditPlugin = null;
 		config = null;
 		data = null;
-		data.saveConfig();
-		
-		//Remove all destinations in the middle of being defined.
-		hcp.cancelDestinationsInProgress();
+		hcp = null;
 	}
 }
