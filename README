@@ -112,7 +112,7 @@ refuel:
   maxtank: 10				< --- Maximum tank size
   arrow:				< --- Item that is used to refuel
   							ships
-    name: "energy cell"		< --- Custom name for the item when it is
+    name: "energy cell"			< --- Custom name for the item when it is
     					referred to inside the plugin
     fills: 1				< --- Number of units one item fills
 events:					< --- All configuration pertaining 

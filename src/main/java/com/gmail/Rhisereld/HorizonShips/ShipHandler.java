@@ -91,10 +91,6 @@ public class ShipHandler
 		if (!shipFound)
 			throw new IllegalArgumentException("Ship not found.");
 		
-		//Check that the person has permission
-		if (!sender.hasPermission("horizonships.admin.delete") && sender instanceof Player)
-			throw new IllegalArgumentException("You don't have permission to delete that ship.");
-		
 		//Delete all information on the ship.
 		Ship ship = new Ship(data, shipName);
 		ship.deleteShip();
