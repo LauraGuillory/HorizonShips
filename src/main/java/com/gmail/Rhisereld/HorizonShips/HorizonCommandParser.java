@@ -1079,8 +1079,8 @@ public class HorizonCommandParser implements CommandExecutor
 		if (sender instanceof Player)
 			player = Bukkit.getPlayer(sender.getName()); //Some commands are not available to console - which is not a player
 		
-		if (player == null)
-			sender.sendMessage("--------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">--------");
+		if (player != null)
+			sender.sendMessage("-----------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">-----------");
 		else
 			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
 			
