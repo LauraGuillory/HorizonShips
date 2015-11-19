@@ -1215,7 +1215,7 @@ public class HorizonCommandParser implements CommandExecutor
 		if (sender.hasPermission("horizonships.pilot.add"))
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship add pilot [shipName] [pilotName]");
-			sender.sendMessage("Add a pilot to the authentication list of the ship, allowing them to pilot it.");
+			sender.sendMessage("Add a pilot to the authentication list of the ship that allows them to pilot it.");
 		}
 		if (sender.hasPermission("horizonships.pilot.remove"))
 		{

@@ -664,12 +664,23 @@ public class ShipHandler
 		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null && player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
+		//Make sure the pilot isn't already a pilot
+		List<UUID> pilots = ship.getPilots();
 		Player pilotPlayer = Bukkit.getPlayer(pilot);
 		UUID pilotUUID;
+		boolean pilotMatch = false;
+		
 		if (pilotPlayer == null)
 			pilotUUID = Bukkit.getOfflinePlayer(pilot).getUniqueId();
 		else
 			pilotUUID = pilotPlayer.getUniqueId();
+		
+		for (UUID u: pilots)
+			if (pilotUUID.equals(u))
+				pilotMatch = true;
+		
+		if (pilotMatch)
+			throw new IllegalArgumentException("That player is already a pilot of that ship.");
 		
 		ship.addPilot(pilotUUID);
 	}
