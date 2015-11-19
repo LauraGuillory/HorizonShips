@@ -25,6 +25,9 @@ public class Destination
 	 */
 	public Destination(ConfigAccessor data, String shipName, String destinationName)
 	{
+		if (!data.getConfig().contains("ships." + shipName + ".destinations"))
+			return;
+		
 		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false);
 		
 		boolean foundDestination = false;

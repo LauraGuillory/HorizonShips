@@ -154,6 +154,17 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
+			//ship setowner [shipName] [playerName]
+			if (args[0].equalsIgnoreCase("setowner"))
+				if (args.length == 3)
+					return setOwner(sender, args);
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship setowner "
+							+ "[shipName] [playerName]");
+					return false;
+				}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -460,7 +471,7 @@ public class HorizonCommandParser implements CommandExecutor
 		//Check that the player has permission
 		if (!player.hasPermission("horizonships.diagnose"))
 		{
-			sender.sendMessage("You don't have permission to diagnose a ship.");
+			sender.sendMessage("You don't have permission to diagnose a ship."); //TODO: needs colour
 			return false;
 		}
 		
@@ -551,7 +562,7 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean shipInfo(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
-		if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
+		if (!sender.hasPermission("horizonships.info") && !(sender instanceof Player)) //TODO: incorrect permission
 		{
 			sender.sendMessage("You don't have permission to view this.");
 			return false;
@@ -563,6 +574,34 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
+		
+		return true;
+	}
+	
+	/**
+	 * setOwner() performs checks to ensure the setowner command is valid, then calls the action.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	private boolean setOwner(CommandSender sender, String[] args)
+	{
+		//Check that the sender has permission OR is the console
+		if (!sender.hasPermission("horizonships.admin.setowner") && !(sender instanceof Player))
+		{
+			sender.sendMessage("You don't have permission to set the owner of a ship.");
+			return false;
+		}
+		
+		try {
+			shipHandler.setOwner(sender, args[1], args[2]);
+		} catch (IllegalArgumentException e) {
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "New owner set.");
 		
 		return true;
 	}

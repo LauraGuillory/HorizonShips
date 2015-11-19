@@ -16,6 +16,7 @@ permissions:
       horizonships.admin.ship.delete: true
       horizonships.admin.destination.add: true
       horizonships.admin.destination.remove: true
+      horizonships.admin.setowner: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
@@ -38,6 +39,7 @@ permissions:
       horizonships.admin.ship.delete: true
       horizonships.admin.destination.add: true
       horizonships.admin.destination.remove: true
+      horizonships.admin.setowner: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true

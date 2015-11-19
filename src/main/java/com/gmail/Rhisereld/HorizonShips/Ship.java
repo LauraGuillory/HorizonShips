@@ -32,6 +32,7 @@ public class Ship
 	private int length;
 	private int width;
 	private int height;
+	private UUID owner;
 	
 	/**
 	 * Constructor for fetching an existing ship from the data file.
@@ -60,6 +61,8 @@ public class Ship
 		length = data.getConfig().getInt(path + "length");
 		width = data.getConfig().getInt(path + "width");
 		height = data.getConfig().getInt(path + "height");
+		if (data.getConfig().getString(path + "owner") != null)
+			owner = UUID.fromString(data.getConfig().getString(path + "owner"));
 	}
 
 	/**
@@ -355,5 +358,22 @@ public class Ship
 	public List<UUID> getPilots()
 	{
 		return pilots;
+	}
+	
+	/**
+	 * getOwner() returns the UUID of the player who is considered to own the ship.
+	 * 
+	 * @return
+	 */
+	public UUID getOwner()
+	{
+		return owner;
+	}
+	
+	public void setOwner(UUID uuid)
+	{
+		owner = uuid;
+		data.getConfig().set("ships." + name + ".owner", uuid);
+		data.saveConfig();
 	}
 }

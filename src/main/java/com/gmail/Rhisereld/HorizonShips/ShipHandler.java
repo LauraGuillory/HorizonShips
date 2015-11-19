@@ -481,6 +481,8 @@ public class ShipHandler
 		if (ship.getName() == null)
 			throw new IllegalArgumentException("Ship not found.");
 		
+		//TODO: Check that the person checking is the owner, a permitted pilot, an admin, or the console
+		
 		//Organise some information
 		//Destinations
 		Set<String> destinations = ship.getAllDestinations();
@@ -530,6 +532,27 @@ public class ShipHandler
 		sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:  " + ChatColor.WHITE + pilotsString);
 		sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + ChatColor.WHITE + condition);
 		sender.sendMessage(ChatColor.YELLOW + "Fuel:  " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+	}
+	
+	/**
+	 * setOwner() sets the owner of the ship.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @param owner
+	 * @throws IllegalArgumentException
+	 */
+	public void setOwner(CommandSender sender, String shipName, String owner) throws IllegalArgumentException
+	{
+		//Get the ship
+		Ship ship = new Ship(data, shipName);
+		
+		//Ensure the ship actually exists
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Set the new owner
+		ship.setOwner(Bukkit.getPlayer(owner).getUniqueId());
 	}
 	
 	/**
