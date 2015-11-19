@@ -726,6 +726,7 @@ public class HorizonCommandParser implements CommandExecutor
 			player.sendMessage(ChatColor.RED + e.getMessage());
 			confirmAddDestination.remove(name);
 			e.printStackTrace();
+			return false;
 		}
 	
 		sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "

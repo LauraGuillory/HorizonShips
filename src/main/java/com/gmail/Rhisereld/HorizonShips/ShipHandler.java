@@ -126,7 +126,8 @@ public class ShipHandler
 			throw new IllegalArgumentException("You don't have permission to create a destination!");
 		
 		//Check that there isn't already a destination by that name.
-		if (data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false).contains(shipName))
+		Ship ship = new Ship(data, shipName);
+		if (ship.getDestination(destinationName) != null)
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
 
 		s = sm.getPlayerSelection(player);
