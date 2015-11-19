@@ -13,8 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.gmail.Rhisereld.Horizon_Professions.ProfessionAPI;
-
 /**
  * ShipEvent handles all things related to the set of events that may occur during a journey.
  * chooseEvent() must be called before trigger() is called.
@@ -93,14 +91,12 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.bumpyRide.";
 		int damage = config.getConfig().getInt(path + "damage");
-		String profession = config.getConfig().getString(path + "profession");
 		Set<String> tiers = config.getConfig().getConfigurationSection(path + "injuryChance").getKeys(false);
 		List<Double> injuryChances = new ArrayList<Double>();
 		
 		for (String t: tiers)
 			injuryChances.add(config.getConfig().getDouble(path + "injuryChance." + t));
 		
-		//TODO: Determine pilot's skill
 		int pilotSkill = 1;
 		
 		//Determine if injury occurs or not

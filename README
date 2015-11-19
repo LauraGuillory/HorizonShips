@@ -1,8 +1,8 @@
 Horizon Ships - Version 1.0 20/11/2015
 
-Horizon Ships is a travel system that incorporates elements of events. 
+Horizon Ships is a travel system that incorporates elements of special events. 
 Players will be able to own, run and travel in ships. Players will also face 
-challenges in certain events. “Events” refers to interruptions that occur 
+certain challenges when they do so. “Events” refers to interruptions that occur 
 during a journey, and can be anything from a pest invasion to a ship breakdown.
 
 A traditional challenge for moving ships on Minecraft servers is the high 
@@ -109,31 +109,31 @@ All configuration files for Bukkit use YAML format: http://yaml.org/
 The following options in the configuration file are explained:
 
 refuel:
-  maxtank: 10						< --- Maximum tank size
-  arrow:							< --- Item that is used to refuel
-  											ships
-    name: "energy cell"				< --- Custom name for the item when it is
-    										referred to inside the plugin
-    fills: 1						< --- Number of units one item fills
-events:								< --- All configuration pertaining 
-											to events
-  bumpyRide:						< --- All configuration pertaining
-  											to "Bumpy Ride" event
-    damage: 8						< --- Amount of health damaged
-    										by the event
-    probability: 3					< --- Probability of the event
+  maxtank: 10				< --- Maximum tank size
+  arrow:					< --- Item that is used to refuel
+  									ships
+    name: "energy cell"		< --- Custom name for the item when it is
+    								referred to inside the plugin
+    fills: 1				< --- Number of units one item fills
+events:						< --- All configuration pertaining 
+									to events
+  bumpyRide:				< --- All configuration pertaining
+  									to "Bumpy Ride" event
+    damage: 8				< --- Amount of health damaged
+    								by the event
+    probability: 3			< --- Probability of the event
   infestation:
-    number: 2						< --- Number of spiders to spawn
-    poisonous: false				< --- Whether the spiders are
-    										poisonous
+    number: 2				< --- Number of spiders to spawn
+    poisonous: false		< --- Whether the spiders are
+    								poisonous
     probability: 2
   breakdown:
     probability: 2
-    spareParts:						< --- List of spare parts that
-    										may be selected as a requirement
-    										to repair the ship.
-      bedrock: 						< --- Item type
-        name: "white Hull"			< --- Custom name
+    spareParts:				< --- List of spare parts that
+    								may be selected as a requirement
+    								to repair the ship.
+      bedrock: 				< --- Item type
+        name: "white Hull"	< --- Custom name
       glass: 
         name: "glass"
       enchanting_table: 
@@ -149,7 +149,7 @@ events:								< --- All configuration pertaining
         name: "soldering iron"
       iron_sword: 
         name: "crowbar"
-  none:								< --- Probability of no event happening
+  none:						< --- Probability of no event happening
     probability: 5
   fuelLeak:
     probability: 1
