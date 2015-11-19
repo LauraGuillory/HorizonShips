@@ -213,7 +213,7 @@ public class HorizonCommandParser implements CommandExecutor
 				//ship confirm remove destination
 				if (args[1].equalsIgnoreCase("remove"))
 					if (args.length >= 3 && args[2].equalsIgnoreCase("destination"))
-						confirmRemoveDestination(sender, args);
+						return confirmRemoveDestination(sender, args);
 					else
 					{
 						sender.sendMessage(ChatColor.RED + "Incorrect format.");
@@ -1102,7 +1102,7 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.admin.destination.remove"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship remove [shipName] [destinationName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [shipName] [destinationName]");
 			sender.sendMessage("Remove a destination from the given ship.");
 		}
 		if (sender.hasPermission("horizonships.admin.setowner"))

@@ -222,8 +222,12 @@ public class ShipHandler
 	 */
 	public void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
 	{
-		//Check that the destination exists
+		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Check that the destination exists
 		Destination destination = ship.getDestination(destinationName);
 		if (destination.getName() == null)
 			throw new IllegalArgumentException("That destination does not exist!");
