@@ -1,5 +1,6 @@
 package com.gmail.Rhisereld.HorizonShips;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +13,7 @@ public class Main extends JavaPlugin implements CommandExecutor
 {
 	static JavaPlugin plugin;						//Some functions require a reference to the plugin in args.
 	WorldEditPlugin worldEditPlugin;
+	HorizonCommandParser hcp;
 	
 	ConfigAccessor config;						//Configuration file.
 	ConfigAccessor data;						//Data file.
@@ -45,7 +47,18 @@ public class Main extends JavaPlugin implements CommandExecutor
         //TODO HorizonProfessions integration
 
         //Register commands
-    	this.getCommand("ship").setExecutor(new HorizonCommandParser(data, config, plugin));
+        hcp = new HorizonCommandParser(data, config, plugin);
+    	this.getCommand("ship").setExecutor(hcp);
+    	
+		//Save every 30 minutes.
+		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
+		{
+			public void run() 
+			{
+				getLogger().info("Backing up ship stats.");
+				data.saveConfig();;
+			}			
+		} , 36000, 36000);
 	}
 
 	/**
@@ -61,7 +74,9 @@ public class Main extends JavaPlugin implements CommandExecutor
 		worldEditPlugin = null;
 		config = null;
 		data = null;
+		data.saveConfig();
 		
-		//TODO remove all destinations in the middle of being defined.
+		//Remove all destinations in the middle of being defined.
+		hcp.cancelDestinationsInProgress();
 	}
 }

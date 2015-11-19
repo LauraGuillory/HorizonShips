@@ -70,7 +70,6 @@ public class Destination
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
 		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
-		data.saveConfig();
 	}
 	
 	/**
@@ -81,7 +80,6 @@ public class Destination
 	public void delete()
 	{
 		data.getConfig().getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
-		data.saveConfig();
 	}
 	
 	/**

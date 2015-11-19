@@ -102,7 +102,6 @@ public class Ship
 		data.getConfig().set("ships." + name + ".length", length);
 		data.getConfig().set("ships." + name + ".width", width);
 		data.getConfig().set("ships." + name + ".height", height);
-		data.saveConfig();
 		
 		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
 		sm.saveSchematic(selection, name + "\\", "ship");
@@ -115,7 +114,6 @@ public class Ship
 	public void deleteShip()
 	{
 		data.getConfig().set("ships." + name, null);
-		data.saveConfig();
 		
 		//Delete ship schematic
 		SchematicManager sm = new SchematicManager(Bukkit.getWorld("world"));
@@ -190,7 +188,6 @@ public class Ship
 		if (currentDestination == null)
 			return false;
 		data.getConfig().set("ships." + name + ".currentDestination", destination);
-		data.saveConfig();
 		
 		return true;
 	}
@@ -213,7 +210,6 @@ public class Ship
 	public void setBroken(boolean broken)
 	{
 		data.getConfig().set("ships." + name + ".broken", broken);
-		data.saveConfig();
 	}
 
 	/**
@@ -264,7 +260,6 @@ public class Ship
 	public void setFuel(int fuel)
 	{
 		data.getConfig().set("ships." + name + ".fuel", fuel);
-		data.saveConfig();
 	}
 	
 	/**
@@ -274,7 +269,6 @@ public class Ship
 	public void reduceFuel()
 	{
 		data.getConfig().set("ships." + name + ".fuel", --fuel);
-		data.saveConfig();
 	}
 	
 	/**
@@ -306,7 +300,6 @@ public class Ship
 	{
 		this.repairItem = item;
 		data.getConfig().set("ships." + name + ".repairItem", item);
-		data.saveConfig();
 	}
 	
 	/**
@@ -331,7 +324,6 @@ public class Ship
 	{
 		this.consumePart = consumePart;
 		data.getConfig().set("ships." + name + ".consumePart", consumePart);
-		data.saveConfig();
 	}
 	
 	/**
@@ -376,7 +368,6 @@ public class Ship
 			pilotStrings.add(u.toString());
 		
 		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
-		data.saveConfig();
 	}
 	
 	public void removePilot(UUID uuid)
@@ -389,7 +380,6 @@ public class Ship
 			pilotStrings.add(u.toString());
 		
 		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
-		data.saveConfig();
 	}
 	
 	/**
@@ -406,6 +396,5 @@ public class Ship
 	{
 		owner = uuid;
 		data.getConfig().set("ships." + name + ".owner", uuid.toString());
-		data.saveConfig();
 	}
 }

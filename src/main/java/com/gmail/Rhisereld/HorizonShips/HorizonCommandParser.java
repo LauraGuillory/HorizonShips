@@ -1262,4 +1262,18 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		return true;
 	}
+	
+	/**
+	 * cancelDestinationsInProgress() immediately cancels all of the destinations that are currently being defined,
+	 * in the case of a sudden server shutdown or reload.
+	 */
+	protected void cancelDestinationsInProgress()
+	{
+		for (String s: confirmAdjust.keySet())
+		{
+			shipHandler.cancelDestination(s);
+			confirmAdjust.remove(s);
+			Bukkit.getLogger().info(s);
+		}
+	}
 }
