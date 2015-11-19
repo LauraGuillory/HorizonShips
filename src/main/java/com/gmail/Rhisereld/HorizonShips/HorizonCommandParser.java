@@ -1132,7 +1132,7 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.repair") && player != null)
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship diagnose");
+			sender.sendMessage(ChatColor.YELLOW + "/ship repair");
 			sender.sendMessage("Use the item in your active hand to repair the ship.");
 		}
 		
