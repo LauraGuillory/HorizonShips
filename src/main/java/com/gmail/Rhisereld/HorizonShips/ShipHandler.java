@@ -488,8 +488,8 @@ public class ShipHandler
 		if (sender instanceof Player)
 			player = Bukkit.getPlayer(sender.getName());
 		
-		if (player != null && (!ship.isPilot(player.getUniqueId()) && !ship.getOwner().equals(player.getUniqueId())
-				&& !player.hasPermission("horizonships.admin.info")))
+		if (player != null && ship.getOwner() != null &&!ship.isPilot(player.getUniqueId())  
+				&& !ship.getOwner().equals(player.getUniqueId()) && !player.hasPermission("horizonships.admin.info"))
 				throw new IllegalArgumentException("You don't have permission to view that ship.");
 
 		//Organise some information
@@ -533,7 +533,9 @@ public class ShipHandler
 		//Owner
 		Player ownerPlayer = Bukkit.getPlayer(ship.getOwner());
 		String owner;
-		if (ownerPlayer == null)
+		if (ship.getOwner() == null)
+			owner = "None";
+		else if (ownerPlayer == null)
 			owner = Bukkit.getOfflinePlayer(ship.getOwner()).getName();
 		else
 			owner = ownerPlayer.getName();
