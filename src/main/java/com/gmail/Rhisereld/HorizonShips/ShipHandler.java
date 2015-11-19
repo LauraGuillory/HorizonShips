@@ -120,10 +120,6 @@ public class ShipHandler
 		new SchematicManager(player.getWorld());
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		schemManagers.put(player.getName(), sm);
-
-		//Check that the player has permission.
-		if (!player.hasPermission("horizonShips.admin.destination"))
-			throw new IllegalArgumentException("You don't have permission to create a destination!");
 		
 		//Check that there isn't already a destination by that name.
 		Ship ship = new Ship(data, shipName);
