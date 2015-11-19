@@ -28,7 +28,7 @@ public class Ship
 	private boolean broken;
 	private String repairItem;
 	private boolean consumePart;
-	private List<String> pilots = new ArrayList<String>();
+	private List<UUID> pilots = new ArrayList<UUID>();
 	private int length;
 	private int width;
 	private int height;
@@ -42,16 +42,21 @@ public class Ship
 	public Ship(ConfigAccessor data, String name)
 	{
 		String path = "ships." + name + ".";
+		currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
+		
+		if (currentDestination.getName() == null) //Ship does not exist.
+			return;
 		
 		this.data = data;
 		this.name = name;
-		currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
 		destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
 		fuel = data.getConfig().getInt(path + "fuel");
 		broken = data.getConfig().getBoolean(path + "broken");
 		repairItem = data.getConfig().getString(path + "repairItem");
 		consumePart = data.getConfig().getBoolean(path + consumePart);
-		pilots = data.getConfig().getStringList(path + "pilots");
+		List<String> pilotsString = data.getConfig().getStringList(path + "pilots");
+		for (String s: pilotsString)
+			pilots.add(UUID.fromString(s));
 		length = data.getConfig().getInt(path + "length");
 		width = data.getConfig().getInt(path + "width");
 		height = data.getConfig().getInt(path + "height");
@@ -79,7 +84,7 @@ public class Ship
 		destinations.add(destinationName);
 		fuel = 10;
 		broken = false;
-		pilots = new ArrayList<String>();
+		pilots = new ArrayList<UUID>();
 		
 		Location min = selection.getMinimumPoint();
 		Location max = selection.getMaximumPoint();
@@ -124,6 +129,16 @@ public class Ship
 	public Destination getDestination(String destinationName)
 	{
 		return new Destination(data, name, destinationName);
+	}
+	
+	/**
+	 * getAllDestinations() returns a list of all available destinations.
+	 * 
+	 * @return
+	 */
+	public Set<String> getAllDestinations()
+	{
+		return destinations;
 	}
 	
 	/**
@@ -330,5 +345,15 @@ public class Ship
 		this.consumePart = consumePart;
 		data.getConfig().set("ships." + name + ".consumePart", consumePart);
 		data.saveConfig();
+	}
+	
+	/**
+	 * getPilots() returns a list of the UUIDs of the players who are permitted to fly the ship.
+	 * 
+	 * @return
+	 */
+	public List<UUID> getPilots()
+	{
+		return pilots;
 	}
 }

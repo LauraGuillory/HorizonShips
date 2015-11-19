@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -242,9 +244,7 @@ public class ShipHandler
 		String list = "Ships currently saved: ";
 		
 		for (String ship: ships)
-		{
 			list = list.concat(ship + ", ");
-		}
 		
 		if (ships.size() == 0)
 			list = list.concat("None.");
@@ -450,6 +450,66 @@ public class ShipHandler
 		
 		//Notify
 		player.sendMessage(ChatColor.YELLOW + "You refilled the ship by " + numToUse * fills + " units.");
+	}
+	
+	public void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
+	{
+		//Get the ship
+		Ship ship = new Ship(data, shipName);
+		
+		//Check the ship actually exists
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Organise some information
+		//Destinations
+		Set<String> destinations = ship.getAllDestinations();
+		String destinationString = "";
+		
+		for (String d: destinations)
+			destinationString = destinationString.concat(d + ", ");
+		
+		if (destinations.size() == 0)
+			destinationString = destinationString.concat("None.");
+		else if (destinationString.length() > 0)
+		{
+			destinationString = destinationString.substring(0, destinationString.length() - 2);
+			destinationString = destinationString.concat(".");
+		}
+		
+		//Condition
+		String condition;
+		if (ship.isBroken())
+			condition = "Broken down";
+		else
+			condition = "Good";
+		
+		//Permitted pilots
+		List<UUID> pilots = ship.getPilots();
+		String pilotsString = "";
+		
+		for (UUID p: pilots)
+			pilotsString = pilotsString.concat(Bukkit.getOfflinePlayer(p).getName() + ", ");
+		
+		if (pilots.size() == 0)
+			pilotsString = pilotsString.concat("None");
+		else if (pilotsString.length() > 0)
+			pilotsString = pilotsString.substring(0, pilotsString.length() - 2);
+		
+		//Current destination
+		String currentDestination = ship.getCurrentDestination().getName();
+		
+		//Dimensions
+		String dimensions = ship.getLength() + "x" + ship.getHeight() + "x" + ship.getWidth();
+		
+		//Displaying
+		sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship: " + shipName + " " + ChatColor.WHITE + ">---------------");
+		sender.sendMessage(ChatColor.YELLOW + "Destinations:  " + ChatColor.WHITE + destinationString);
+		sender.sendMessage(ChatColor.YELLOW + "Current location:  " + ChatColor.WHITE + currentDestination);
+		sender.sendMessage(ChatColor.YELLOW + "Dimensions:  " + ChatColor.WHITE + dimensions);
+		sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:  " + ChatColor.WHITE + pilotsString);
+		sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + ChatColor.WHITE + condition);
+		sender.sendMessage(ChatColor.YELLOW + "Fuel:  " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
 	}
 	
 	/**

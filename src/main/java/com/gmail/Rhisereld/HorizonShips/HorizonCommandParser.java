@@ -199,6 +199,10 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship cancel
 			if (args[0].equalsIgnoreCase("cancel"))
 				return cancelAction(sender, args);
+			
+			//ship [shipName]
+			//If not any recognised command, assume ship and request information on it.
+			return shipInfo(sender, args);
 		}
 		
 		return false;
@@ -533,6 +537,20 @@ public class HorizonCommandParser implements CommandExecutor
 			player.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
+		
+		return true;
+	}
+	
+	private boolean shipInfo(CommandSender sender, String[] args)
+	{
+		//Check that the sender has permission OR is the console
+		if (!sender.hasPermission("horizonships.list") && !(sender instanceof Player))
+		{
+			sender.sendMessage("You don't have permission to view this.");
+			return false;
+		}
+		
+		shipHandler.shipInfo(sender, args[0]);
 		
 		return true;
 	}
