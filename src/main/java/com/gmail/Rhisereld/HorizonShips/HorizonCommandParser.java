@@ -58,7 +58,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship test
 			if (args[0].equalsIgnoreCase("test"))
 			{
-				
+				sender.sendMessage(Boolean.toString(data.getConfig().contains("ships." + "SS_Example" + ".destinations")));
 			}
 			
 			//ship create [shipName] [destinationName]
@@ -783,12 +783,10 @@ public class HorizonCommandParser implements CommandExecutor
 		} catch (MaxChangedBlocksException e) {
 			player.sendMessage(ChatColor.RED + "Ship too large!");
 			confirmAddDestination.remove(name);
-			e.printStackTrace();
 			return false;
 		} catch (NullPointerException | IllegalArgumentException e) {
 			player.sendMessage(ChatColor.RED + e.getMessage());
 			confirmAddDestination.remove(name);
-			e.printStackTrace();
 			return false;
 		}
 	

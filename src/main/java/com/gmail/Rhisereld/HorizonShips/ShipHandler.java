@@ -121,9 +121,13 @@ public class ShipHandler
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		schemManagers.put(player.getName(), sm);
 		
-		//Check that there isn't already a destination by that name.
+		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
-		if (ship.getDestination(destinationName) != null)
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Check that there isn't already a destination by that name.
+		if (ship.getDestination(destinationName) == null)
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
 
 		s = sm.getPlayerSelection(player);
