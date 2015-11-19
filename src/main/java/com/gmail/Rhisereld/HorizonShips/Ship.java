@@ -373,7 +373,7 @@ public class Ship
 	public void setOwner(UUID uuid)
 	{
 		owner = uuid;
-		data.getConfig().set("ships." + name + ".owner", uuid);
+		data.getConfig().set("ships." + name + ".owner", uuid.toString());
 		data.saveConfig();
 	}
 }

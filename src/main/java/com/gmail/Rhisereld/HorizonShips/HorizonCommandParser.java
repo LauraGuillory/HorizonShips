@@ -54,6 +54,12 @@ public class HorizonCommandParser implements CommandExecutor
 			if (args.length == 0)
 				return showCommands(sender);
 			
+			//ship test
+			if (args[0].equalsIgnoreCase("test"))
+			{
+				
+			}
+			
 			//ship create [shipName] [destinationName]
 			if (args[0].equalsIgnoreCase("create"))
 				if (args.length == 3)
@@ -594,6 +600,7 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		sender.sendMessage(args[1] + args[2]);
 		try {
 			shipHandler.setOwner(sender, args[1], args[2]);
 		} catch (IllegalArgumentException e) {

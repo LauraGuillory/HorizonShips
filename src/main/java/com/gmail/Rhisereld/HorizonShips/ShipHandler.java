@@ -552,7 +552,13 @@ public class ShipHandler
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Set the new owner
-		ship.setOwner(Bukkit.getPlayer(owner).getUniqueId());
+		UUID uuid = Bukkit.getPlayer(owner).getUniqueId();
+		if (uuid == null)
+			uuid = Bukkit.getOfflinePlayer(owner).getUniqueId();
+		if (uuid == null)
+			throw new IllegalArgumentException("Player does not exist.");
+		
+		ship.setOwner(uuid);
 	}
 	
 	/**
