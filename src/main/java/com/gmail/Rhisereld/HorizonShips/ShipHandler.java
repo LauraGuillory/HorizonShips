@@ -545,18 +545,31 @@ public class ShipHandler
 		if (owner == null) //Sometimes player names can't be retrieved if the player has never joined the server.
 			owner = ship.getOwner().toString(); //At this point, give up and provide the UUID instead.
 		
+		//Colour status
+		ChatColor conditionStatus;
+		if (ship.isBroken())
+			conditionStatus = ChatColor.RED;
+		else
+			conditionStatus = ChatColor.GREEN;
+		
+		ChatColor fuelStatus;
+		if (ship.getFuel() == 0)
+			fuelStatus = ChatColor.RED;
+		else
+			fuelStatus = ChatColor.GREEN;
+		
 		//Displaying
 		if (sender instanceof Player)
 		{
 			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD + shipName + " " 
 								+ ChatColor.WHITE + ">---------------");
-			sender.sendMessage(ChatColor.YELLOW + "Owner:                                        " + ChatColor.WHITE + owner);
-			sender.sendMessage(ChatColor.YELLOW + "Destinations:                                " + ChatColor.WHITE + destinationString);
-			sender.sendMessage(ChatColor.YELLOW + "Current location:                          " + ChatColor.WHITE + currentDestination);
-			sender.sendMessage(ChatColor.YELLOW + "Dimensions:                                  " + ChatColor.WHITE + dimensions);
-			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:                            " + ChatColor.WHITE + pilotsString);
-			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:                      " + ChatColor.WHITE + condition);
-			sender.sendMessage(ChatColor.YELLOW + "Fuel:                                          " + ChatColor.WHITE + 
+			sender.sendMessage(ChatColor.YELLOW + "Owner:                        " + ChatColor.WHITE + owner);
+			sender.sendMessage(ChatColor.YELLOW + "Destinations:                " + ChatColor.WHITE + destinationString);
+			sender.sendMessage(ChatColor.YELLOW + "Current location:           " + ChatColor.WHITE + currentDestination);
+			sender.sendMessage(ChatColor.YELLOW + "Dimensions:                  " + ChatColor.WHITE + dimensions);
+			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:            " + ChatColor.WHITE + pilotsString);
+			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:      " + conditionStatus + condition);
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                          " + fuelStatus + 
 					Integer.toString(ship.getFuel()));
 		}
 		else
@@ -568,8 +581,8 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:      " + ChatColor.WHITE + pilotsString);
-			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + ChatColor.WHITE + condition);
-			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + ChatColor.WHITE + Integer.toString(ship.getFuel()));
+			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + conditionStatus + condition);
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + fuelStatus + Integer.toString(ship.getFuel()));
 		}
 
 	}
