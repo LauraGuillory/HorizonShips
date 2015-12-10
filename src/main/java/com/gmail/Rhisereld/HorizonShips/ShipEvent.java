@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -48,7 +49,8 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		while (sum < randomNum);
 		
-		chosenEvent = EVENTS[i-1];
+		//chosenEvent = EVENTS[i-1];
+		chosenEvent = "breakdown";
 	}
 	
 	/**
@@ -250,7 +252,7 @@ public class ShipEvent
 	 * @param ship
 	 * @return A string detailing the events of the trip.
 	 */
-	private String triggerBreakdown(Player player, Ship ship)
+	private String triggerBreakdown(Player player, Ship ship) throws IllegalArgumentException
 	{
 		//Configuration options
 		String path = "events.breakdown.";
@@ -264,9 +266,9 @@ public class ShipEvent
 		
 		//Choose item needed for repair
 		Random rand = new Random();
-		int randomNum = rand.nextInt(spareParts.size() + tools.size());
-		
-		//Set item needed for repair and isConsumed
+		int randomNum = rand.nextInt(spareParts.size() + tools.size()) + 1;
+
+		//Check that the item is valid - if not, cancel the event.
 		boolean consumePart = false;
 		String repairItem;
 		if (randomNum < spareParts.size())
@@ -277,7 +279,11 @@ public class ShipEvent
 		else
 			repairItem = tools.get(randomNum - spareParts.size());
 		
+		Material repairItemMaterial = Material.matchMaterial(repairItem);
+		if (repairItemMaterial == null)
+			throw new IllegalArgumentException("Invalid configuration item: " + repairItem + ". Please contact an Administrator.");
 		
+		//Set item needed for repair and isConsumed
 		ship.setRepairItem(repairItem);
 		ship.setConsumePart(consumePart);
 		

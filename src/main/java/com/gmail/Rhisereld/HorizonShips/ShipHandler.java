@@ -574,7 +574,7 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "DESTINATIONS: " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "CURRENT LOCATION: " + ChatColor.WHITE + currentDestination);
 			sender.sendMessage(ChatColor.YELLOW + "DIMENSIONS: " + ChatColor.WHITE + dimensions);
-			sender.sendMessage(ChatColor.YELLOW + "PPERMITTED PILOTS: " + ChatColor.WHITE + pilotsString);
+			sender.sendMessage(ChatColor.YELLOW + "PERMITTED PILOTS: " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "MECHANICAL CONDITION: " + conditionStatus + condition);
 			sender.sendMessage(ChatColor.YELLOW + "FUEL: " + fuelStatus + 
 					Integer.toString(ship.getFuel()));

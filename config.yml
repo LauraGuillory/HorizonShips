@@ -5,6 +5,8 @@ refuel:
     fills: 1
 events:
   bumpyRide:
+    injuryChance:
+      tier1: 50
     damage: 8
     probability: 3
   infestation:
@@ -20,7 +22,7 @@ events:
         name: "glass"
       enchanting_table: 
         name: "navigation screen"
-      piston:
+      piston_base:
         name: "piston"
       redstone: 
         name: "copper wire"
