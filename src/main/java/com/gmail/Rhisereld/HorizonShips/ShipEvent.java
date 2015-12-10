@@ -44,8 +44,9 @@ public class ShipEvent
 
 		randomNum = rand.nextInt(totalSum);
 		
-		while (sum < randomNum)
+		do
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
+		while (sum < randomNum);
 		
 		chosenEvent = EVENTS[i-1];
 	}
