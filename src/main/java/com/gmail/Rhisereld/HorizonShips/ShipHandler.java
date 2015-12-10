@@ -406,12 +406,15 @@ public class ShipHandler
 		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial))
 			throw new IllegalArgumentException("You don't have the correct item.");
 		
-		//If they are, remove one of that item.
-		int numItemsInHand = player.getItemInHand().getAmount();
-		if (numItemsInHand <= 1)
-			player.setItemInHand(null);
-		else
-			player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+		//If they are and the item is consumable, remove one of that item
+		if (ship.getConsumePart())
+		{
+			int numItemsInHand = player.getItemInHand().getAmount();
+			if (numItemsInHand <= 1)
+				player.setItemInHand(null);
+			else
+				player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+		}
 		
 		//Repair the ship
 		ship.setBroken(false);

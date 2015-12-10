@@ -49,8 +49,7 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		while (sum < randomNum);
 		
-		//chosenEvent = EVENTS[i-1];
-		chosenEvent = "breakdown";
+		chosenEvent = EVENTS[i-1];
 	}
 	
 	/**
@@ -266,12 +265,12 @@ public class ShipEvent
 		
 		//Choose item needed for repair
 		Random rand = new Random();
-		int randomNum = rand.nextInt(spareParts.size() + tools.size()) + 1;
+		int randomNum = rand.nextInt(spareParts.size() + tools.size());
 
 		//Check that the item is valid - if not, cancel the event.
 		boolean consumePart = false;
 		String repairItem;
-		if (randomNum < spareParts.size())
+		if (randomNum < spareParts.size() - 1)
 		{
 			consumePart = true;
 			repairItem = spareParts.get(randomNum);
