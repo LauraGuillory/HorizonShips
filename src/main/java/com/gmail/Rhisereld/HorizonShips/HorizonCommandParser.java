@@ -868,7 +868,7 @@ public class HorizonCommandParser implements CommandExecutor
 			shipHandler.testDestination(player, arguments[0], arguments[1]);
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
-			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Adminstrator.");
+			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Administrator.");
 			confirmAddDestination.remove(name);
 			e.printStackTrace();
 			return false;

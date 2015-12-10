@@ -111,23 +111,32 @@ public class ShipHandler
 	 */
 	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
 	{
-		Selection s;
-		player.getWorld();
-		new SchematicManager(player.getWorld());
-		SchematicManager sm = new SchematicManager(player.getWorld());
-		schemManagers.put(player.getName(), sm);
-		
 		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
 		if (ship.getName() == null)
 			throw new IllegalArgumentException("Ship not found.");
-		
+
 		//Check that there isn't already a destination by that name.
 		if (ship.getDestination(destinationName) == null)
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
 
-		s = sm.getPlayerSelection(player);
-		sm.loadSchematic(s, shipName + "\\", "ship");
+		//Save schematic from current destination
+		Location currentLocation = ship.getCurrentDestination().getLocation();		
+		Location loc2 = new Location(currentLocation.getWorld(), 
+				currentLocation.getBlockX() + ship.getLength(), 
+				currentLocation.getBlockY() + ship.getHeight(), 
+				currentLocation.getBlockZ() + ship.getWidth());
+
+		SchematicManager sm = new SchematicManager(currentLocation.getWorld());
+		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");	
+		
+		//Test schematic at new destination
+		sm = new SchematicManager(player.getWorld());
+		Selection s = sm.getPlayerSelection(player);
+		sm.loadSchematic(s, ship.getName() + "\\ship");
+		
+		//Players currently testing a destination
+		schemManagers.put(player.getName(), sm);
 	}
 	
 	/**
@@ -175,7 +184,7 @@ public class ShipHandler
 		sm.shiftSelection(player, s, dir);
 		
 		//Paste
-		sm.loadSchematic(s, shipName + "\\", "ship");
+		sm.loadSchematic(s, shipName + "\\ship");
 	}
 	
 	/**
@@ -306,12 +315,12 @@ public class ShipHandler
 				currentLocation.getBlockY() + ship.getHeight(), 
 				currentLocation.getBlockZ() + ship.getWidth());
 		
-		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\", "ship");
+		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");
 
 		//Paste schematic at new location
 		Destination newDestination = ship.getDestination(destination);
 		sm = new SchematicManager(newDestination.getLocation().getWorld());		//Each schematic manager may only apply to one world.
-		sm.loadSchematic(newDestination.getLocation(), ship.getName() + "\\", "ship");
+		sm.loadSchematic(newDestination.getLocation(), ship.getName() + "\\ship");
 
 		//Teleport all players from old to new location
 		teleportPlayers(ship, newDestination.getLocation());

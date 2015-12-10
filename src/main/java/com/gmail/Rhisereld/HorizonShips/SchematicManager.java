@@ -54,12 +54,12 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Location loc1, Location loc2, String path, String schematicName) throws DataException, IOException
+	public void saveSchematic(Location loc1, Location loc2, String path) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = getMin(loc1, loc2);
@@ -81,12 +81,12 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Selection selection, String path, String schematicName) throws DataException, IOException
+	public void saveSchematic(Selection selection, String path) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = loc2Vector(selection.getMinimumPoint());
@@ -109,11 +109,11 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(Location l, String path, String schematicName) throws MaxChangedBlocksException, DataException, IOException
+	public void loadSchematic(Location l, String path) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		Vector origin = new Vector(l.getX(), l.getY(), l.getZ());
 		
 		editSession.enableQueue();
@@ -134,11 +134,11 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(Selection s, String path, String schematicName) throws MaxChangedBlocksException, DataException, IOException
+	public void loadSchematic(Selection s, String path) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + schematicName + ".schematic");
+		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
 		Vector origin = s.getNativeMinimumPoint();
 		
 		editSession.enableQueue();

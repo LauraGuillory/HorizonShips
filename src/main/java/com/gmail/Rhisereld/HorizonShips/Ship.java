@@ -9,7 +9,9 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 
@@ -104,7 +106,7 @@ public class Ship
 		data.getConfig().set("ships." + name + ".height", height);
 		
 		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
-		sm.saveSchematic(selection, name + "\\", "ship");
+		sm.saveSchematic(selection, name + "\\ship");
 	}
 	
 	/**
