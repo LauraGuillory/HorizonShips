@@ -3,6 +3,7 @@ package com.gmail.Rhisereld.HorizonShips;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -58,11 +59,11 @@ public class ShipRegionNotifier implements Listener
 			ship = new Ship(data, playersInsideShip.get(player.getName()));
 			min = ship.getCurrentDestination().getLocation();
 			max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-					min.getBlockY() + ship.getWidth());
+					min.getBlockZ() + ship.getWidth());
 			
 			if (!min.getWorld().equals(player.getLocation().getWorld()) 
 					|| min.getBlockX() > x || max.getBlockX() < x
-					|| min.getBlockY()-2 > y || max.getBlockY() < y
+					|| min.getBlockY() >= y || max.getBlockY() < y
 					|| min.getBlockZ() > z || max.getBlockZ() < z)
 			{
 				//If so, notify the player
@@ -79,12 +80,12 @@ public class ShipRegionNotifier implements Listener
 				ship = new Ship(data, s);
 				min = ship.getCurrentDestination().getLocation();
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockY() + ship.getWidth());
+						min.getBlockZ() + ship.getWidth());
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
-						&& min.getBlockX() < x && max.getBlockX() > x
-						&& min.getBlockY()-2 < y && max.getBlockY() > y
-						&& min.getBlockZ() < z && max.getBlockZ() > z)
+						&& min.getBlockX() <= x && max.getBlockX() >= x
+						&& min.getBlockY() < y && max.getBlockY() >= y
+						&& min.getBlockZ() < z && max.getBlockZ() >= z)
 				{
 					//If so, notify the player
 					player.sendMessage(ChatColor.GOLD + "Now entering ship: " + ship.getName());

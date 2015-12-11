@@ -397,4 +397,10 @@ public class Ship
 		owner = uuid;
 		data.getConfig().set("ships." + name + ".owner", uuid.toString());
 	}
+	
+	public boolean isInsideRegion(Location location)
+	{
+		return false;
+		
+	}
 }
