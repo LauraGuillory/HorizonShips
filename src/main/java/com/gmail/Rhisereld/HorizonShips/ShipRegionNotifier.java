@@ -14,8 +14,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 /**
  * ShipRegionNotifier monitors all player's locations and notifies them if they enter or leave a region that defines a ship.
  * 
- * @author Laura
- *
+ * @author Rhisereld
  */
 public class ShipRegionNotifier implements Listener
 {

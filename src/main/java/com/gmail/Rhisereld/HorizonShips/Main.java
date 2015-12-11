@@ -45,8 +45,9 @@ public class Main extends JavaPlugin implements CommandExecutor
         hcp = new HorizonCommandParser(data, config, plugin);
     	this.getCommand("ship").setExecutor(hcp);
     	
-    	//Register listener
+    	//Register listeners
     	getServer().getPluginManager().registerEvents(new ShipRegionNotifier(data, config), this);
+    	getServer().getPluginManager().registerEvents(new ShipProtector(data, config), this);
     	
 		//Save every 30 minutes.
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
