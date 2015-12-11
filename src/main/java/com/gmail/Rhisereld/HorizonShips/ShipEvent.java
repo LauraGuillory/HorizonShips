@@ -265,12 +265,12 @@ public class ShipEvent
 		
 		//Choose item needed for repair
 		Random rand = new Random();
-		int randomNum = rand.nextInt(spareParts.size() + tools.size());
+		int randomNum = rand.nextInt(spareParts.size() + tools.size() - 1);
 
 		//Check that the item is valid - if not, cancel the event.
 		boolean consumePart = false;
 		String repairItem;
-		if (randomNum < spareParts.size() - 1)
+		if (randomNum < spareParts.size())
 		{
 			consumePart = true;
 			repairItem = spareParts.get(randomNum);
