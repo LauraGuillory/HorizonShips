@@ -815,15 +815,16 @@ public class ShipHandler
 		Location oldLocation = ship.getCurrentDestination().getLocation();
 		Set<Entity> entitiesInside = getEntitiesInsideRegion(ship);
 
-		for (Entity e: entitiesInside)
-		{			
-			//Determine new entity location based on existing offset to ship location.
-			newLocation.getWorld().spawnEntity(new Location(e.getLocation().getWorld(), 
-					e.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
-					e.getLocation().getY() - oldLocation.getY() + newLocation.getY(), 
-					e.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ()), e.getType());
-			e.remove();
-		}
+		for (Entity e: entitiesInside)		
+			if (e.getType().isSpawnable())
+			{
+				//Determine new entity location based on existing offset to ship location.
+				newLocation.getWorld().spawnEntity(new Location(e.getLocation().getWorld(), 
+						e.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
+						e.getLocation().getY() - oldLocation.getY() + newLocation.getY(), 
+						e.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ()), e.getType());
+				e.remove();
+			}
 	}
 	
 	/**

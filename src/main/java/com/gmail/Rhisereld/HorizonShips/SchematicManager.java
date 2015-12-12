@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.sk89q.worldedit.CuboidClipboard;
@@ -287,6 +288,16 @@ public class SchematicManager
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);
 
+		for (int x = (int) min.getX(); x <= max.getX(); x++)
+			for (int y = (int) min.getY(); y <= max.getY(); y++)
+				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
+				{
+					Block block = loc1.getWorld().getBlockAt(x, y, z);
+					if (!block.getType().isSolid() || block.getType().equals(Material.GOLD_PLATE))
+						block.setType(Material.AIR);
+					block.getState();
+				}
+		
 		for (int x = (int) min.getX(); x <= max.getX(); x++)
 			for (int y = (int) min.getY(); y <= max.getY(); y++)
 				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
