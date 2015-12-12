@@ -54,7 +54,7 @@ public class Ship
 		fuel = data.getConfig().getInt(path + "fuel");
 		broken = data.getConfig().getBoolean(path + "broken");
 		repairItem = data.getConfig().getString(path + "repairItem");
-		consumePart = data.getConfig().getBoolean(path + consumePart);
+		consumePart = data.getConfig().getBoolean(path + "consumePart");
 		List<String> pilotsString = data.getConfig().getStringList(path + "pilots");
 		for (String s: pilotsString)
 			pilots.add(UUID.fromString(s));

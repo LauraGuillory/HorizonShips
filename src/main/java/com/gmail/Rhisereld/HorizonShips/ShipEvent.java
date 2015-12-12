@@ -49,7 +49,8 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		while (sum < randomNum);
 		
-		chosenEvent = EVENTS[i-1];
+		//chosenEvent = EVENTS[i-1];
+		chosenEvent = "breakdown";
 	}
 	
 	/**
@@ -277,7 +278,7 @@ public class ShipEvent
 		}
 		else
 			repairItem = tools.get(randomNum - spareParts.size());
-		
+
 		Material repairItemMaterial = Material.matchMaterial(repairItem);
 		if (repairItemMaterial == null)
 			throw new IllegalArgumentException("Invalid configuration item: " + repairItem + ". Please contact an Administrator.");
