@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -324,6 +325,9 @@ public class ShipHandler
 
 		//Teleport all players from old to new location
 		teleportPlayers(ship, newDestination.getLocation());
+		
+		//Teleport all other entities from old to new location
+		teleportEntities(ship, newDestination.getLocation());
 
 		//Erase old location
 		sm.eraseArea(currentLocation, loc2);
@@ -778,14 +782,11 @@ public class ShipHandler
 	}
 	
 	/**
-	 * teleportPlayers() teleports all players within the region defined by oldLocation and the length, width, and height
-	 * to newLocation. The position of all players teleported is offset by their offset at the original location.
+	 * teleportPlayers() teleports all players within the ship region to newLocation. The position of all players teleported is offset by 
+	 * their offset at the original location.
 	 * 
-	 * @param oldLocation
+	 * @param ship
 	 * @param newLocation
-	 * @param length
-	 * @param width
-	 * @param height
 	 */
 	private void teleportPlayers(Ship ship, Location newLocation)
 	{
@@ -803,13 +804,33 @@ public class ShipHandler
 	}
 	
 	/**
-	 * getPlayersInsideRegion() returns a set containing all the players whose locations are
-	 * within the region defined by a location, length, width and height.
+	 * teleportEntities() teleports all entities within the ship region to newLocation. The position of all entities teleported is offset by
+	 * their offset at the original location.
 	 * 
-	 * @param location
-	 * @param length
-	 * @param width
-	 * @param height
+	 * @param ship
+	 * @param newLocation
+	 */
+	private void teleportEntities(Ship ship, Location newLocation)
+	{
+		Location oldLocation = ship.getCurrentDestination().getLocation();
+		Set<Entity> entitiesInside = getEntitiesInsideRegion(ship);
+
+		for (Entity e: entitiesInside)
+		{			
+			//Determine new entity location based on existing offset to ship location.
+			newLocation.getWorld().spawnEntity(new Location(e.getLocation().getWorld(), 
+					e.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
+					e.getLocation().getY() - oldLocation.getY() + newLocation.getY(), 
+					e.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ()), e.getType());
+			e.remove();
+		}
+	}
+	
+	/**
+	 * getPlayersInsideRegion() returns a set containing all the players whose locations are
+	 * within the ship region.
+	 * 
+	 * @param ship
 	 * @return
 	 */
 	private Set<Player> getPlayersInsideRegion(Ship ship)
@@ -826,5 +847,28 @@ public class ShipHandler
 				playersInside.add(p);
 
 		return playersInside;
+	}
+	
+	/**
+	 * getEntitiesInsideRegion() returns a set containing all the entities whose locations are
+	 * within the ship region.
+	 * 
+	 * @param ship
+	 * @return
+	 */
+	private Set<Entity> getEntitiesInsideRegion(Ship ship)
+	{
+		List<Entity> entities = ship.getCurrentDestination().getLocation().getWorld().getEntities();
+		Set<Entity> entitiesInside = new HashSet<Entity>();
+		Location location = ship.getCurrentDestination().getLocation();
+		
+		for (Entity e: entities)
+			if (e.getWorld().equals(location.getWorld())
+					&& e.getLocation().getBlockX() >= location.getBlockX() && e.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
+					&& e.getLocation().getBlockY() >= location.getBlockY() && e.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
+					&& e.getLocation().getBlockZ() >= location.getBlockZ() && e.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
+				entitiesInside.add(e);
+
+		return entitiesInside;
 	}
 }
