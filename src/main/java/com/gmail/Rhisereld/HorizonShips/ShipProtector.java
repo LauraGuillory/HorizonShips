@@ -2,6 +2,7 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -56,15 +57,15 @@ public class ShipProtector implements Listener
 			{
 				min = ship.getDestination(d).getLocation();
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockY() + ship.getWidth());
+						min.getBlockZ() + ship.getWidth());
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
-						&& min.getBlockX() < x && max.getBlockX() > x
-						&& min.getBlockY() < y && max.getBlockY() > y
-						&& min.getBlockZ() < z && max.getBlockZ() > z)
+						&& min.getBlockX() <= x && max.getBlockX() >= x
+						&& min.getBlockY() <= y && max.getBlockY() >= y
+						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 				{
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
-					if ((ship.getOwner() == null || ship.getOwner().equals(player.getUniqueId())) || ship.isPilot(player.getUniqueId()))
+					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) && !ship.isPilot(player.getUniqueId()))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
@@ -102,19 +103,19 @@ public class ShipProtector implements Listener
 			{
 				min = ship.getDestination(d).getLocation();
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockY() + ship.getWidth());
+						min.getBlockZ() + ship.getWidth());
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
-						&& min.getBlockX() < x && max.getBlockX() > x
-						&& min.getBlockY() < y && max.getBlockY() > y
-						&& min.getBlockZ() < z && max.getBlockZ() > z)
+						&& min.getBlockX() <= x && max.getBlockX() >= x
+						&& min.getBlockY() <= y && max.getBlockY() >= y
+						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 				{
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
-					if ((ship.getOwner() == null || ship.getOwner().equals(player.getUniqueId())) || ship.isPilot(player.getUniqueId()))
+					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) && !ship.isPilot(player.getUniqueId()))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
-					}		
+					}	
 				}
 			}
 		}
