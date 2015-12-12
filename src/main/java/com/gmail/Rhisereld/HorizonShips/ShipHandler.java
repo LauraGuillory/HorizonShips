@@ -405,9 +405,16 @@ public class ShipHandler
 		//Get required item
 		String repairItem = ship.getRepairItem();
 		Material repairItemMaterial = Material.matchMaterial(repairItem);
+		int dataValue;
+		
+		if (ship.getConsumePart())
+			dataValue = config.getConfig().getInt("events.breakdown.spareParts." + repairItem + ".data value");
+		else
+			dataValue = config.getConfig().getInt("events.breakdown.tools." + repairItem + ".data value");
 		
 		//Check player is holding the correct item.
-		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial))
+		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial)
+				|| !(player.getInventory().getItemInHand().getDurability() == dataValue))
 			throw new IllegalArgumentException("You don't have the correct item.");
 		
 		//If they are and the item is consumable, remove one of that item
