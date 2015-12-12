@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -293,9 +294,13 @@ public class SchematicManager
 				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
 				{
 					Block block = loc1.getWorld().getBlockAt(x, y, z);
+					if (block.getState() instanceof InventoryHolder)
+					{
+						InventoryHolder inventoryHolder = (InventoryHolder) block.getState();
+						inventoryHolder.getInventory().clear();
+					}
 					if (!block.getType().isSolid() || block.getType().equals(Material.GOLD_PLATE))
 						block.setType(Material.AIR);
-					block.getState();
 				}
 		
 		for (int x = (int) min.getX(); x <= max.getX(); x++)

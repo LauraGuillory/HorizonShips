@@ -49,8 +49,7 @@ public class ShipEvent
 			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
 		while (sum < randomNum);
 		
-		//chosenEvent = EVENTS[i-1];
-		chosenEvent = "breakdown";
+		chosenEvent = EVENTS[i-1];
 	}
 	
 	/**
