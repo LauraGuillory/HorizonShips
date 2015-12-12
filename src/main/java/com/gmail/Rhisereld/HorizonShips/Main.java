@@ -52,11 +52,7 @@ public class Main extends JavaPlugin implements CommandExecutor
 		//Save every 30 minutes.
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()
 		{
-			public void run() 
-			{
-				getLogger().info("Backing up ship stats.");
-				data.saveConfig();;
-			}			
+			public void run() {	data.saveConfig(); }			
 		} , 36000, 36000);
 	}
 
