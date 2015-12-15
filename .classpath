@@ -24,6 +24,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="D:/Spigot/WorldEdit/worldedit-bukkit-6.1.jar"/>
-	<classpathentry kind="lib" path="D:/My Documents/Project Horizon/Releases/HorizonProfessions_1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

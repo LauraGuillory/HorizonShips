@@ -61,8 +61,11 @@ public class ShipHandler
 		//Check a ship doesn't already exist by that name.
 		if (data.getConfig().contains("ships."))
 		{
-			Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
-			for (String sh : shipNames)
+			Set<String> ships;
+			try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+			catch (NullPointerException e)
+			{ return; }
+			for (String sh : ships)
 				if (sh.equalsIgnoreCase(shipName))
 					throw new IllegalArgumentException("A ship already exists by that name.");
 		}
@@ -82,11 +85,14 @@ public class ShipHandler
 	 */
 	public void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
-		Set<String> shipNames = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		Set<String> ships;
+		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		boolean shipFound = false;
 		
 		//Check that the ship exists
-		for (String s : shipNames)
+		for (String s : ships)
 			if (s.equalsIgnoreCase(shipName))
 				shipFound = true;
 		if (!shipFound)
@@ -252,7 +258,10 @@ public class ShipHandler
 	 */
 	public void listShips(CommandSender sender)
 	{
-		Set<String> ships = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		Set<String> ships;
+		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		String list = "Ships currently saved: ";
 		
 		for (String ship: ships)
@@ -454,7 +463,10 @@ public class ShipHandler
 			throw new IllegalArgumentException("The ship's tank is already full.");
 		
 		//Get required items
-		Set<String> refuelItemStrings = config.getConfig().getConfigurationSection("refuel").getKeys(false);
+		Set<String> refuelItemStrings;
+		try { refuelItemStrings = data.getConfig().getConfigurationSection("refuel").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		
 		//Check player is holding the correct item
 		String itemInHand = player.getItemInHand().getType().name();
@@ -771,7 +783,10 @@ public class ShipHandler
 	 */
 	private Ship findCurrentShip(Player player)
 	{
-		Set<String> shipStrings = data.getConfig().getConfigurationSection("ships.").getKeys(false);
+		Set<String> shipStrings;
+		try { shipStrings = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return null; }
 		Set<Ship> ships = new HashSet<Ship>();
 		
 		for (String ss: shipStrings)

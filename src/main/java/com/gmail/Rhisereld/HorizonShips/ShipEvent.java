@@ -2,6 +2,7 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -93,7 +94,10 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.bumpyRide.";
 		int damage = config.getConfig().getInt(path + "damage");
-		Set<String> tiers = config.getConfig().getConfigurationSection(path + "injuryChance").getKeys(false);
+		Set<String> tiers;
+		try { tiers = config.getConfig().getConfigurationSection(path + "injuryChance").getKeys(false); }
+		catch (NullPointerException e)
+		{ tiers = new HashSet<String>(); }
 		List<Double> injuryChances = new ArrayList<Double>();
 		
 		for (String t: tiers)
@@ -256,9 +260,11 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.breakdown.";
 		List<String> spareParts = new ArrayList<String>();
-		spareParts.addAll(config.getConfig().getConfigurationSection(path + "spareParts").getKeys(false));
+		try { spareParts.addAll(config.getConfig().getConfigurationSection(path + "spareParts").getKeys(false)); }
+		catch (NullPointerException e) { }
 		List<String> tools = new ArrayList<String>();
-		tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false));
+		try { tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false)); }
+		catch (NullPointerException e) { }
 		
 		//Set ship to broken
 		ship.setBroken(true);

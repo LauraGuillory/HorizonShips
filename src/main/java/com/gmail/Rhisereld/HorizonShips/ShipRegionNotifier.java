@@ -45,7 +45,11 @@ public class ShipRegionNotifier implements Listener
 			return;
 
 		//Check if the new destination is inside any of these ships
-		Set<String> ships = data.getConfig().getConfigurationSection("ships").getKeys(false);
+		Set<String> ships;
+		
+		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		
 		Ship ship;
 		Location min;
@@ -54,7 +58,7 @@ public class ShipRegionNotifier implements Listener
 		
 		//If player is currently inside a ship, detect leaving the region
 		if (playersInsideShip.containsKey(player.getName()))
-		{
+		{			
 			ship = new Ship(data, playersInsideShip.get(player.getName()));
 			min = ship.getCurrentDestination().getLocation();
 			max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 

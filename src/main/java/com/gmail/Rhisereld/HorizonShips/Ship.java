@@ -50,7 +50,8 @@ public class Ship
 		
 		this.data = data;
 		this.name = name;
-		destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false);
+		try { destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false); }
+		catch (NullPointerException e) { }
 		fuel = data.getConfig().getInt(path + "fuel");
 		broken = data.getConfig().getBoolean(path + "broken");
 		repairItem = data.getConfig().getString(path + "repairItem");

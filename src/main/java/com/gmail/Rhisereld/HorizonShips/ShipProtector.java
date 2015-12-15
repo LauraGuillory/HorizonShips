@@ -36,7 +36,10 @@ public class ShipProtector implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreakBlock(BlockBreakEvent event)
 	{
-		Set<String> ships = data.getConfig().getConfigurationSection("ships").getKeys(false);
+		Set<String> ships;
+		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		
 		Ship ship;
 		Location min;
@@ -83,7 +86,10 @@ public class ShipProtector implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event)
 	{
-		Set<String> ships = data.getConfig().getConfigurationSection("ships").getKeys(false);
+		Set<String> ships;
+		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		
 		Ship ship;
 		Location min;

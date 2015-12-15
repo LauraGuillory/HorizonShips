@@ -28,7 +28,10 @@ public class Destination
 		if (!data.getConfig().contains("ships." + shipName + ".destinations"))
 			return;
 		
-		Set<String> destinations = data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false);
+		Set<String> destinations;
+		try { destinations = data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
 		
 		boolean foundDestination = false;
 		
