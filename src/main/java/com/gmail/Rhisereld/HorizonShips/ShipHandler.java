@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
@@ -29,14 +30,16 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 @SuppressWarnings("deprecation")
 public class ShipHandler 
 {	
+	ProfessionAPI prof;
 	ConfigAccessor data;
 	ConfigAccessor config;
 	Plugin plugin;
 	
 	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
 	
-	public ShipHandler(ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
+	public ShipHandler(ProfessionAPI prof, ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
 	{
+		this.prof = prof;
 		this.data = data;
 		this.plugin = plugin;
 		this.config = config;
@@ -294,6 +297,16 @@ public class ShipHandler
 	 */
 	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{
+		//Ensure that the player has the tier requirement
+		UUID uuid = player.getUniqueId();
+		String professionReq = config.getConfig().getString("professionReq.profession");
+		int tierReq = config.getConfig().getInt("professionReq.tier");
+		
+		if (prof != null && professionReq != null && prof.isValidProfession(professionReq) 
+				&& !prof.hasTier(uuid, professionReq, tierReq))
+			throw new IllegalArgumentException("You cannot pilot a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
+					+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
+		
 		//Determine the ship the player is trying to pilot.
 		Ship ship = findCurrentShip(player);
 		if (ship == null)
@@ -350,7 +363,7 @@ public class ShipHandler
 		ship.setCurrentDestination(destination);
 		
 		//Event trigger
-		ShipEvent shipEvent = new ShipEvent(config, data);
+		ShipEvent shipEvent = new ShipEvent(prof, config, data);
 		shipEvent.chooseEvent();
 		String message = shipEvent.trigger(player, ship);
 		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
@@ -466,7 +479,7 @@ public class ShipHandler
 		
 		//Get required items
 		Set<String> refuelItemStrings;
-		try { refuelItemStrings = data.getConfig().getConfigurationSection("refuel").getKeys(false); }
+		try { refuelItemStrings = config.getConfig().getConfigurationSection("refuel").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		
@@ -895,5 +908,19 @@ public class ShipHandler
 				entitiesInside.add(e);
 
 		return entitiesInside;
+	}
+	
+	/** 
+	 * getDeterminer() returns the determiner that should occur before a noun.
+	 * @param string - the noun.
+	 * @return - "an" if the noun begins with a vowel, "a" otherwise.
+	 */
+	private String getDeterminer(String string)
+	{
+		if (string.charAt(0) == 'a' || string.charAt(0) == 'e' || string.charAt(0) == 'i' || string.charAt(0) == 'o'
+				|| string.charAt(0) == 'u')
+			return "an";
+		else
+			return "a";
 	}
 }

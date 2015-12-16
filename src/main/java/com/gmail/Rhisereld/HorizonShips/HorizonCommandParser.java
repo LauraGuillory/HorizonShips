@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.data.DataException;
@@ -19,6 +20,7 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 @SuppressWarnings("deprecation")
 public class HorizonCommandParser implements CommandExecutor 
 {
+	ProfessionAPI prof;
 	ConfigAccessor data;
 	ConfigAccessor config;
 	ShipHandler shipHandler;
@@ -31,12 +33,13 @@ public class HorizonCommandParser implements CommandExecutor
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	HashMap<String, String> confirmTransfer = new HashMap<String, String>();
 	
-    public HorizonCommandParser(ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
+    public HorizonCommandParser(ProfessionAPI prof, ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
     {
+    	this.prof = prof;
 		this.data = data;
 		this.config = config;
 		this.plugin = plugin;
-		shipHandler = new ShipHandler(data, config, plugin);
+		shipHandler = new ShipHandler(prof, data, config, plugin);
 	}
 
 	/**

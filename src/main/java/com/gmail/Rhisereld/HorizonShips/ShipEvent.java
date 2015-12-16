@@ -15,6 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
+
 /**
  * ShipEvent handles all things related to the set of events that may occur during a journey.
  * chooseEvent() must be called before trigger() is called.
@@ -22,11 +24,13 @@ import org.bukkit.entity.Player;
 public class ShipEvent 
 {
 	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak", "none"};
+	ProfessionAPI prof;
 	private ConfigAccessor config;
 	private String chosenEvent;
 	
-	public ShipEvent(ConfigAccessor config, ConfigAccessor data)
+	public ShipEvent(ProfessionAPI prof, ConfigAccessor config, ConfigAccessor data)
 	{
+		this.prof = prof;
 		this.config = config;
 	}
 
@@ -103,19 +107,26 @@ public class ShipEvent
 		for (String t: tiers)
 			injuryChances.add(config.getConfig().getDouble(path + "injuryChance." + t));
 		
-		int pilotSkill = 1;
+		String professionReq = config.getConfig().getString("professionReq.profession");
 		
 		//Determine if injury occurs or not
+		double randomDoub = 0;
+		int pilotSkill = 0;
 		Random rand = new Random();
-		double randomDoub = rand.nextDouble();
+		//If profession isn't required, injury never happens.
+		if (prof != null && professionReq != null)
+		{
+			pilotSkill = prof.getTier(player.getUniqueId(), config.getConfig().getString("professionReq.profession"));
+			randomDoub = rand.nextDouble();
+		}
 		
-		//If not, notify and exit
-		if (randomDoub < injuryChances.get(pilotSkill-1))
+		//No injury
+		if (prof == null || professionReq == null || randomDoub < injuryChances.get(pilotSkill-1))
 		{
 			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + ChatColor.YELLOW + 
 					" expertly manouevres the ship through the storm, and the tremors fade away.";
 		}
-		//If yes,
+		//Injury
 		else 
 		{
 			//Choose a player to damage

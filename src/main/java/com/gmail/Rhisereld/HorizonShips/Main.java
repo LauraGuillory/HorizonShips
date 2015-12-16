@@ -4,13 +4,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
+
 
 public class Main extends JavaPlugin implements CommandExecutor
 {
-	static JavaPlugin plugin;						//Some functions require a reference to the plugin in args.
-	WorldEditPlugin worldEditPlugin;
+	static JavaPlugin plugin;					//Some functions require a reference to the plugin in args.
 	HorizonCommandParser hcp;
+	ProfessionAPI prof;
 	
 	ConfigAccessor config;						//Configuration file.
 	ConfigAccessor data;						//Data file.
@@ -40,9 +41,17 @@ public class Main extends JavaPlugin implements CommandExecutor
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        
+        //Horizon Professions integration for piloting
+        if (!getServer().getPluginManager().isPluginEnabled("HorizonProfessions"))
+        {
+            getLogger().severe("Horizon Professions not found - piloting requirements disabled!");
+        }
+        else
+        	prof = new ProfessionAPI();
 
         //Register commands
-        hcp = new HorizonCommandParser(data, config, plugin);
+        hcp = new HorizonCommandParser(prof, data, config, plugin);
     	this.getCommand("ship").setExecutor(hcp);
     	
     	//Register listeners
@@ -68,8 +77,6 @@ public class Main extends JavaPlugin implements CommandExecutor
 		//Remove all destinations in the middle of being defined.
 		hcp.cancelDestinationsInProgress();
 		data.saveConfig();
-		
-		worldEditPlugin = null;
 		config = null;
 		data = null;
 		hcp = null;
