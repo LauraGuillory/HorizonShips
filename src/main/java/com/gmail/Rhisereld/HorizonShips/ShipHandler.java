@@ -55,7 +55,6 @@ public class ShipHandler
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
-	@SuppressWarnings("unused")
 	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
@@ -73,7 +72,7 @@ public class ShipHandler
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		
-		Ship ship = new Ship(data, shipName, destinationName, s);
+		new Ship(data, shipName, destinationName, s);
 	}
 
 	/**
@@ -261,7 +260,10 @@ public class ShipHandler
 		Set<String> ships;
 		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
-		{ return; }
+		{ 
+			sender.sendMessage(ChatColor.YELLOW + "Ships currently saved: None");
+			return;
+		}
 		String list = "Ships currently saved: ";
 		
 		for (String ship: ships)

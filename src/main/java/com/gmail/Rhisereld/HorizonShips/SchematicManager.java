@@ -61,7 +61,7 @@ public class SchematicManager
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = getMin(loc1, loc2);
@@ -88,7 +88,7 @@ public class SchematicManager
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = loc2Vector(selection.getMinimumPoint());
@@ -115,7 +115,7 @@ public class SchematicManager
 	{
 		File file;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		Vector origin = new Vector(l.getX(), l.getY(), l.getZ());
 		
 		editSession.enableQueue();
@@ -140,7 +140,7 @@ public class SchematicManager
 	{
 		File file;
 		
-		file = new File("plugins\\HorizonShips\\schematics\\" + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		Vector origin = s.getNativeMinimumPoint();
 		
 		editSession.enableQueue();
@@ -158,11 +158,11 @@ public class SchematicManager
 	 */
 	public void deleteSchematic(String path, String name)
 	{
-		File file = new File("plugins\\HorizonShips\\schematics\\" + path + name + ".schematic");
+		File file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		file.delete();
 		
 		//Delete directory
-		file = new File("plugins\\HorizonShips\\schematics\\" + name);
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + name);
 		file.delete();	
 	}
 	

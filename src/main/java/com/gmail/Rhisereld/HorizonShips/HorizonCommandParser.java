@@ -798,6 +798,7 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		} catch (NullPointerException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
 			return false;
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
