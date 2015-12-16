@@ -87,10 +87,10 @@ public class ShipHandler
 	 */
 	public void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
-		Set<String> ships;
+		Set<String> ships = new HashSet<String>();
 		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
-		{ return; }
+		{ }
 		boolean shipFound = false;
 		
 		//Check that the ship exists
@@ -481,7 +481,7 @@ public class ShipHandler
 		Set<String> refuelItemStrings;
 		try { refuelItemStrings = config.getConfig().getConfigurationSection("refuel").getKeys(false); }
 		catch (NullPointerException e)
-		{ return; }
+		{ throw new IllegalArgumentException("No items are configured to refuel. Please contact an Administrator."); }
 		
 		//Check player is holding the correct item
 		String itemInHand = player.getItemInHand().getType().name();

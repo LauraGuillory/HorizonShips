@@ -116,7 +116,7 @@ public class ShipEvent
 					" expertly manouevres the ship through the atmosphere, and the tremors fade away.";
 		}
 		//Injury
-		else 
+		else
 		{
 			//Choose a player to damage
 			Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
