@@ -2,10 +2,8 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -98,33 +96,24 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.bumpyRide.";
 		int damage = config.getConfig().getInt(path + "damage");
-		Set<String> tiers;
-		try { tiers = config.getConfig().getConfigurationSection(path + "injuryChance").getKeys(false); }
-		catch (NullPointerException e)
-		{ tiers = new HashSet<String>(); }
-		List<Double> injuryChances = new ArrayList<Double>();
-		
-		for (String t: tiers)
-			injuryChances.add(config.getConfig().getDouble(path + "injuryChance." + t));
-		
-		String professionReq = config.getConfig().getString("professionReq.profession");
+		String professionReq = config.getConfig().getString(path + "profession");
 		
 		//Determine if injury occurs or not
 		double randomDoub = 0;
-		int pilotSkill = 0;
+		int injuryChance = 0;
 		Random rand = new Random();
 		//If profession isn't required, injury never happens.
 		if (prof != null && professionReq != null)
 		{
-			pilotSkill = prof.getTier(player.getUniqueId(), config.getConfig().getString("professionReq.profession"));
-			randomDoub = rand.nextDouble();
+			injuryChance = config.getConfig().getInt(path + "injuryChance." + prof.getTier(player.getUniqueId(), professionReq));
+			randomDoub = rand.nextDouble() * 100;
 		}
 		
 		//No injury
-		if (prof == null || professionReq == null || randomDoub < injuryChances.get(pilotSkill-1))
+		if (prof == null || professionReq == null || randomDoub > injuryChance)
 		{
 			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + ChatColor.YELLOW + 
-					" expertly manouevres the ship through the storm, and the tremors fade away.";
+					" expertly manouevres the ship through the atmosphere, and the tremors fade away.";
 		}
 		//Injury
 		else 
