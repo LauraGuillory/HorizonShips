@@ -362,6 +362,10 @@ public class ShipHandler
 		ship.setCurrentDestination(destination);
 		
 		//Event trigger
+		//No event if destination is "DeepSpace"
+		if (destination.equalsIgnoreCase("DeepSpace"))
+			return;
+		
 		ShipEvent shipEvent = new ShipEvent(prof, config, data);
 		String message = null;
 		try {
