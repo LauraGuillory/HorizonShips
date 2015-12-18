@@ -57,6 +57,7 @@ public class Main extends JavaPlugin implements CommandExecutor
     	//Register listeners
     	getServer().getPluginManager().registerEvents(new ShipRegionNotifier(data, config), this);
     	getServer().getPluginManager().registerEvents(new ShipProtector(data, config), this);
+    	getServer().getPluginManager().registerEvents(new UUIDsaver(data.getConfig()), this);
     	
 		//Save every 30 minutes.
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable()

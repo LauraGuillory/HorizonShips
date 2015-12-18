@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -364,8 +363,15 @@ public class ShipHandler
 		
 		//Event trigger
 		ShipEvent shipEvent = new ShipEvent(prof, config, data);
+		String message = null;
+		try {
 		shipEvent.chooseEvent();
-		String message = shipEvent.trigger(player, ship);
+		message = shipEvent.trigger(player, ship);
+		} catch (IllegalArgumentException e)
+		{
+			player.sendMessage(ChatColor.RED + "There was an error with ship events. Please contact an Administrator.");
+			e.printStackTrace();
+		}
 		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
@@ -567,7 +573,7 @@ public class ShipHandler
 		String pilotsString = "";
 		
 		for (UUID p: pilots)
-			pilotsString = pilotsString.concat(Bukkit.getOfflinePlayer(p).getName() + ", ");
+			pilotsString = pilotsString.concat(getName(p) + ", ");
 		
 		if (pilots.size() == 0)
 			pilotsString = pilotsString.concat("None");
@@ -586,7 +592,7 @@ public class ShipHandler
 		if (ship.getOwner() == null)
 			owner = "None";
 		else if (ownerPlayer == null)
-			owner = Bukkit.getOfflinePlayer(ship.getOwner()).getName();
+			owner = getName(ship.getOwner());
 		else
 			owner = ownerPlayer.getName();
 		
@@ -653,18 +659,11 @@ public class ShipHandler
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Set the new owner
-		Player player = Bukkit.getPlayer(owner);
-		if (player == null)
-		{
-			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+		UUID uuid = getUUID(owner);
+		if (uuid == null)
+			throw new IllegalArgumentException("That player does not exist!");
 			
-			if (offlinePlayer == null)
-				throw new IllegalArgumentException("Player does not exist.");
-			
-			ship.setOwner(offlinePlayer.getUniqueId());
-		}
-		else
-			ship.setOwner(player.getUniqueId());		
+		ship.setOwner(uuid);		
 	}
 	
 	/**
@@ -689,18 +688,11 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not the owner of that ship.");
 		
 		//Set the new owner
-		Player player = Bukkit.getPlayer(newOwner);
-		if (player == null)
-		{
-			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(newOwner);
-			
-			if (offlinePlayer == null)
-				throw new IllegalArgumentException("Player does not exist.");
-			
-			ship.setOwner(offlinePlayer.getUniqueId());
-		}
-		else
-			ship.setOwner(player.getUniqueId());
+		UUID uuid = getUUID(newOwner);
+		if (uuid == null)
+			throw new IllegalArgumentException("That player does not exist!");
+		
+		ship.setOwner(uuid);
 	}
 	
 	/**
@@ -727,21 +719,14 @@ public class ShipHandler
 		
 		//Make sure the pilot isn't already a pilot
 		List<UUID> pilots = ship.getPilots();
-		Player pilotPlayer = Bukkit.getPlayer(pilot);
-		UUID pilotUUID;
-		boolean pilotMatch = false;
 		
-		if (pilotPlayer == null)
-			pilotUUID = Bukkit.getOfflinePlayer(pilot).getUniqueId();
-		else
-			pilotUUID = pilotPlayer.getUniqueId();
+		UUID pilotUUID = getUUID(pilot);
+		if (pilotUUID == null)
+			throw new IllegalArgumentException("That player does not exist!");
 		
-		for (UUID u: pilots)
-			if (pilotUUID.equals(u))
-				pilotMatch = true;
-		
-		if (pilotMatch)
-			throw new IllegalArgumentException("That player is already a pilot of that ship.");
+		for (UUID p: pilots)
+			if (p.equals(pilotUUID))
+				throw new IllegalArgumentException("That player is already a pilot of that ship.");
 		
 		ship.addPilot(pilotUUID);
 	}
@@ -770,14 +755,11 @@ public class ShipHandler
 		
 		//Check that the pilot is currently a pilot of the ship
 		List<UUID> pilots = ship.getPilots();
-		Player pilotPlayer = Bukkit.getPlayer(pilot);
-		UUID pilotUUID;
 		boolean pilotMatch = false;
 		
-		if (pilotPlayer == null)
-			pilotUUID = Bukkit.getOfflinePlayer(pilot).getUniqueId();
-		else
-			pilotUUID = pilotPlayer.getUniqueId();
+		UUID pilotUUID = getUUID(pilot);
+		if (pilotUUID == null)
+			throw new IllegalArgumentException("That player does not exist!");
 		
 		for (UUID u: pilots)
 			if (pilotUUID.equals(u))
@@ -922,5 +904,36 @@ public class ShipHandler
 			return "an";
 		else
 			return "a";
+	}
+	
+	/**
+	 * getUUID() searches the data file for a name and returns the UUID if found.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public UUID getUUID(String name)
+	{
+		Set<String> uuids;
+		try { uuids = data.getConfig().getConfigurationSection("uuids.").getKeys(false); }
+		catch (NullPointerException e)
+		{ return null; }
+		
+		for (String u: uuids)
+			if (data.getConfig().getString("uuids." + u).equalsIgnoreCase(name))
+				return UUID.fromString(u);
+		
+		return null;
+	}
+	
+	/**
+	 * getName() returns the name of a given UUID if saved.
+	 * 
+	 * @param uuid
+	 * @return
+	 */
+	public String getName(UUID uuid)
+	{
+		return data.getConfig().getString("uuids." + uuid);
 	}
 }

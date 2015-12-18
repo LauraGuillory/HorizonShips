@@ -266,6 +266,10 @@ public class ShipEvent
 		try { tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false)); }
 		catch (NullPointerException e) { }
 		
+		//If there's no possible spare parts or tools this event can't continue
+		if (spareParts.isEmpty() && tools.isEmpty())
+			return "Breakdown not possible: No spare parts or tools configured. Please contact an Administrator.";
+		
 		//Set ship to broken
 		ship.setBroken(true);
 		
@@ -286,7 +290,7 @@ public class ShipEvent
 
 		Material repairItemMaterial = Material.matchMaterial(repairItem);
 		if (repairItemMaterial == null)
-			throw new IllegalArgumentException("Invalid configuration item: " + repairItem + ". Please contact an Administrator.");
+			return "Breakdown not possible: Invalid configuration item: " + repairItem + ". Please contact an Administrator.";
 		
 		//Set item needed for repair and isConsumed
 		ship.setRepairItem(repairItem);
