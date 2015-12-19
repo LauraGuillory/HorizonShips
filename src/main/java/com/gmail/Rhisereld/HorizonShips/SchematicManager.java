@@ -2,6 +2,8 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -288,10 +290,19 @@ public class SchematicManager
 	{
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);
+		List<Material> droppables = new ArrayList<Material>();
+		droppables.add(Material.TRAP_DOOR);
+		droppables.add(Material.IRON_TRAPDOOR);
+		droppables.add(Material.REDSTONE_TORCH_ON);
+		droppables.add(Material.REDSTONE_TORCH_OFF);
+		droppables.add(Material.TORCH);
+		droppables.add(Material.STONE_BUTTON);
+		droppables.add(Material.WOOD_BUTTON);		
 
-		for (int x = (int) min.getX(); x <= max.getX(); x++)
-			for (int y = (int) min.getY(); y <= max.getY(); y++)
-				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
+		//Clean the area of items that are likely to drop items.
+		for (int x = max.getBlockX(); x >= min.getBlockX(); x--)
+			for (int y = max.getBlockY(); y >= min.getBlockY(); y--)
+				for (int z = max.getBlockZ(); z >= min.getBlockZ(); z--)
 				{
 					Block block = loc1.getWorld().getBlockAt(x, y, z);
 					if (block.getState() instanceof InventoryHolder)
@@ -299,13 +310,15 @@ public class SchematicManager
 						InventoryHolder inventoryHolder = (InventoryHolder) block.getState();
 						inventoryHolder.getInventory().clear();
 					}
-					if (!block.getType().isSolid() || block.getType().equals(Material.GOLD_PLATE))
+					
+					if (droppables.contains(block.getType()))
 						block.setType(Material.AIR);
 				}
 		
-		for (int x = (int) min.getX(); x <= max.getX(); x++)
-			for (int y = (int) min.getY(); y <= max.getY(); y++)
-				for (int z = (int) min.getZ(); z <= max.getZ(); z++)
+		//Erase what's left.
+		for (int x = max.getBlockX(); x >= min.getBlockX(); x--)
+			for (int y = max.getBlockY(); y >= min.getBlockY(); y--)
+				for (int z = max.getBlockZ(); z >= min.getBlockZ(); z--)
 					loc1.getWorld().getBlockAt(x, y, z).setType(Material.AIR);
 	}
 }
