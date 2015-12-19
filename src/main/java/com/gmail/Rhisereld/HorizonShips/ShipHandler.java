@@ -355,17 +355,17 @@ public class ShipHandler
 		//Erase old location
 		sm.eraseArea(currentLocation, loc2);
 
-		//Reduce fuel by one
-		ship.reduceFuel();
-
 		//Change current destination
 		ship.setCurrentDestination(destination);
 		
-		//Event trigger
 		//No event if destination is "DeepSpace"
 		if (destination.equalsIgnoreCase("DeepSpace"))
 			return;
 		
+		//Reduce fuel by one
+		ship.reduceFuel();
+		
+		//Event trigger
 		ShipEvent shipEvent = new ShipEvent(prof, config, data);
 		String message = null;
 		try {
