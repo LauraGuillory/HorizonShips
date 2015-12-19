@@ -125,10 +125,16 @@ public class ShipEvent
 
 			for (Player p: onlinePlayers)
 				if (p.getWorld().equals(location.getWorld())
-						&& p.getLocation().getX() >= location.getX() && p.getLocation().getX() <= location.getX() + ship.getLength()
-						&& p.getLocation().getY() >= location.getY() && p.getLocation().getY() <= location.getY() + ship.getHeight()
-						&& p.getLocation().getZ() >= location.getZ() && p.getLocation().getZ() <= location.getZ() + ship.getWidth())
+						&& p.getLocation().getBlockX() >= location.getBlockX() 
+						&& p.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
+						&& p.getLocation().getBlockY() >= location.getBlockY() 
+						&& p.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
+						&& p.getLocation().getBlockZ() >= location.getBlockZ() 
+						&& p.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
 					playersOnShip.add(p);
+			
+			if (playersOnShip.isEmpty())
+				throw new IllegalArgumentException("Error with bumpy ride event: no players detected on the ship!");
 			
 			int randomInt = rand.nextInt(playersOnShip.size());
 			
