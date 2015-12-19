@@ -297,7 +297,15 @@ public class SchematicManager
 		droppables.add(Material.REDSTONE_TORCH_OFF);
 		droppables.add(Material.TORCH);
 		droppables.add(Material.STONE_BUTTON);
-		droppables.add(Material.WOOD_BUTTON);		
+		droppables.add(Material.WOOD_BUTTON);
+		droppables.add(Material.DARK_OAK_DOOR);
+		droppables.add(Material.WOOD_DOOR);
+		droppables.add(Material.WOODEN_DOOR);
+		droppables.add(Material.ACACIA_DOOR);
+		droppables.add(Material.JUNGLE_DOOR);
+		droppables.add(Material.BIRCH_DOOR);
+		droppables.add(Material.IRON_DOOR);
+		droppables.add(Material.SPRUCE_DOOR);
 
 		//Clean the area of items that are likely to drop items.
 		for (int x = max.getBlockX(); x >= min.getBlockX(); x--)
