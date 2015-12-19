@@ -329,7 +329,19 @@ public class ShipHandler
 		
 		//Make sure the destination is valid.		
 		if (ship.getDestination(destination).getName() == null)
-			throw new IllegalArgumentException("That destination does not exist.");
+		{
+			Set<String> destinations = ship.getAllDestinations();
+			String message = "That destination does not exist. Valid destinations: ";
+			
+			if (destinations.isEmpty())
+				message += "None";
+			else
+				for (String d: destinations)
+					message += d + " ";
+			
+			throw new IllegalArgumentException(message);
+		}
+
 		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
