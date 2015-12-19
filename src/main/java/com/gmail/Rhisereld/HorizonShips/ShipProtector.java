@@ -68,7 +68,7 @@ public class ShipProtector implements Listener
 				{
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
 					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) && !ship.isPilot(player.getUniqueId())
-							&& !player.hasPermission("horizonships.admin.canbuildinsideship"))
+							&& !player.hasPermission("horizonships.admin.canbuildinsideships"))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
