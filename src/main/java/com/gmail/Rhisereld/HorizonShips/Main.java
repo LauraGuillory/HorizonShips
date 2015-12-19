@@ -32,7 +32,8 @@ public class Main extends JavaPlugin implements CommandExecutor
     	data = new ConfigAccessor(this, "data.yml");
     	
     	//Load configuration
-    	config.saveDefaultConfig();
+    	config.getConfig().options().copyDefaults(true);
+    	config.saveConfig();
     	
     	//WorldEdit integration for schematics.
         if (!getServer().getPluginManager().isPluginEnabled("WorldEdit")) 

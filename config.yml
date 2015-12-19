@@ -6,7 +6,9 @@ refuel:
 events:
   bumpyRide:
     injuryChance:
-      tier1: 50
+      1: 100
+      2: 50
+      3: 0
     damage: 8
     probability: 3
   infestation:
@@ -16,24 +18,9 @@ events:
   breakdown:
     probability: 2
     spareParts:
-      bedrock: 
-        name: "white Hull"
       glass: 
         name: "glass"
-      enchanting_table: 
-        name: "navigation screen"
-      piston_base:
-        name: "piston"
-      redstone: 
-        name: "copper wire"
-    tools:
-      ink_sack:
-        name: "wrench"
-      nether_star:
-        name: "soldering iron"
-      iron_sword: 
-        name: "crowbar"
   none:
-    probability: 5
+    probability: 3
   fuelLeak:
     probability: 1
