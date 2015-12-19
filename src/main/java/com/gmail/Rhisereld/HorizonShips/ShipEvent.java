@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -23,10 +24,10 @@ public class ShipEvent
 {
 	private String[] EVENTS = {"bumpyRide", "infestation", "breakdown", "fuelLeak", "none"};
 	ProfessionAPI prof;
-	private ConfigAccessor config;
+	private FileConfiguration config;
 	private String chosenEvent;
 	
-	public ShipEvent(ProfessionAPI prof, ConfigAccessor config, ConfigAccessor data)
+	public ShipEvent(ProfessionAPI prof, FileConfiguration config, FileConfiguration data)
 	{
 		this.prof = prof;
 		this.config = config;
@@ -44,12 +45,12 @@ public class ShipEvent
 		int i = 0;
 		
 		for (String e: EVENTS)
-			totalSum += config.getConfig().getInt("events." + e + ".probability");
+			totalSum += config.getInt("events." + e + ".probability");
 
 		randomNum = rand.nextInt(totalSum);
 		
 		do
-			sum += config.getConfig().getInt("events." + EVENTS[i++] + ".probability");
+			sum += config.getInt("events." + EVENTS[i++] + ".probability");
 		while (sum < randomNum);
 		
 		chosenEvent = EVENTS[i-1];
@@ -95,8 +96,8 @@ public class ShipEvent
 	{
 		//Configuration options
 		String path = "events.bumpyRide.";
-		int damage = config.getConfig().getInt(path + "damage");
-		String professionReq = config.getConfig().getString(path + "profession");
+		int damage = config.getInt(path + "damage");
+		String professionReq = config.getString(path + "profession");
 		
 		//Determine if injury occurs or not
 		double randomDoub = 0;
@@ -105,7 +106,7 @@ public class ShipEvent
 		//If profession isn't required, injury never happens.
 		if (prof != null && professionReq != null)
 		{
-			injuryChance = config.getConfig().getInt(path + "injuryChance." + prof.getTier(player.getUniqueId(), professionReq));
+			injuryChance = config.getInt(path + "injuryChance." + prof.getTier(player.getUniqueId(), professionReq));
 			randomDoub = rand.nextDouble() * 100;
 		}
 		
@@ -169,8 +170,8 @@ public class ShipEvent
 	{
 		//Configuration options
 		String path = "events.infestation.";
-		int number = config.getConfig().getInt(path + "number");
-		boolean poisonous = config.getConfig().getBoolean(path + "poisonous");
+		int number = config.getInt(path + "number");
+		boolean poisonous = config.getBoolean(path + "poisonous");
 		
 		//Determine spawn point
 		//Create list of locations that have a block directly below and somewhere above them.
@@ -266,10 +267,10 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.breakdown.";
 		List<String> spareParts = new ArrayList<String>();
-		try { spareParts.addAll(config.getConfig().getConfigurationSection(path + "spareParts").getKeys(false)); }
+		try { spareParts.addAll(config.getConfigurationSection(path + "spareParts").getKeys(false)); }
 		catch (NullPointerException e) { }
 		List<String> tools = new ArrayList<String>();
-		try { tools.addAll(config.getConfig().getConfigurationSection(path + "tools").getKeys(false)); }
+		try { tools.addAll(config.getConfigurationSection(path + "tools").getKeys(false)); }
 		catch (NullPointerException e) { }
 		
 		//If there's no possible spare parts or tools this event can't continue

@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -30,18 +31,23 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 public class ShipHandler 
 {	
 	ProfessionAPI prof;
-	ConfigAccessor data;
-	ConfigAccessor config;
+	FileConfiguration data;
+	static FileConfiguration config;
 	Plugin plugin;
 	
 	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
 	
-	public ShipHandler(ProfessionAPI prof, ConfigAccessor data, ConfigAccessor config, Plugin plugin) 
+	public ShipHandler(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, Plugin plugin) 
 	{
 		this.prof = prof;
 		this.data = data;
 		this.plugin = plugin;
-		this.config = config;
+		ShipHandler.config = config;
+	}
+	
+	public static void updateConfig(FileConfiguration config)
+	{
+		ShipHandler.config = config;
 	}
 
 	/**
@@ -60,10 +66,10 @@ public class ShipHandler
 	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
-		if (data.getConfig().contains("ships."))
+		if (data.contains("ships."))
 		{
 			Set<String> ships;
-			try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+			try { ships = data.getConfigurationSection("ships").getKeys(false); }
 			catch (NullPointerException e)
 			{ return; }
 			for (String sh : ships)
@@ -87,7 +93,7 @@ public class ShipHandler
 	public void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
 		Set<String> ships = new HashSet<String>();
-		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { ships = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ }
 		boolean shipFound = false;
@@ -260,7 +266,7 @@ public class ShipHandler
 	public void listShips(CommandSender sender)
 	{
 		Set<String> ships;
-		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { ships = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ 
 			sender.sendMessage(ChatColor.YELLOW + "Ships currently saved: None");
@@ -298,8 +304,8 @@ public class ShipHandler
 	{
 		//Ensure that the player has the tier requirement
 		UUID uuid = player.getUniqueId();
-		String professionReq = config.getConfig().getString("professionReq.profession");
-		int tierReq = config.getConfig().getInt("professionReq.tier");
+		String professionReq = config.getString("professionReq.profession");
+		int tierReq = config.getInt("professionReq.tier");
 		
 		if (prof != null && professionReq != null && prof.isValidProfession(professionReq) 
 				&& !prof.hasTier(uuid, professionReq, tierReq))
@@ -415,9 +421,9 @@ public class ShipHandler
 		//Use custom name for item.
 		Boolean consumePart = ship.getConsumePart();
 		if (consumePart)
-			repairItem = config.getConfig().getString("events.breakdown.spareParts." + repairItem + ".name", repairItem);
+			repairItem = config.getString("events.breakdown.spareParts." + repairItem + ".name", repairItem);
 		else
-			repairItem = config.getConfig().getString("events.breakdown.tools." + repairItem + ".name", repairItem);
+			repairItem = config.getString("events.breakdown.tools." + repairItem + ".name", repairItem);
 		
 		String article;
 		Set<Character> vowels = new HashSet<Character>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
@@ -454,9 +460,9 @@ public class ShipHandler
 		int dataValue;
 		
 		if (ship.getConsumePart())
-			dataValue = config.getConfig().getInt("events.breakdown.spareParts." + repairItem + ".data value");
+			dataValue = config.getInt("events.breakdown.spareParts." + repairItem + ".data value");
 		else
-			dataValue = config.getConfig().getInt("events.breakdown.tools." + repairItem + ".data value");
+			dataValue = config.getInt("events.breakdown.tools." + repairItem + ".data value");
 		
 		//Check player is holding the correct item.
 		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial)
@@ -495,13 +501,13 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Check if the ship tank is full
-		int maxTank = config.getConfig().getInt("refuel.maxtank");
+		int maxTank = config.getInt("refuel.maxtank");
 		if (ship.getFuel() >= maxTank)
 			throw new IllegalArgumentException("The ship's tank is already full.");
 		
 		//Get required items
 		Set<String> refuelItemStrings;
-		try { refuelItemStrings = config.getConfig().getConfigurationSection("refuel").getKeys(false); }
+		try { refuelItemStrings = config.getConfigurationSection("refuel").getKeys(false); }
 		catch (NullPointerException e)
 		{ throw new IllegalArgumentException("No items are configured to refuel. Please contact an Administrator."); }
 		
@@ -517,7 +523,7 @@ public class ShipHandler
 		
 		//Remove the correct number of the item.
 		int numItemsInHand = player.getItemInHand().getAmount();
-		int fills = config.getConfig().getInt("refuel." + refuelItemString + ".fills");
+		int fills = config.getInt("refuel." + refuelItemString + ".fills");
 		int numToUse;
 		
 		if ((10 - ship.getFuel()) < (numItemsInHand * fills))
@@ -797,7 +803,7 @@ public class ShipHandler
 	private Ship findCurrentShip(Player player)
 	{
 		Set<String> shipStrings;
-		try { shipStrings = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { shipStrings = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ return null; }
 		Set<Ship> ships = new HashSet<Ship>();
@@ -931,12 +937,12 @@ public class ShipHandler
 	public UUID getUUID(String name)
 	{
 		Set<String> uuids;
-		try { uuids = data.getConfig().getConfigurationSection("uuids.").getKeys(false); }
+		try { uuids = data.getConfigurationSection("uuids.").getKeys(false); }
 		catch (NullPointerException e)
 		{ return null; }
 		
 		for (String u: uuids)
-			if (data.getConfig().getString("uuids." + u).equalsIgnoreCase(name))
+			if (data.getString("uuids." + u).equalsIgnoreCase(name))
 				return UUID.fromString(u);
 		
 		return null;
@@ -950,6 +956,6 @@ public class ShipHandler
 	 */
 	public String getName(UUID uuid)
 	{
-		return data.getConfig().getString("uuids." + uuid);
+		return data.getString("uuids." + uuid);
 	}
 }

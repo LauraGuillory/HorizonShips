@@ -51,12 +51,12 @@ public class Main extends JavaPlugin implements CommandExecutor
         	prof = new ProfessionAPI();
 
         //Register commands
-        hcp = new HorizonCommandParser(prof, data, config, plugin);
+        hcp = new HorizonCommandParser(prof, data.getConfig(), config.getConfig(), plugin);
     	this.getCommand("ship").setExecutor(hcp);
     	
     	//Register listeners
-    	getServer().getPluginManager().registerEvents(new ShipRegionNotifier(data, config), this);
-    	getServer().getPluginManager().registerEvents(new ShipProtector(data, config), this);
+    	getServer().getPluginManager().registerEvents(new ShipRegionNotifier(data.getConfig()), this);
+    	getServer().getPluginManager().registerEvents(new ShipProtector(data.getConfig()), this);
     	getServer().getPluginManager().registerEvents(new UUIDsaver(data.getConfig()), this);
     	
 		//Save every 30 minutes.

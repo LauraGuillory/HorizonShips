@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * This class contains all the information pertaining to a single destination.
@@ -11,7 +12,7 @@ import org.bukkit.Location;
  */
 public class Destination 
 {
-	private ConfigAccessor data;
+	private FileConfiguration data;
 	private String shipName;
 	private String destinationName;
 	private Location location;
@@ -23,13 +24,13 @@ public class Destination
 	 * @param shipName
 	 * @param destinationName
 	 */
-	public Destination(ConfigAccessor data, String shipName, String destinationName)
+	public Destination(FileConfiguration data, String shipName, String destinationName)
 	{
-		if (!data.getConfig().contains("ships." + shipName + ".destinations"))
+		if (!data.contains("ships." + shipName + ".destinations"))
 			return;
 		
 		Set<String> destinations;
-		try { destinations = data.getConfig().getConfigurationSection("ships." + shipName + ".destinations").getKeys(false); }
+		try { destinations = data.getConfigurationSection("ships." + shipName + ".destinations").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		
@@ -48,10 +49,10 @@ public class Destination
 		this.shipName = shipName;
 		this.destinationName = destinationName;
 		this.data = data;
-		location = new Location(Bukkit.getWorld(data.getConfig().getString("ships." + shipName + ".destinations." + destinationName + ".world")),
-								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".x"),
-								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".y"),
-								data.getConfig().getInt("ships." + shipName + ".destinations." + destinationName + ".z"));
+		location = new Location(Bukkit.getWorld(data.getString("ships." + shipName + ".destinations." + destinationName + ".world")),
+								data.getInt("ships." + shipName + ".destinations." + destinationName + ".x"),
+								data.getInt("ships." + shipName + ".destinations." + destinationName + ".y"),
+								data.getInt("ships." + shipName + ".destinations." + destinationName + ".z"));
 	}
 	
 	/**
@@ -62,17 +63,17 @@ public class Destination
 	 * @param destinationName
 	 * @param location
 	 */
-	public Destination(ConfigAccessor data, String shipName, String destinationName, Location location)
+	public Destination(FileConfiguration data, String shipName, String destinationName, Location location)
 	{
 		this.shipName = shipName;
 		this.destinationName = destinationName;
 		this.location = location;
 		this.data = data;
 		
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".world", location.getWorld().getName());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
-		data.getConfig().set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
+		data.set("ships." + shipName + ".destinations." + destinationName + ".world", location.getWorld().getName());
+		data.set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
+		data.set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
+		data.set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
 	}
 	
 	/**
@@ -82,7 +83,7 @@ public class Destination
 	 */
 	public void delete()
 	{
-		data.getConfig().getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
+		data.getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
 	}
 	
 	/**

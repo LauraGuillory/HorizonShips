@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
@@ -20,7 +21,7 @@ import com.sk89q.worldedit.data.DataException;
 @SuppressWarnings("deprecation")
 public class Ship 
 {
-	private ConfigAccessor data;
+	private FileConfiguration data;
 	private String name;
 	private Destination currentDestination;
 	private Set<String> destinations = new HashSet<String>();
@@ -40,30 +41,30 @@ public class Ship
 	 * @param data
 	 * @param name
 	 */
-	public Ship(ConfigAccessor data, String name)
+	public Ship(FileConfiguration data, String name)
 	{
 		String path = "ships." + name + ".";
-		currentDestination = new Destination(data, name, data.getConfig().getString(path + "currentDestination"));
+		currentDestination = new Destination(data, name, data.getString(path + "currentDestination"));
 		
 		if (currentDestination.getName() == null) //Ship does not exist.
 			return;
 		
 		this.data = data;
 		this.name = name;
-		try { destinations = data.getConfig().getConfigurationSection(path + "destinations").getKeys(false); }
+		try { destinations = data.getConfigurationSection(path + "destinations").getKeys(false); }
 		catch (NullPointerException e) { }
-		fuel = data.getConfig().getInt(path + "fuel");
-		broken = data.getConfig().getBoolean(path + "broken");
-		repairItem = data.getConfig().getString(path + "repairItem");
-		consumePart = data.getConfig().getBoolean(path + "consumePart");
-		List<String> pilotsString = data.getConfig().getStringList(path + "pilots");
+		fuel = data.getInt(path + "fuel");
+		broken = data.getBoolean(path + "broken");
+		repairItem = data.getString(path + "repairItem");
+		consumePart = data.getBoolean(path + "consumePart");
+		List<String> pilotsString = data.getStringList(path + "pilots");
 		for (String s: pilotsString)
 			pilots.add(UUID.fromString(s));
-		length = data.getConfig().getInt(path + "length");
-		width = data.getConfig().getInt(path + "width");
-		height = data.getConfig().getInt(path + "height");
-		if (data.getConfig().getString(path + "owner") != null)
-			owner = UUID.fromString(data.getConfig().getString(path + "owner"));
+		length = data.getInt(path + "length");
+		width = data.getInt(path + "width");
+		height = data.getInt(path + "height");
+		if (data.getString(path + "owner") != null)
+			owner = UUID.fromString(data.getString(path + "owner"));
 	}
 
 	/**
@@ -80,7 +81,7 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public Ship(ConfigAccessor data, String name, String destinationName, Selection selection) throws DataException, IOException
+	public Ship(FileConfiguration data, String name, String destinationName, Selection selection) throws DataException, IOException
 	{
 		this.data = data;
 		this.name = name;
@@ -96,13 +97,13 @@ public class Ship
 		width = max.getBlockZ() - min.getBlockZ();
 		height = max.getBlockY() - min.getBlockY();
 		
-		data.getConfig().set("ships." + name + ".currentDestination", destinationName);
-		data.getConfig().set("ships." + name + ".fuel", fuel);
-		data.getConfig().set("ships." + name + ".broken", broken);
-		data.getConfig().set("ships." + name + ".pilots", pilots);
-		data.getConfig().set("ships." + name + ".length", length);
-		data.getConfig().set("ships." + name + ".width", width);
-		data.getConfig().set("ships." + name + ".height", height);
+		data.set("ships." + name + ".currentDestination", destinationName);
+		data.set("ships." + name + ".fuel", fuel);
+		data.set("ships." + name + ".broken", broken);
+		data.set("ships." + name + ".pilots", pilots);
+		data.set("ships." + name + ".length", length);
+		data.set("ships." + name + ".width", width);
+		data.set("ships." + name + ".height", height);
 		
 		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
 		sm.saveSchematic(selection, name + "\\ship");
@@ -114,7 +115,7 @@ public class Ship
 	 */
 	public void deleteShip()
 	{
-		data.getConfig().set("ships." + name, null);
+		data.set("ships." + name, null);
 		
 		//Delete ship schematic
 		SchematicManager sm = new SchematicManager(Bukkit.getWorld("world"));
@@ -188,7 +189,7 @@ public class Ship
 		currentDestination = new Destination(data, name, destination);
 		if (currentDestination == null)
 			return false;
-		data.getConfig().set("ships." + name + ".currentDestination", destination);
+		data.set("ships." + name + ".currentDestination", destination);
 		
 		return true;
 	}
@@ -210,7 +211,7 @@ public class Ship
 	 */
 	public void setBroken(boolean broken)
 	{
-		data.getConfig().set("ships." + name + ".broken", broken);
+		data.set("ships." + name + ".broken", broken);
 	}
 
 	/**
@@ -260,7 +261,7 @@ public class Ship
 	 */
 	public void setFuel(int fuel)
 	{
-		data.getConfig().set("ships." + name + ".fuel", fuel);
+		data.set("ships." + name + ".fuel", fuel);
 	}
 	
 	/**
@@ -269,7 +270,7 @@ public class Ship
 	 */
 	public void reduceFuel()
 	{
-		data.getConfig().set("ships." + name + ".fuel", --fuel);
+		data.set("ships." + name + ".fuel", --fuel);
 	}
 	
 	/**
@@ -300,7 +301,7 @@ public class Ship
 	public void setRepairItem(String item)
 	{
 		this.repairItem = item;
-		data.getConfig().set("ships." + name + ".repairItem", item);
+		data.set("ships." + name + ".repairItem", item);
 	}
 	
 	/**
@@ -324,7 +325,7 @@ public class Ship
 	public void setConsumePart(boolean consumePart)
 	{
 		this.consumePart = consumePart;
-		data.getConfig().set("ships." + name + ".consumePart", consumePart);
+		data.set("ships." + name + ".consumePart", consumePart);
 	}
 	
 	/**
@@ -345,7 +346,7 @@ public class Ship
 	 */
 	public boolean isPilot(UUID player)
 	{
-		List <String> pilots = data.getConfig().getStringList("ships." + name + ".pilots");
+		List <String> pilots = data.getStringList("ships." + name + ".pilots");
 		
 		for (String p : pilots)
 			if (player.toString().equalsIgnoreCase(p))
@@ -368,7 +369,7 @@ public class Ship
 		for (UUID u: pilots)
 			pilotStrings.add(u.toString());
 		
-		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
+		data.set("ships." + name + ".pilots", pilotStrings);
 	}
 	
 	public void removePilot(UUID uuid)
@@ -380,7 +381,7 @@ public class Ship
 		for (UUID u: pilots)
 			pilotStrings.add(u.toString());
 		
-		data.getConfig().set("ships." + name + ".pilots", pilotStrings);
+		data.set("ships." + name + ".pilots", pilotStrings);
 	}
 	
 	/**
@@ -396,6 +397,6 @@ public class Ship
 	public void setOwner(UUID uuid)
 	{
 		owner = uuid;
-		data.getConfig().set("ships." + name + ".owner", uuid.toString());
+		data.set("ships." + name + ".owner", uuid.toString());
 	}
 }

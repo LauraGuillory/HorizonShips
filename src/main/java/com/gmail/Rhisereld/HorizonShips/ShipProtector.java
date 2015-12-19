@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,13 +20,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
  */
 public class ShipProtector implements Listener
 {
-	ConfigAccessor data;
-	ConfigAccessor config;
+	FileConfiguration data;
 	
-	public ShipProtector(ConfigAccessor data, ConfigAccessor config)
+	public ShipProtector(FileConfiguration data)
 	{
 		this.data = data;
-		this.config = config;
 	}
 	
 	/**
@@ -37,7 +36,7 @@ public class ShipProtector implements Listener
 	public void onBreakBlock(BlockBreakEvent event)
 	{
 		Set<String> ships;
-		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { ships = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		
@@ -87,7 +86,7 @@ public class ShipProtector implements Listener
 	public void onBlockPlace(BlockPlaceEvent event)
 	{
 		Set<String> ships;
-		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { ships = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		

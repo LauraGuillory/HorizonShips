@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,14 +19,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 public class ShipRegionNotifier implements Listener
 {
-	ConfigAccessor data;
-	ConfigAccessor config;	
+	FileConfiguration data;
 	HashMap<String, String> playersInsideShip = new HashMap<String, String>();
 	
-	public ShipRegionNotifier(ConfigAccessor data, ConfigAccessor config)
+	public ShipRegionNotifier(FileConfiguration data)
 	{
 		this.data = data;
-		this.config = config;
 	}
 	
 	/**
@@ -47,7 +46,7 @@ public class ShipRegionNotifier implements Listener
 		//Check if the new destination is inside any of these ships
 		Set<String> ships;
 		
-		try { ships = data.getConfig().getConfigurationSection("ships").getKeys(false); }
+		try { ships = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		

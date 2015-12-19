@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,8 +22,8 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 public class HorizonCommandParser implements CommandExecutor 
 {
 	ProfessionAPI prof;
-	ConfigAccessor data;
-	ConfigAccessor config;
+	FileConfiguration data;
+	FileConfiguration config;
 	ShipHandler shipHandler;
 	JavaPlugin plugin;
 	
@@ -33,7 +34,7 @@ public class HorizonCommandParser implements CommandExecutor
 	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	HashMap<String, String> confirmTransfer = new HashMap<String, String>();
 	
-    public HorizonCommandParser(ProfessionAPI prof, ConfigAccessor data, ConfigAccessor config, JavaPlugin plugin) 
+    public HorizonCommandParser(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, JavaPlugin plugin) 
     {
     	this.prof = prof;
 		this.data = data;
@@ -58,11 +59,21 @@ public class HorizonCommandParser implements CommandExecutor
 			if (args.length == 0)
 				return showCommands(sender);
 			
-			//ship test
-			if (args[0].equalsIgnoreCase("test"))
-			{
-				return true;
-			}
+			//ship reload
+			if (args[0].equalsIgnoreCase("reload"))
+				if (!(sender instanceof Player) || sender.hasPermission("horizonships.reload"))
+				{
+					config = new ConfigAccessor(plugin, "config.yml").getConfig();
+					ShipHandler.updateConfig(config);
+					
+					sender.sendMessage(ChatColor.YELLOW + "Horizon Ships config reloaded.");
+					return true;
+				}
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "You don't have permission to use this commend!");
+					return false;
+				}
 			
 			//ship create [shipName] [destinationName]
 			if (args[0].equalsIgnoreCase("create"))
