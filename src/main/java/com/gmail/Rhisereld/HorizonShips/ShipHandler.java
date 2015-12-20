@@ -304,8 +304,8 @@ public class ShipHandler
 	{
 		//Ensure that the player has the tier requirement
 		UUID uuid = player.getUniqueId();
-		String professionReq = config.getString("professionReq.profession");
-		int tierReq = config.getInt("professionReq.tier");
+		String professionReq = config.getString("professionReqs.pilot.profession");
+		int tierReq = config.getInt("professionReqs.pilot.tier");
 		
 		if (prof != null && professionReq != null && prof.isValidProfession(professionReq) 
 				&& !prof.hasTier(uuid, professionReq, tierReq))
@@ -406,6 +406,17 @@ public class ShipHandler
 	 */
 	public void diagnose(Player player) throws IllegalArgumentException
 	{
+		//Only novice pilots can diagnose a ship.
+		String professionReq = config.getString("professionReqs.repair.profession");
+		if (prof != null && config.getBoolean("professionsEnabled") && professionReq != null)
+		{
+			String tierReq = config.getString("professionReqs.repair.tier");
+			
+			if (!prof.hasTier(player.getUniqueId(), professionReq, tierReq))
+				throw new IllegalArgumentException("You cannot diagnose a ship because you are not " + getDeterminer(tierReq) 
+						+ " " + tierReq + " " + professionReq + ".");
+		}
+		
 		//Determine the ship the player is trying to diagnose.
 		Ship ship = findCurrentShip(player);
 		if (ship == null)

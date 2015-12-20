@@ -38,22 +38,24 @@ public class ShipEvent
 	 */
 	public void chooseEvent()
 	{
-		Random rand = new Random();
-		int totalSum = 0;
-		int randomNum;
-		int sum = 0;
-		int i = 0;
+		int total = 0;
 		
 		for (String e: EVENTS)
-			totalSum += config.getInt("events." + e + ".probability");
+			total += config.getInt("events." + e + ".probability");
+		
+		double randomNum = Math.random() * total;
+		double cumulativeProbability = 0;
+		for (String e: EVENTS) 
+		{
+		    cumulativeProbability += config.getInt("events." + e + ".probability");
+		    if (cumulativeProbability >= randomNum)
+		    {
+		        chosenEvent = e;
+		        return;
+		    }
 
-		randomNum = rand.nextInt(totalSum);
-		
-		do
-			sum += config.getInt("events." + EVENTS[i++] + ".probability");
-		while (sum < randomNum);
-		
-		chosenEvent = EVENTS[i-1];
+		}
+
 	}
 	
 	/**
@@ -97,14 +99,15 @@ public class ShipEvent
 		//Configuration options
 		String path = "events.bumpyRide.";
 		int damage = config.getInt(path + "damage");
-		String professionReq = config.getString(path + "profession");
+		boolean professionsEnabled = config.getBoolean("professionsEnabled");
+		String professionReq = config.getString("professionReqs.pilot.profession");
 		
 		//Determine if injury occurs or not
 		double randomDoub = 0;
 		int injuryChance = 0;
 		Random rand = new Random();
 		//If profession isn't required, injury never happens.
-		if (prof != null && professionReq != null)
+		if (prof != null && professionsEnabled && professionReq != null)
 		{
 			injuryChance = config.getInt(path + "injuryChance." + prof.getTier(player.getUniqueId(), professionReq));
 			randomDoub = rand.nextDouble() * 100;
