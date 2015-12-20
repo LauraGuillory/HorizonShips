@@ -497,7 +497,7 @@ public class ShipHandler
 		if (prof != null && professionEnabled)
 		{
 			int tier = prof.getTier(uuid, professionReq);
-			double successRate = config.getInt("professionReqs.repair.successRate." + tier) / 100;
+			double successRate = config.getDouble("professionReqs.repair.successRate." + tier) / 100;
 			double randomNum = Math.random();
 			if (randomNum > successRate)
 			{
