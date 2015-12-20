@@ -509,8 +509,14 @@ public class ShipHandler
 					player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
 				
 				//Send message
-				player.sendMessage(ChatColor.YELLOW + "You try to repair the ship, but you fumble and destroy your " + ship.getRepairItem()
-						+ "!");
+				String itemName;
+				if (ship.getConsumePart())
+					itemName = config.getString("events.breakdown.spareParts." + repairItem + ".name");
+				else
+					itemName = config.getString("events.breakdown.tools." + repairItem + ".name");
+				
+				player.sendMessage(ChatColor.YELLOW + "You try to repair the ship, but you fumble and destroy your " 
+						+ itemName + "!");
 				return;
 			}
 		}
