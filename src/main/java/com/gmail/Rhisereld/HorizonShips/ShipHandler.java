@@ -457,12 +457,14 @@ public class ShipHandler
 	public void repair(Player player)
 	{
 		//Only novice pilots can repair a ship.
+		UUID uuid = player.getUniqueId();
 		String professionReq = config.getString("professionReqs.repair.profession");
-		if (prof != null && config.getBoolean("professionsEnabled") && professionReq != null)
+		boolean professionEnabled = config.getBoolean("professionsEnabled");
+		if (prof != null && professionEnabled && professionReq != null)
 		{
 			int tierReq = config.getInt("professionReqs.repair.tier");
 			
-			if (!prof.hasTier(player.getUniqueId(), professionReq, tierReq))
+			if (!prof.hasTier(uuid, professionReq, tierReq))
 				throw new IllegalArgumentException("You cannot repair a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
 						+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
 		}
@@ -490,6 +492,30 @@ public class ShipHandler
 		if(!player.getInventory().getItemInHand().getType().equals(repairItemMaterial)
 				|| !(player.getInventory().getItemInHand().getDurability() == dataValue))
 			throw new IllegalArgumentException("You don't have the correct item.");
+		
+		//If professions are enabled, there is a chance to fumble and destroy the item
+		if (prof != null && professionEnabled)
+		{
+			int tier = prof.getTier(uuid, professionReq);
+			double successRate = config.getInt("professionReqs.repair.successRate." + tier) / 100;
+			double randomNum = Math.random();
+			if (randomNum > successRate)
+			{
+				//Destroy the item
+				int numItemsInHand = player.getItemInHand().getAmount();
+				if (numItemsInHand <= 1)
+					player.setItemInHand(null);
+				else
+					player.getItemInHand().setAmount(player.getItemInHand().getAmount() - 1);
+				
+				//Send message
+				player.sendMessage(ChatColor.YELLOW + "You try to repair the ship, but you fumble and destroy your " + ship.getRepairItem()
+						+ "!");
+				return;
+			}
+		}
+
+		
 		
 		//If they are and the item is consumable, remove one of that item
 		if (ship.getConsumePart())
