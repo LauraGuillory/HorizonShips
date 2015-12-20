@@ -456,6 +456,17 @@ public class ShipHandler
 	 */
 	public void repair(Player player)
 	{
+		//Only novice pilots can repair a ship.
+		String professionReq = config.getString("professionReqs.repair.profession");
+		if (prof != null && config.getBoolean("professionsEnabled") && professionReq != null)
+		{
+			int tierReq = config.getInt("professionReqs.repair.tier");
+			
+			if (!prof.hasTier(player.getUniqueId(), professionReq, tierReq))
+				throw new IllegalArgumentException("You cannot repair a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
+						+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
+		}
+		
 		//Determine the ship the player is trying to repair.
 		Ship ship = findCurrentShip(player);
 		if (ship == null)
