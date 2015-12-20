@@ -410,11 +410,11 @@ public class ShipHandler
 		String professionReq = config.getString("professionReqs.repair.profession");
 		if (prof != null && config.getBoolean("professionsEnabled") && professionReq != null)
 		{
-			String tierReq = config.getString("professionReqs.repair.tier");
+			int tierReq = config.getInt("professionReqs.repair.tier");
 			
 			if (!prof.hasTier(player.getUniqueId(), professionReq, tierReq))
-				throw new IllegalArgumentException("You cannot diagnose a ship because you are not " + getDeterminer(tierReq) 
-						+ " " + tierReq + " " + professionReq + ".");
+				throw new IllegalArgumentException("You cannot diagnose a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
+						+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
 		}
 		
 		//Determine the ship the player is trying to diagnose.
