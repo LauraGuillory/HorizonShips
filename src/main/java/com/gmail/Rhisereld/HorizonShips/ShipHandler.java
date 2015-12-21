@@ -14,6 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -133,20 +134,52 @@ public class ShipHandler
 		//Check that there isn't already a destination by that name.
 		if (ship.getDestination(destinationName) == null)
 			throw new IllegalArgumentException("This ship already has a destination by that name.");
+		
+		//Check that the destination doesn't collide with any other destinations.
+		Set<String> shipStrings;
+		ConfigurationSection configSection = data.getConfigurationSection("ships");
+		Location currentLocation = ship.getCurrentDestination().getLocation();	
+		SchematicManager sm = new SchematicManager(currentLocation.getWorld());
+		sm = new SchematicManager(player.getWorld());
+		Selection s = sm.getPlayerSelection(player);
+		if (configSection != null)
+		{
+			shipStrings = configSection.getKeys(false);
+			Set<String> destinations;
+			
+			for (String ss: shipStrings)
+			{
+				Ship checkShip = new Ship(data, ss);
+				destinations = checkShip.getAllDestinations();
+				for (String d: destinations)
+				{
+					Location min = new Destination(data, ss, d).getLocation();
+					Location max = new Location(min.getWorld(), min.getX() + ship.getLength(), min.getY() + ship.getHeight(), min.getZ() 
+												+ ship.getWidth());
+					
+					Location newMin = s.getMinimumPoint();
+					Location newMax = new Location(newMin.getWorld(), newMin.getX() + checkShip.getLength(), newMin.getY() + checkShip.getHeight(), 
+													newMin.getZ() + checkShip.getWidth());
+					
+					//Check if the regions intersect.
+					if (min.getWorld().equals(newMin.getWorld())
+							&& (newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
+							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMax.getY() <= max.getY())
+							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()))
+						throw new IllegalArgumentException("Collision detected: There is already another destination here!");
+				}
+			}
+		}
 
-		//Save schematic from current destination
-		Location currentLocation = ship.getCurrentDestination().getLocation();		
+		//Save schematic from current destination	
 		Location loc2 = new Location(currentLocation.getWorld(), 
 				currentLocation.getBlockX() + ship.getLength(), 
 				currentLocation.getBlockY() + ship.getHeight(), 
 				currentLocation.getBlockZ() + ship.getWidth());
 
-		SchematicManager sm = new SchematicManager(currentLocation.getWorld());
 		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");	
 		
 		//Test schematic at new destination
-		sm = new SchematicManager(player.getWorld());
-		Selection s = sm.getPlayerSelection(player);
 		sm.loadSchematic(s, ship.getName() + "\\ship");
 		
 		//Players currently testing a destination
