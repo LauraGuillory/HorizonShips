@@ -823,7 +823,7 @@ public class ShipHandler
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null && player.getUniqueId().equals(ship.getOwner()))
+		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null && !player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Make sure the pilot isn't already a pilot
@@ -859,7 +859,7 @@ public class ShipHandler
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && player.getUniqueId().equals(ship.getOwner()))
+		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && !player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Check that the pilot is currently a pilot of the ship

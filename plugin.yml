@@ -19,6 +19,8 @@ permissions:
       horizonships.admin.setowner: true
       horizonships.admin.info: true
       horizonships.admin.canbuildinsideships: true
+      horizonships.admin.pilot.add: true
+      horizonships.admin.pilot.remove: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
@@ -52,6 +54,8 @@ permissions:
       horizonships.admin.setowner: true
       horizonships.admin.info: true
       horizonships.admin.canbuildinsideships: true
+      horizonships.admin.pilot.add: true
+      horizonships.admin.pilot.remove: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true

@@ -457,7 +457,8 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean addPilot(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission to add a pilot OR is the console
-		if (!sender.hasPermission("horizonships.pilot.add") && sender instanceof Player)
+		if (!sender.hasPermission("horizonships.pilot.add") && !sender.hasPermission("horizonships.admin.pilot.remove") 
+				&& sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to add a pilot.");
 			return false;
@@ -487,7 +488,8 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean removePilot(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission to remove a pilot OR is the console
-		if (!sender.hasPermission("horizonships.pilot.remove") && sender instanceof Player)
+		if (!sender.hasPermission("horizonships.pilot.remove") && !sender.hasPermission("horizonships.admin.pilot.remove") 
+				&& sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a pilot.");
 			return false;
