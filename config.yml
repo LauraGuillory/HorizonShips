@@ -1,14 +1,8 @@
 refuel:
   maxtank: 10
-  arrow:
-    name: "energy cell"
-    fills: 1
 events:
   bumpyRide:
     injuryChance:
-      1: 100
-      2: 50
-      3: 0
     damage: 8
     probability: 3
   infestation:
@@ -18,8 +12,7 @@ events:
   breakdown:
     probability: 2
     spareParts:
-      glass: 
-        name: "glass"
+    tools:
   none:
     probability: 3
   fuelLeak:
