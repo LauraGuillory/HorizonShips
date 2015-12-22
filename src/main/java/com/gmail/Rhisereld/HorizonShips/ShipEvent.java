@@ -117,7 +117,7 @@ public class ShipEvent
 		if (prof == null || professionReq == null || randomDoub > injuryChance)
 		{
 			return "The ship creaks and shudders, battered with whorls of wind. " + player.getDisplayName() + ChatColor.YELLOW + 
-					" expertly manouevres the ship through the atmosphere, and the tremors fade away.";
+					" expertly manoeuvres the ship through the atmosphere, and the tremors fade away.";
 		}
 		//Injury
 		else
