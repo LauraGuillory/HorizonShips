@@ -381,7 +381,6 @@ public class ShipHandler
 			throw new IllegalArgumentException(message);
 		}
 
-		
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Location currentLocation = ship.getCurrentDestination().getLocation();
@@ -405,9 +404,10 @@ public class ShipHandler
 
 		//Erase old location
 		sm.eraseArea(currentLocation, loc2);
-
-		//Change current destination
-		ship.setCurrentDestination(destination);
+		
+		//Award experience for flying.
+		if (prof != null && professionReq != null && prof.isValidProfession(professionReq))
+			prof.addExperience(uuid, professionReq, config.getInt("professionReqs." + professionReq + ".exp"));
 		
 		//No event if destination is "DeepSpace"
 		if (destination.equalsIgnoreCase("DeepSpace"))
@@ -430,6 +430,9 @@ public class ShipHandler
 		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
+		
+		//Change current destination
+		ship.setCurrentDestination(destination);
 	}
 	
 	/**
@@ -920,22 +923,25 @@ public class ShipHandler
 	{
 		final Set<Player> playersInside = getPlayersInsideRegion(ship);
 		
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+		for (final Player p: playersInside)
 		{
-			Location oldLocation = ship.getCurrentDestination().getLocation();
+			final Location playerLocation = p.getLocation();
+			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+			{
+				Location oldLocation = ship.getCurrentDestination().getLocation();
 			
-			public void run() 
-			{ 
-				for (Player p: playersInside)
+				public void run() 
+				{ 
 					//Determine new player location based on existing offset to ship location.			
 					p.teleport(new Location(newLocation.getWorld(),
-						p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
-						p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
-						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
-						p.getLocation().getYaw(),
-						p.getLocation().getPitch()));
-			}
+						playerLocation.getX() - oldLocation.getX() + newLocation.getX(), 
+						playerLocation.getY() - oldLocation.getY() + newLocation.getY(),
+						playerLocation.getZ() - oldLocation.getZ() + newLocation.getZ(),
+						playerLocation.getYaw(),
+						playerLocation.getPitch()));
+				}
 			}, 20);
+		}
 	}
 	
 	/**
