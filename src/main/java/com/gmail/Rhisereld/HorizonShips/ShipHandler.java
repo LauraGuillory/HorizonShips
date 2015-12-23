@@ -916,19 +916,26 @@ public class ShipHandler
 	 * @param ship
 	 * @param newLocation
 	 */
-	private void teleportPlayers(Ship ship, Location newLocation)
+	private void teleportPlayers(final Ship ship, final Location newLocation)
 	{
-		Location oldLocation = ship.getCurrentDestination().getLocation();
-		Set<Player> playersInside = getPlayersInsideRegion(ship);
+		final Set<Player> playersInside = getPlayersInsideRegion(ship);
 		
-		for (Player p: playersInside)
-			//Determine new player location based on existing offset to ship location.			
-			p.teleport(new Location(newLocation.getWorld(),
-				p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
-				p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
-				p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
-				p.getLocation().getYaw(),
-				p.getLocation().getPitch()));
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
+		{
+			Location oldLocation = ship.getCurrentDestination().getLocation();
+			
+			public void run() 
+			{ 
+				for (Player p: playersInside)
+					//Determine new player location based on existing offset to ship location.			
+					p.teleport(new Location(newLocation.getWorld(),
+						p.getLocation().getX() - oldLocation.getX() + newLocation.getX(), 
+						p.getLocation().getY() - oldLocation.getY() + newLocation.getY(),
+						p.getLocation().getZ() - oldLocation.getZ() + newLocation.getZ(),
+						p.getLocation().getYaw(),
+						p.getLocation().getPitch()));
+			}
+			}, 20);
 	}
 	
 	/**
