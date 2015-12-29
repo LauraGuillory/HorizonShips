@@ -411,8 +411,12 @@ public class ShipHandler
 		
 		//No event if destination is "DeepSpace"
 		if (destination.equalsIgnoreCase("DeepSpace"))
+		{
+			//Change current destination but do nothing else.
+			ship.setCurrentDestination(destination);
 			return;
-		
+		}
+
 		//Reduce fuel by one
 		ship.reduceFuel();
 		
