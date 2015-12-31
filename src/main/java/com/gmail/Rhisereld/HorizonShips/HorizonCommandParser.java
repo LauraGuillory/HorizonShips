@@ -240,6 +240,17 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
+			//ship tp [shipName]
+			if (args[0].equalsIgnoreCase("tp"))
+				if (args.length == 2)
+					return teleport(sender, args[1].toLowerCase());
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship tp "
+							+ "[shipName]");
+					return false;
+				}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -812,13 +823,42 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		//Perform the action.
 		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
-		try { shipHandler.rename(sender, args[1], args[2]); }
+		try { shipHandler.rename(sender, args[1].toLowerCase(), args[2].toLowerCase()); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
 		sender.sendMessage(ChatColor.YELLOW + "Ship renamed from " + args[1] + " to " + args[2]);
+		return true;
+	}
+	
+	/**
+	 * teleport() checks if the sender is a player and has permission and teleports the player
+	 * to the current destination of the ship name given.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @return
+	 */
+	public boolean teleport(CommandSender sender, String shipName)
+	{
+		//Check that they have permission and is a player
+		if (!sender.hasPermission("horizonships.admin.teleport") || !(sender instanceof Player))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to teleport to a ship.");
+			return false;
+		}
+		
+		//Perform the action
+		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
+		try { shipHandler.teleport((Player) sender, shipName); }
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		sender.sendMessage(ChatColor.YELLOW + "Teleporting to ship: " + shipName);
 		return true;
 	}
 	
@@ -1282,6 +1322,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship setowner [shipName] [playerName]");
 			sender.sendMessage("Sets the player as the owner of the ship.");
+		}
+		if (sender.hasPermission("horizonships.admin.teleport"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship tp [shipName]");
+			sender.sendMessage("Teleport to the ship's current destination.");
 		}
 		if (sender.hasPermission("horizonships.list"))
 		{

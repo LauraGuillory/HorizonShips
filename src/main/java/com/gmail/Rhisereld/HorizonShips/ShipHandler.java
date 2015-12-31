@@ -18,6 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.Plugin;
 
 import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
@@ -915,6 +916,24 @@ public class ShipHandler
 		
 		//Change the name
 		ship.rename(newName);
+	}
+	
+	/**
+	 * teleport() teleports the player to the current destination of the ship given.
+	 * 
+	 * @param player
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
+	public void teleport(Player player, String shipName) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Teleport the player there
+		player.teleport(ship.getCurrentDestination().getLocation(), TeleportCause.PLUGIN);
 	}
 	
 	/**
