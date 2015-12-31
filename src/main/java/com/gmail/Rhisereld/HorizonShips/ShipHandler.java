@@ -937,6 +937,23 @@ public class ShipHandler
 	}
 	
 	/**
+	 * forceRefuel() sets the ship's fuel to full without taking any items.
+	 * 
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
+	public void forceRefuel(String shipName) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Refuel the ship.
+		ship.setFuel(config.getInt("refuel.maxtank"));
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 

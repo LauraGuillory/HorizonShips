@@ -23,6 +23,7 @@ permissions:
       horizonships.admin.pilot.remove: true
       horizonships.admin.rename: true
       horizonships.admin.teleport: true
+      horizonships.admin.forcerefuel: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
@@ -62,6 +63,7 @@ permissions:
       horizonships.admin.pilot.remove: true
       horizonships.admin.rename: true
       horizonships.admin.teleport: true
+      horizonships.admin.forcerefuel: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true

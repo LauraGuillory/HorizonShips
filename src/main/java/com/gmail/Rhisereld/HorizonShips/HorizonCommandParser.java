@@ -243,10 +243,21 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship tp [shipName]
 			if (args[0].equalsIgnoreCase("tp"))
 				if (args.length == 2)
-					return teleport(sender, args[1].toLowerCase());
+					return teleport(sender, args[1]);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship tp "
+							+ "[shipName]");
+					return false;
+				}
+			
+			//ship forcerefuel [shipName]
+			if (args[0].equalsIgnoreCase("forcerefuel"))
+				if (args.length == 2)
+					return forceRefuel(sender, args[1]);
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship forcerefuel "
 							+ "[shipName]");
 					return false;
 				}
@@ -823,7 +834,7 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		//Perform the action.
 		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
-		try { shipHandler.rename(sender, args[1].toLowerCase(), args[2].toLowerCase()); }
+		try { shipHandler.rename(sender, args[1], args[2]); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
@@ -859,6 +870,34 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		sender.sendMessage(ChatColor.YELLOW + "Teleporting to ship: " + shipName);
+		return true;
+	}
+	
+	/**
+	 * forceRefuel() sets the ship's fuel to full without taking any items or requiring the ship's owner.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @return
+	 */
+	public boolean forceRefuel(CommandSender sender, String shipName)
+	{
+		//Check that they have permission
+		if (!sender.hasPermission("horizonships.admin.forcerefuel"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to force a ship refuel.");
+			return false;
+		}
+		
+		//Perform the action
+		try { new ShipHandler(prof, data, config, plugin).forceRefuel(shipName); }
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to refuel.");
 		return true;
 	}
 	
@@ -1307,6 +1346,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [shipName] [destinationName]");
 			sender.sendMessage("Remove a destination from the given ship.");
+		}
+		if (sender.hasPermission("horizonships.admin.forcerefuel"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship forcerefuel [shipName]");
+			sender.sendMessage("Force the ship to refuel to full without taking any items.");
 		}
 		if (sender.hasPermission("horizonships.pilot.add"))
 		{
