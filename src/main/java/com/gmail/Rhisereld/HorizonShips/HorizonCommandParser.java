@@ -273,6 +273,16 @@ public class HorizonCommandParser implements CommandExecutor
 								+ "[shipName]");
 							return false;
 					}
+				//ship force break [shipName]
+				else if (args[1].equalsIgnoreCase("break"))
+					if (args.length == 3)
+						return forceBreak(sender, args[2]);
+					else
+					{
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force break "
+								+ "[shipName]");
+							return false;
+					}
 			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
@@ -913,6 +923,13 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
+	/**
+	 * forceRepair() forces the ship to repair without taking any items or requiring any skill.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @return
+	 */
 	public boolean forceRepair(CommandSender sender, String shipName)
 	{
 		//Check that they have permission
@@ -931,6 +948,34 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to repair.");
+		return true;
+	}
+	
+	/**
+	 * forceBreak() forces a ship to break down.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @return
+	 */
+	public boolean forceBreak(CommandSender sender, String shipName)
+	{
+		//Check that they have permission
+		if (!sender.hasPermission("horizonships.admin.forcebreak"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to force a ship to break.");
+			return false;
+		}
+		
+		//Perform the action
+		try { new ShipHandler(prof, data, config, plugin).forceBreak(shipName); }
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to break.");
 		return true;
 	}
 	
@@ -1389,6 +1434,11 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship force repair [shipName]");
 			sender.sendMessage("Force the ship to repair without taking any items.");
+		}
+		if (sender.hasPermission("horizonships.admin.forcebreak"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship force break [shipName]");
+			sender.sendMessage("Force the ship to break down.");
 		}
 		if (sender.hasPermission("horizonships.pilot.add"))
 		{

@@ -971,6 +971,23 @@ public class ShipHandler
 	}
 	
 	/**
+	 * forceBreak() sets the ship to broken.
+	 * 
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
+	public void forceBreak(String shipName) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Break the ship
+		ship.setBroken(true);
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 
