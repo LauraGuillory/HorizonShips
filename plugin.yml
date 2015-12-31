@@ -21,6 +21,7 @@ permissions:
       horizonships.admin.canbuildinsideships: true
       horizonships.admin.pilot.add: true
       horizonships.admin.pilot.remove: true
+      horizonships.admin.rename: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
@@ -30,6 +31,7 @@ permissions:
       horizonships.info: true
       horizonships.pilot.add: true
       horizonships.pilot.remove: true
+      horizonships.rename: true
     
   horizonships.common:
     description: Gives access to Horizon Ships for normal players.
@@ -43,6 +45,7 @@ permissions:
       horizonships.info: true
       horizonships.pilot.add: true
       horizonships.pilot.remove: true
+      horizonships.rename: true
     
   horizonships.admin:
     description: Gives access to all Horizon Ships commands for admins and normal players.
@@ -56,6 +59,7 @@ permissions:
       horizonships.admin.canbuildinsideships: true
       horizonships.admin.pilot.add: true
       horizonships.admin.pilot.remove: true
+      horizonships.admin.rename: true
       horizonships.list: true
       horizonships.pilot: true
       horizonships.diagnose: true
@@ -64,4 +68,5 @@ permissions:
       horizonships.info: true
       horizonships.pilot.add: true
       horizonships.pilot.remove: true
+      horizonships.rename: true
   

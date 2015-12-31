@@ -229,6 +229,17 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
+			//ship rename [shipName] [newShipName]
+			if (args[0].equalsIgnoreCase("rename"))
+				if (args.length == 3)
+					return renameShip(sender, args);
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship rename "
+							+ "[shipName] [newShipName]");
+					return false;
+				}
+			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
 			{
@@ -784,6 +795,34 @@ public class HorizonCommandParser implements CommandExecutor
 	}
 	
 	/**
+	 * renameShip() changes the name of the ship.
+	 * 
+	 * @param sender
+	 * @param args
+	 * @return
+	 */
+	public boolean renameShip(CommandSender sender, String[] args)
+	{
+		//Check that they have permission.
+		if (!sender.hasPermission("horizonships.rename") && !sender.hasPermission("horizonships.admin.rename"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to rename a ship.");
+			return false;
+		}
+		
+		//Perform the action.
+		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
+		try { shipHandler.rename(sender, args[1], args[2]); }
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		sender.sendMessage(ChatColor.YELLOW + "Ship renamed from " + args[1] + " to " + args[2]);
+		return true;
+	}
+	
+	/**
 	 * confirmCreate() performs the delayed action for the /ship create command.
 	 * 
 	 * @param sender
@@ -1273,7 +1312,12 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship transfer [shipName] [playerName]");
 			sender.sendMessage("Transfer ownership of a ship to another player.");
-		}		
+		}	
+		if (sender.hasPermission("horizonships.rename"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship rename [shipName] [newshipName]");
+			sender.sendMessage("Rename a ship.");
+		}
 		sender.sendMessage(ChatColor.YELLOW + "/ship cancel");
 		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
 		

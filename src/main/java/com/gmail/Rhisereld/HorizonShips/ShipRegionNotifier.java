@@ -87,7 +87,7 @@ public class ShipRegionNotifier implements Listener
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x
 						&& min.getBlockY() < y && max.getBlockY() >= y
-						&& min.getBlockZ() < z && max.getBlockZ() >= z)
+						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 				{
 					//If so, notify the player
 					player.sendMessage(ChatColor.GOLD + "Now entering ship: " + ship.getName());

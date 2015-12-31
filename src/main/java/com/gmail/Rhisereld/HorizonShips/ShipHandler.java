@@ -888,6 +888,36 @@ public class ShipHandler
 	}
 	
 	/**
+	 * rename() changes the name of the ship. The player must be an admin or the owner of the ship.
+	 * 
+	 * @param sender
+	 * @param shipName
+	 * @param newName
+	 * @throws IllegalArgumentException
+	 */
+	public void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Check that the sender is an administrator OR owns the ship
+		Player player = Bukkit.getPlayer(sender.getName());
+		
+		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && !player.getUniqueId().equals(ship.getOwner()))
+			throw new IllegalArgumentException("That ship does not belong to you.");
+		
+		//Check that a ship doesn't already exist by the new name
+		Ship newShip = new Ship(data, newName);
+		if (newShip.getName() != null)
+			throw new IllegalArgumentException("A ship already exists by that name.");
+		
+		//Change the name
+		ship.rename(newName);
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 

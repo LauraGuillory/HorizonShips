@@ -45,11 +45,11 @@ public class Ship
 	{
 		String path = "ships." + name + ".";
 		currentDestination = new Destination(data, name, data.getString(path + "currentDestination"));
+		this.data = data;
 		
 		if (currentDestination.getName() == null) //Ship does not exist.
 			return;
 		
-		this.data = data;
 		this.name = name;
 		try { destinations = data.getConfigurationSection(path + "destinations").getKeys(false); }
 		catch (NullPointerException e) { }
@@ -225,6 +225,17 @@ public class Ship
 	}
 	
 	/**
+	 * setLength() sets the length of the ship.
+	 * 
+	 * @param length
+	 */
+	public void setLength(int length)
+	{
+		this.length = length;
+		data.set("ships." + name + ".length", length);
+	}
+	
+	/**
 	 * getWidth() returns the width of the ship.
 	 * 
 	 * @return
@@ -235,6 +246,17 @@ public class Ship
 	}
 	
 	/**
+	 * setWidth() sets the length of the ship.
+	 * 
+	 * @param length
+	 */
+	public void setWidth(int width)
+	{
+		this.width = width;
+		data.set("ships." + name + ".width", width);
+	}
+	
+	/**
 	 * getHeight() returns the height of the ship.
 	 * 
 	 * @return
@@ -242,6 +264,17 @@ public class Ship
 	public int getHeight()
 	{
 		return height;
+	}
+	
+	/**
+	 * setHeight() sets the height of the ship.
+	 * 
+	 * @param height
+	 */
+	public void setHeight(int height)
+	{
+		this.height = height;
+		data.set("ships." + name + ".height", height);
 	}
 	
 	/**
@@ -281,6 +314,18 @@ public class Ship
 	public String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 * setName() sets the name of the ship.
+	 * To be used only while renaming ships. Setting the name without transferring all data
+	 * will result in lost ship data.
+	 * 
+	 * @return
+	 */
+	public void setName(String newName)
+	{
+		name = newName;
 	}
 	
 	/**
@@ -398,5 +443,30 @@ public class Ship
 	{
 		owner = uuid;
 		data.set("ships." + name + ".owner", uuid.toString());
+	}
+	
+	/**
+	 * rename() takes all of the data under the old ship name and transfers it to a new ship name.
+	 * 
+	 * @param newName
+	 */
+	public void rename(String newName)
+	{
+		Ship newShip = new Ship(data, newName);
+		newShip.setName(newName);
+		newShip.setLength(length);
+		newShip.setHeight(height);
+		newShip.setWidth(width);
+		newShip.setBroken(broken);
+		newShip.setConsumePart(consumePart);
+		newShip.setCurrentDestination(currentDestination.getName());
+		newShip.setFuel(fuel);
+		if (owner != null)
+			newShip.setOwner(owner);
+		newShip.setRepairItem(repairItem);
+		for (String d: destinations)
+			newShip.addDestination(d, getDestination(d).getLocation());
+		data.getConfigurationSection("ships.").set(name, null);
+		name = newName;
 	}
 }
