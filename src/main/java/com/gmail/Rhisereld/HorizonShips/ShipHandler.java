@@ -954,6 +954,23 @@ public class ShipHandler
 	}
 	
 	/**
+	 * forceRepair() sets the ship to fixed without taking any items or requiring any skill.
+	 * 
+	 * @param shipName
+	 * @throws IllegalArgumentException
+	 */
+	public void forceRepair(String shipName) throws IllegalArgumentException
+	{
+		//Make sure the ship exists
+		Ship ship = new Ship(data, shipName);
+		if (ship.getName() == null)
+			throw new IllegalArgumentException("Ship not found.");
+		
+		//Repair the ship.
+		ship.setBroken(false);
+	}
+	
+	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
 	 * 

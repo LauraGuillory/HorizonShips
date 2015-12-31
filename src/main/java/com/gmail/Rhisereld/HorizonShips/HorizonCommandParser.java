@@ -251,16 +251,28 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
-			//ship forcerefuel [shipName]
-			if (args[0].equalsIgnoreCase("forcerefuel"))
-				if (args.length == 2)
-					return forceRefuel(sender, args[1]);
-				else
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship forcerefuel "
+			//ship force
+			if (args[0].equalsIgnoreCase("force"))
+				//ship force refuel [shipName]
+				if (args[1].equalsIgnoreCase("refuel"))
+					if (args.length == 3)
+						return forceRefuel(sender, args[2]);
+					else
+					{
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force refuel "
 							+ "[shipName]");
-					return false;
-				}
+						return false;
+					}
+				//ship force repair [shipName]
+				else if (args[1].equalsIgnoreCase("repair"))
+					if (args.length == 3)
+						return forceRepair(sender, args[2]);
+					else
+					{
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force repair "
+								+ "[shipName]");
+							return false;
+					}
 			
 			//ship confirm
 			if (args[0].equalsIgnoreCase("confirm"))
@@ -901,6 +913,27 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
+	public boolean forceRepair(CommandSender sender, String shipName)
+	{
+		//Check that they have permission
+		if (!sender.hasPermission("horizonships.admin.forcerepair"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to force a ship repair.");
+			return false;
+		}
+		
+		//Perform the action
+		try { new ShipHandler(prof, data, config, plugin).forceRepair(shipName); }
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to repair.");
+		return true;
+	}
+	
 	/**
 	 * confirmCreate() performs the delayed action for the /ship create command.
 	 * 
@@ -1349,8 +1382,13 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.admin.forcerefuel"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship forcerefuel [shipName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship force refuel [shipName]");
 			sender.sendMessage("Force the ship to refuel to full without taking any items.");
+		}
+		if (sender.hasPermission("horizonships.admin.forcerepair"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship force repair [shipName]");
+			sender.sendMessage("Force the ship to repair without taking any items.");
 		}
 		if (sender.hasPermission("horizonships.pilot.add"))
 		{
