@@ -1077,21 +1077,19 @@ public class HorizonCommandParser implements CommandExecutor
 		//Paste ship
 		player = Bukkit.getPlayer(name);
 		String[] arguments = confirmAddDestination.get(name).split(" ");
+		confirmAddDestination.remove(name);
 		try {
 			shipHandler.testDestination(player, arguments[0], arguments[1]);
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Administrator.");
-			confirmAddDestination.remove(name);
 			e.printStackTrace();
 			return false;
 		} catch (MaxChangedBlocksException e) {
 			player.sendMessage(ChatColor.RED + "Ship too large!");
-			confirmAddDestination.remove(name);
 			return false;
 		} catch (NullPointerException | IllegalArgumentException e) {
 			player.sendMessage(ChatColor.RED + e.getMessage());
-			confirmAddDestination.remove(name);
 			return false;
 		}
 	
@@ -1100,9 +1098,8 @@ public class HorizonCommandParser implements CommandExecutor
 			+ "'/ship confirm adjust'.");
 	
 		//Remove confirmation for destination, add confirmation for tweaking
-		confirmAdjust.put(name, confirmAddDestination.get(name));
+		confirmAdjust.put(name, arguments[0] + " " + arguments[1]);
 		confirmAdjustTimeout(sender);
-		confirmAddDestination.remove(name);
 		return true;
 	}
 	

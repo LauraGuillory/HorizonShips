@@ -126,7 +126,7 @@ public class ShipHandler
 	 * @throws IOException
 	 */
 	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
-	{
+	{	
 		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
 		if (ship.getName() == null)
@@ -141,7 +141,6 @@ public class ShipHandler
 		ConfigurationSection configSection = data.getConfigurationSection("ships");
 		Location currentLocation = ship.getCurrentDestination().getLocation();	
 		SchematicManager sm = new SchematicManager(currentLocation.getWorld());
-		sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		if (configSection != null)
 		{
@@ -177,10 +176,10 @@ public class ShipHandler
 				currentLocation.getBlockX() + ship.getLength(), 
 				currentLocation.getBlockY() + ship.getHeight(), 
 				currentLocation.getBlockZ() + ship.getWidth());
-
 		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");	
 		
 		//Test schematic at new destination
+		sm = new SchematicManager(s.getWorld());
 		sm.loadSchematic(s, ship.getName() + "\\ship");
 		
 		//Players currently testing a destination
