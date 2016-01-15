@@ -113,7 +113,7 @@ public class Ship
 	 * deleteShip() removes all the information about the ship and its destinations.
 	 * The instance or its destinations should NOT continue to be used after this is called.
 	 */
-	public void deleteShip()
+	void deleteShip()
 	{
 		data.set("ships." + name, null);
 		
@@ -129,7 +129,7 @@ public class Ship
 	 * @param destinationName
 	 * @return
 	 */
-	public Destination getDestination(String destinationName)
+	Destination getDestination(String destinationName)
 	{
 		return new Destination(data, name, destinationName);
 	}
@@ -139,7 +139,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public Set<String> getAllDestinations()
+	Set<String> getAllDestinations()
 	{
 		return destinations;
 	}
@@ -150,7 +150,7 @@ public class Ship
 	 * @param destinationName
 	 * @param location
 	 */
-	public Destination addDestination(String destinationName, Location location)
+	Destination addDestination(String destinationName, Location location)
 	{
 		return new Destination(data, name, destinationName, location);
 	}
@@ -160,7 +160,7 @@ public class Ship
 	 * 
 	 * @param destinationName
 	 */
-	public void removeDestination(String destinationName)
+	void removeDestination(String destinationName)
 	{
 		Destination destination = new Destination(data, name, destinationName);
 		destination.delete();
@@ -171,7 +171,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public Destination getCurrentDestination()
+	Destination getCurrentDestination()
 	{
 		return currentDestination;
 	}
@@ -184,7 +184,7 @@ public class Ship
 	 * 
 	 * @param destination
 	 */
-	public boolean setCurrentDestination(String destination)
+	boolean setCurrentDestination(String destination)
 	{
 		currentDestination = new Destination(data, name, destination);
 		if (currentDestination == null)
@@ -199,7 +199,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public boolean isBroken()
+	boolean isBroken()
 	{
 		return broken;
 	}
@@ -209,7 +209,7 @@ public class Ship
 	 * 
 	 * @param broken
 	 */
-	public void setBroken(boolean broken)
+	void setBroken(boolean broken)
 	{
 		data.set("ships." + name + ".broken", broken);
 	}
@@ -219,7 +219,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public int getLength()
+	int getLength()
 	{
 		return length;
 	}
@@ -229,7 +229,7 @@ public class Ship
 	 * 
 	 * @param length
 	 */
-	public void setLength(int length)
+	void setLength(int length)
 	{
 		this.length = length;
 		data.set("ships." + name + ".length", length);
@@ -240,7 +240,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public int getWidth()
+	int getWidth()
 	{
 		return width;
 	}
@@ -250,7 +250,7 @@ public class Ship
 	 * 
 	 * @param length
 	 */
-	public void setWidth(int width)
+	void setWidth(int width)
 	{
 		this.width = width;
 		data.set("ships." + name + ".width", width);
@@ -261,7 +261,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public int getHeight()
+	int getHeight()
 	{
 		return height;
 	}
@@ -271,7 +271,7 @@ public class Ship
 	 * 
 	 * @param height
 	 */
-	public void setHeight(int height)
+	void setHeight(int height)
 	{
 		this.height = height;
 		data.set("ships." + name + ".height", height);
@@ -282,7 +282,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public int getFuel()
+	int getFuel()
 	{
 		return fuel;
 	}
@@ -292,7 +292,7 @@ public class Ship
 	 * 
 	 * @param fuel
 	 */
-	public void setFuel(int fuel)
+	void setFuel(int fuel)
 	{
 		data.set("ships." + name + ".fuel", fuel);
 	}
@@ -301,7 +301,7 @@ public class Ship
 	 * reduceFuel() reduces the fuel level by one.
 	 * 
 	 */
-	public void reduceFuel()
+	void reduceFuel()
 	{
 		data.set("ships." + name + ".fuel", --fuel);
 	}
@@ -311,7 +311,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public String getName()
+	String getName()
 	{
 		return name;
 	}
@@ -323,7 +323,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public void setName(String newName)
+	void setName(String newName)
 	{
 		name = newName;
 	}
@@ -333,7 +333,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public String getRepairItem()
+	String getRepairItem()
 	{
 		return repairItem;
 	}
@@ -343,7 +343,7 @@ public class Ship
 	 * 
 	 * @param item
 	 */
-	public void setRepairItem(String item)
+	void setRepairItem(String item)
 	{
 		this.repairItem = item;
 		data.set("ships." + name + ".repairItem", item);
@@ -356,7 +356,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public boolean getConsumePart()
+	boolean getConsumePart()
 	{
 		return consumePart;
 	}
@@ -367,7 +367,7 @@ public class Ship
 	 * 
 	 * @param consumePart
 	 */
-	public void setConsumePart(boolean consumePart)
+	void setConsumePart(boolean consumePart)
 	{
 		this.consumePart = consumePart;
 		data.set("ships." + name + ".consumePart", consumePart);
@@ -378,7 +378,7 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public List<UUID> getPilots()
+	List<UUID> getPilots()
 	{
 		return pilots;
 	}
@@ -389,7 +389,7 @@ public class Ship
 	 * @param player
 	 * @return
 	 */
-	public boolean isPilot(UUID player)
+	boolean isPilot(UUID player)
 	{
 		List <String> pilots = data.getStringList("ships." + name + ".pilots");
 		
@@ -405,7 +405,7 @@ public class Ship
 	 * @param uuid
 	 */
 	
-	public void addPilot(UUID uuid)
+	void addPilot(UUID uuid)
 	{
 		pilots.add(uuid);
 		
@@ -417,7 +417,7 @@ public class Ship
 		data.set("ships." + name + ".pilots", pilotStrings);
 	}
 	
-	public void removePilot(UUID uuid)
+	void removePilot(UUID uuid)
 	{
 		pilots.remove(uuid);
 		
@@ -434,12 +434,12 @@ public class Ship
 	 * 
 	 * @return
 	 */
-	public UUID getOwner()
+	UUID getOwner()
 	{
 		return owner;
 	}
 	
-	public void setOwner(UUID uuid)
+	void setOwner(UUID uuid)
 	{
 		owner = uuid;
 		data.set("ships." + name + ".owner", uuid.toString());
@@ -450,7 +450,7 @@ public class Ship
 	 * 
 	 * @param newName
 	 */
-	public void rename(String newName)
+	void rename(String newName)
 	{
 		Ship newShip = new Ship(data, newName);
 		newShip.setName(newName);

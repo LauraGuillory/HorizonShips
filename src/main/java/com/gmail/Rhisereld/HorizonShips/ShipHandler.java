@@ -47,7 +47,7 @@ public class ShipHandler
 		ShipHandler.config = config;
 	}
 	
-	public static void updateConfig(FileConfiguration config)
+	static void updateConfig(FileConfiguration config)
 	{
 		ShipHandler.config = config;
 	}
@@ -65,7 +65,7 @@ public class ShipHandler
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
-	public void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
+	void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
 		if (data.contains("ships."))
@@ -92,7 +92,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
+	void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
 		Set<String> ships = new HashSet<String>();
 		try { ships = data.getConfigurationSection("ships").getKeys(false); }
@@ -125,7 +125,7 @@ public class ShipHandler
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
+	void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
 	{	
 		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -201,7 +201,7 @@ public class ShipHandler
 	 * @throws RegionOperationException
 	 * @throws IncompleteRegionException
 	 */
-	public void adjustDestination(Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
+	void adjustDestination(Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
 	{
 		Vector dir;
 		SchematicManager sm = schemManagers.get(player.getName());
@@ -239,7 +239,7 @@ public class ShipHandler
 	 * 
 	 * @param sm
 	 */
-	public void cancelDestination(String name)
+	void cancelDestination(String name)
 	{
 		SchematicManager sm = schemManagers.get(name);
 		schemManagers.remove(name);
@@ -255,7 +255,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	public void addDestination(Player player, String shipName, String destinationName)
+	void addDestination(Player player, String shipName, String destinationName)
 	{
 		SchematicManager sm = schemManagers.get(player.getName());
 
@@ -272,7 +272,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	public void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
+	void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
 	{
 		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -296,7 +296,7 @@ public class ShipHandler
 	 * 
 	 * @param sender
 	 */
-	public void listShips(CommandSender sender)
+	void listShips(CommandSender sender)
 	{
 		Set<String> ships;
 		try { ships = data.getConfigurationSection("ships").getKeys(false); }
@@ -333,7 +333,7 @@ public class ShipHandler
 	 * @throws MaxChangedBlocksException
 	 * @throws IllegalArgumentException
 	 */
-	public void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
+	void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{
 		//Ensure that the player has the tier requirement
 		UUID uuid = player.getUniqueId();
@@ -444,7 +444,7 @@ public class ShipHandler
 	 * 
 	 * @param player
 	 */
-	public void diagnose(Player player) throws IllegalArgumentException
+	void diagnose(Player player) throws IllegalArgumentException
 	{
 		//Only novice pilots can diagnose a ship.
 		String professionReq = config.getString("professionReqs.repair.profession");
@@ -494,7 +494,7 @@ public class ShipHandler
 	 * 
 	 * @param player
 	 */
-	public void repair(Player player)
+	void repair(Player player)
 	{
 		//Only novice pilots can repair a ship.
 		UUID uuid = player.getUniqueId();
@@ -587,7 +587,7 @@ public class ShipHandler
 	 * @param player
 	 * @throws IllegalArgumentException
 	 */
-	public void refuel(Player player) throws IllegalArgumentException
+	void refuel(Player player) throws IllegalArgumentException
 	{
 		//Determine the ship the player is trying to refuel
 		Ship ship = findCurrentShip(player);
@@ -646,7 +646,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
+	void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
 	{
 		//Get the ship
 		Ship ship = new Ship(data, shipName);
@@ -765,7 +765,7 @@ public class ShipHandler
 	 * @param owner
 	 * @throws IllegalArgumentException
 	 */
-	public void setOwner(CommandSender sender, String shipName, String owner) throws IllegalArgumentException
+	void setOwner(CommandSender sender, String shipName, String owner) throws IllegalArgumentException
 	{
 		//Get the ship
 		Ship ship = new Ship(data, shipName);
@@ -790,7 +790,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @param newOwner
 	 */
-	public void transfer(Player owner, String shipName, String newOwner)
+	void transfer(Player owner, String shipName, String newOwner)
 	{
 		//Get the ship
 		Ship ship = new Ship(data, shipName);
@@ -820,7 +820,7 @@ public class ShipHandler
 	 * @param pilot
 	 * @throws IllegalArgumentException
 	 */
-	public void addPilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
+	void addPilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -856,7 +856,7 @@ public class ShipHandler
 	 * @param pilot
 	 * @throws IllegalArgumentException
 	 */
-	public void removePilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
+	void removePilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -895,7 +895,7 @@ public class ShipHandler
 	 * @param newName
 	 * @throws IllegalArgumentException
 	 */
-	public void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException
+	void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -924,7 +924,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void teleport(Player player, String shipName) throws IllegalArgumentException
+	void teleport(Player player, String shipName) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -941,7 +941,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void forceRefuel(String shipName) throws IllegalArgumentException
+	void forceRefuel(String shipName) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -958,7 +958,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void forceRepair(String shipName) throws IllegalArgumentException
+	void forceRepair(String shipName) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -975,7 +975,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @throws IllegalArgumentException
 	 */
-	public void forceBreak(String shipName) throws IllegalArgumentException
+	void forceBreak(String shipName) throws IllegalArgumentException
 	{
 		//Make sure the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -1137,7 +1137,7 @@ public class ShipHandler
 	 * @param name
 	 * @return
 	 */
-	public UUID getUUID(String name)
+	UUID getUUID(String name)
 	{
 		Set<String> uuids;
 		try { uuids = data.getConfigurationSection("uuids.").getKeys(false); }
@@ -1157,7 +1157,7 @@ public class ShipHandler
 	 * @param uuid
 	 * @return
 	 */
-	public String getName(UUID uuid)
+	String getName(UUID uuid)
 	{
 		return data.getString("uuids." + uuid);
 	}

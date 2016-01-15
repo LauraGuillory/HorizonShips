@@ -81,7 +81,7 @@ public class Destination
 	 * The instance should not continue to be used after this is called.
 	 * 
 	 */
-	public void delete()
+	void delete()
 	{
 		data.getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
 	}
@@ -91,7 +91,7 @@ public class Destination
 	 * 
 	 * @return
 	 */
-	public String getShipName()
+	String getShipName()
 	{
 		return shipName;
 	}
@@ -101,7 +101,7 @@ public class Destination
 	 * 
 	 * @return
 	 */
-	public String getName()
+	String getName()
 	{
 		return destinationName;
 	}
@@ -111,7 +111,7 @@ public class Destination
 	 * 
 	 * @return
 	 */
-	public Location getLocation()
+	Location getLocation()
 	{
 		return location;
 	}
@@ -122,7 +122,7 @@ public class Destination
 	 * 
 	 * @return
 	 */
-	public boolean exists()
+	boolean exists()
 	{
 		if (location.getWorld() == null)
 			return false;

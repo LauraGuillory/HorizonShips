@@ -58,7 +58,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Location loc1, Location loc2, String path) throws DataException, IOException
+	void saveSchematic(Location loc1, Location loc2, String path) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
@@ -85,7 +85,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void saveSchematic(Selection selection, String path) throws DataException, IOException
+	void saveSchematic(Selection selection, String path) throws DataException, IOException
 	{
 		File file;
 		CuboidClipboard clipboard;
@@ -113,7 +113,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(Location l, String path) throws MaxChangedBlocksException, DataException, IOException
+	void loadSchematic(Location l, String path) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		
@@ -138,7 +138,7 @@ public class SchematicManager
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public void loadSchematic(Selection s, String path) throws MaxChangedBlocksException, DataException, IOException
+	void loadSchematic(Selection s, String path) throws MaxChangedBlocksException, DataException, IOException
 	{
 		File file;
 		
@@ -158,7 +158,7 @@ public class SchematicManager
 	 * @param path
 	 * @param name
 	 */
-	public void deleteSchematic(String path, String name)
+	void deleteSchematic(String path, String name)
 	{
 		File file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
 		file.delete();
@@ -172,7 +172,7 @@ public class SchematicManager
 	 * undoSession() undoes all of the actions undertaken with the current edit session 
 	 * (i.e. everything done with the current object)
 	 */
-	public void undoSession()
+	void undoSession()
 	{
 		editSession.undo(editSession);
 	}
@@ -181,7 +181,7 @@ public class SchematicManager
 	 * redoSession() redoes all of the actions undertaken with the current edit session
 	 * that may have been undone.
 	 */
-	public void redoSession()
+	void redoSession()
 	{
 		editSession.redo(editSession);
 	}
@@ -241,7 +241,7 @@ public class SchematicManager
 	 * If the player hasw no selection, throws NullPointerException.
 	 * @return selection
 	 */
-	public Selection getPlayerSelection(Player player)
+	Selection getPlayerSelection(Player player)
 	{	
 		Selection s = wep.getSelection(player);
 		if (s == null)
@@ -255,7 +255,7 @@ public class SchematicManager
 	 * @param s
 	 * @param player
 	 */
-	public void setPlayerSelection(Selection s, Player player)
+	void setPlayerSelection(Selection s, Player player)
 	{
 		wep.setSelection(player, s);
 	}
@@ -270,7 +270,7 @@ public class SchematicManager
 	 * @throws RegionOperationException
 	 * @throws IncompleteRegionException
 	 */
-	public Selection shiftSelection(Player player, Selection selection, Vector dir) throws RegionOperationException, IncompleteRegionException
+	Selection shiftSelection(Player player, Selection selection, Vector dir) throws RegionOperationException, IncompleteRegionException
 	{		
 		RegionSelector rs = selection.getRegionSelector();
 		
@@ -286,7 +286,7 @@ public class SchematicManager
 	 * @param loc1
 	 * @param loc2
 	 */
-	public void eraseArea(Location loc1, Location loc2)
+	void eraseArea(Location loc1, Location loc2)
 	{
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);

@@ -36,7 +36,7 @@ public class ShipEvent
 	/**
 	 * chooseEvent() randomly selects an event from the EVENTS array.
 	 */
-	public void chooseEvent()
+	void chooseEvent()
 	{
 		int total = 0;
 		
@@ -69,7 +69,7 @@ public class ShipEvent
 	 * @param height
 	 * @return A string detailing the events of the trip.
 	 */
-	public String trigger(Player player, Ship ship)
+	String trigger(Player player, Ship ship)
 	{
 		switch(chosenEvent) {
 			case "bumpyRide": return triggerBumpyRide(player, ship);
