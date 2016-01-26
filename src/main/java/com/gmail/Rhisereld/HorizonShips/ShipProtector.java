@@ -60,6 +60,9 @@ public class ShipProtector implements Listener
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
 						min.getBlockZ() + ship.getWidth());
 				
+				if (min.getWorld() == null)
+					continue;
+				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x
 						&& min.getBlockY() <= y && max.getBlockY() >= y
@@ -72,6 +75,9 @@ public class ShipProtector implements Listener
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
 					}	
+					//If the player IS, make sure they have access.
+					else
+						event.setCancelled(false);
 				}
 			}
 		}
@@ -110,6 +116,9 @@ public class ShipProtector implements Listener
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
 						min.getBlockZ() + ship.getWidth());
 				
+				if (min.getWorld() == null)
+					continue;
+				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x
 						&& min.getBlockY() <= y && max.getBlockY() >= y
@@ -122,6 +131,9 @@ public class ShipProtector implements Listener
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
 					}	
+					//If the player IS, make sure they have access.
+					else
+						event.setCancelled(false);
 				}
 			}
 		}

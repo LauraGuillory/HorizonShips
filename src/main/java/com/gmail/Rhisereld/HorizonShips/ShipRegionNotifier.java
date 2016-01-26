@@ -62,6 +62,9 @@ public class ShipRegionNotifier implements Listener
 			min = ship.getCurrentDestination().getLocation();
 			max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
 					min.getBlockZ() + ship.getWidth());
+			
+			if (min.getWorld() == null)
+				return;
 
 			if (!min.getWorld().equals(player.getLocation().getWorld()) 
 					|| min.getBlockX() > x || max.getBlockX() < x
@@ -83,6 +86,9 @@ public class ShipRegionNotifier implements Listener
 				min = ship.getCurrentDestination().getLocation();
 				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
 						min.getBlockZ() + ship.getWidth());
+				
+				if (min.getWorld() == null)
+					continue;
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x

@@ -1088,7 +1088,7 @@ public class HorizonCommandParser implements CommandExecutor
 		} catch (MaxChangedBlocksException e) {
 			player.sendMessage(ChatColor.RED + "Ship too large!");
 			return false;
-		} catch (NullPointerException | IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			player.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}

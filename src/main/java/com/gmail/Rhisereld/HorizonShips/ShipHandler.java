@@ -125,7 +125,7 @@ public class ShipHandler
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, NullPointerException, IllegalArgumentException
+	void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, IllegalArgumentException
 	{	
 		//Check that the ship exists
 		Ship ship = new Ship(data, shipName);
@@ -160,6 +160,9 @@ public class ShipHandler
 					Location newMin = s.getMinimumPoint();
 					Location newMax = new Location(newMin.getWorld(), newMin.getX() + checkShip.getLength(), newMin.getY() + checkShip.getHeight(), 
 													newMin.getZ() + checkShip.getWidth());
+					
+					if (min.getWorld() == null)
+						continue;
 					
 					//Check if the regions intersect.
 					if (min.getWorld().equals(newMin.getWorld())
