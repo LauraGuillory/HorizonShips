@@ -7,11 +7,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class Dock 
 {
 	private FileConfiguration data;
-	private String name;
+	private int id;
+	private String destination;
 	private Location location;
 	private int length;
 	private int height;
 	private int width;
+	private String ship;
 	
 	/**
 	 * Constructor for fetching a dock from file.
@@ -19,16 +21,17 @@ public class Dock
 	 * @param data
 	 * @param name
 	 */
-	Dock(FileConfiguration data, String name)
+	Dock(FileConfiguration data, String destination, int id)
 	{
-		this.name = name;
-		this.location = new Location(Bukkit.getWorld(data.getString("docks." + name + ".world")),
-										data.getInt("docks." + name + ".x"),
-										data.getInt("docks." + name + ".y"),
-										data.getInt("docks." + name + ".z"));
-		this.length = data.getInt("docks." + name + ".length");
-		this.height = data.getInt("docks." + name + ".height");
-		this.width = data.getInt("docks." + name + ".width");
+		this.destination = destination;
+		this.id = id;
+		this.location = new Location(Bukkit.getWorld(data.getString("docks." + destination + "." + id + ".world")),
+										data.getInt("docks." + destination + "." + id + ".x"),
+										data.getInt("docks." + destination + "." + id + ".y"),
+										data.getInt("docks." + destination + "." + id + ".z"));
+		this.length = data.getInt("docks." + destination + "." + id + ".length");
+		this.height = data.getInt("docks." + destination + "." + id + ".height");
+		this.width = data.getInt("docks." + destination + "." + id + ".width");
 	}
 	
 	/**
@@ -40,8 +43,19 @@ public class Dock
 	 * @param height
 	 * @param width
 	 */
-	Dock(FileConfiguration data, Location location, int length, int height, int width)
+	Dock(FileConfiguration data, String destination, Location location, int length, int height, int width)
 	{
+		this.destination = destination;
+		this.id = 0;
+		
+		//Determines the ID number of the new dock. 
+		//If any of the docks no longer exist between 0 and i-1 where i is the number of docks,
+		//the new dock will take that number.
+		//Otherwise, the new ID will be i.
+		for (int i = 0; i < data.getConfigurationSection("docks." + destination).getKeys(false).size(); i++)
+			if (!new Dock(data, destination, i).exists())
+				this.id = i;
+		
 		this.location = location;
 		this.length = length;
 		this.height = height;
@@ -49,33 +63,24 @@ public class Dock
 	}
 	
 	/**
-	 * getName() returns the name of the dock.
+	 * getID() returns the ID of the dock.
 	 * 
 	 * @param name
 	 * @return
 	 */
-	String getName()
+	int getID()
 	{
-		return name;
+		return id;
 	}
-
+	
 	/**
-	 * setName() changes the name of the dock.
+	 * getdestination() returns the destination of the dock.
 	 * 
-	 * @param name
+	 * @return
 	 */
-	void setName(String name)
+	String getDestination()
 	{
-		data.set("docks." + name + ".world", location.getWorld());
-		data.set("docks." + name + ".x", location.getX());
-		data.set("docks." + name + ".y", location.getY());
-		data.set("docks." + name + ".z", location.getZ());
-		data.set("docks." + name + ".length", length);
-		data.set("docks." + name + ".height", height);
-		data.set("docks." + name + ".width", width);
-		
-		data.getConfigurationSection("docks.").set(this.name, null);
-		this.name = name;
+		return destination;
 	}
 	
 	/**
@@ -179,6 +184,28 @@ public class Dock
 	 */
 	void delete()
 	{
-		data.getConfigurationSection("docks.").set(this.name, null);
+		data.getConfigurationSection("docks." + destination).set(Integer.toString(this.id), null);
+	}
+	
+	/**
+	 * updateShipName() updates the stored name of the ship that may be inhabiting this location.
+	 * Should be set to null if there is no ship.
+	 * 
+	 * @param shipName
+	 */
+	void updateShipName(String shipName)
+	{
+		ship = shipName;
+	}
+	
+	/**
+	 * getShip() returns the name of the ship that may be inhabiting this location
+	 * Should return null if there is no ship.
+	 * 
+	 * @return
+	 */
+	String getShip()
+	{
+		return ship;
 	}
 }

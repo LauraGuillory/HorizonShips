@@ -2,9 +2,7 @@ package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -15,16 +13,14 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 
 /**
- * This class contains all the information pertaining to a ship. It is controlled by a ShipHandler
- * and always has one or more Destinations.
+ * This class contains all the information pertaining to a ship. It is controlled by a ShipHandler.
  */
 @SuppressWarnings("deprecation")
 public class Ship 
 {
 	private FileConfiguration data;
 	private String name;
-	private Destination currentDestination;
-	private Set<String> destinations = new HashSet<String>();
+	private Dock dock;
 	private int fuel;
 	private boolean broken;
 	private String repairItem;
@@ -44,15 +40,12 @@ public class Ship
 	public Ship(FileConfiguration data, String name)
 	{
 		String path = "ships." + name + ".";
-		currentDestination = new Destination(data, name, data.getString(path + "currentDestination"));
 		this.data = data;
+		this.name = name;		
 		
-		if (currentDestination.getName() == null) //Ship does not exist.
+		dock = new Dock(data, data.getString("ships." + name + ".dock.destination"), data.getInt("ships." + name + ".dock.id"));
+		if (dock.getLocation().getWorld() == null) //Ship does not exist.
 			return;
-		
-		this.name = name;
-		try { destinations = data.getConfigurationSection(path + "destinations").getKeys(false); }
-		catch (NullPointerException e) { }
 		fuel = data.getInt(path + "fuel");
 		broken = data.getBoolean(path + "broken");
 		repairItem = data.getString(path + "repairItem");
@@ -81,12 +74,10 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public Ship(FileConfiguration data, String name, String destinationName, Selection selection) throws DataException, IOException
+	public Ship(FileConfiguration data, String name, Selection selection) throws DataException, IOException
 	{
 		this.data = data;
 		this.name = name;
-		currentDestination = new Destination(data, name, destinationName, selection.getMinimumPoint());
-		destinations.add(destinationName);
 		fuel = 10;
 		broken = false;
 		pilots = new ArrayList<UUID>();
@@ -96,8 +87,7 @@ public class Ship
 		length = max.getBlockX() - min.getBlockX();
 		width = max.getBlockZ() - min.getBlockZ();
 		height = max.getBlockY() - min.getBlockY();
-		
-		data.set("ships." + name + ".currentDestination", destinationName);
+		dock = new Dock(data, "temp", selection.getMinimumPoint(), length, height, width);
 		data.set("ships." + name + ".fuel", fuel);
 		data.set("ships." + name + ".broken", broken);
 		data.set("ships." + name + ".pilots", pilots);
@@ -123,75 +113,36 @@ public class Ship
 	}
 	
 	/**
-	 * getDestination() attempts to return a Destination object identified by its string name.
-	 * Not case sensitive. Returns null upon fail.
-	 * 
-	 * @param destinationName
-	 * @return
-	 */
-	Destination getDestination(String destinationName)
-	{
-		return new Destination(data, name, destinationName);
-	}
-	
-	/**
-	 * getAllDestinations() returns a list of all available destinations.
+	 * getDock() returns the dock that the ship is currently inhabiting.
 	 * 
 	 * @return
 	 */
-	Set<String> getAllDestinations()
+	Dock getDock()
 	{
-		return destinations;
+		return dock;
 	}
 	
 	/**
-	 * addDestination() creates, saves and returns a new destination.
+	 * setDock() sets the dock that the ship is currently inhabiting.
 	 * 
-	 * @param destinationName
-	 * @param location
+	 * @param dock
 	 */
-	Destination addDestination(String destinationName, Location location)
+	void setDock(Dock dock)
 	{
-		return new Destination(data, name, destinationName, location);
-	}
-	
-	/**
-	 * removeDestination() removes the destination given and all its information from this ship.
-	 * 
-	 * @param destinationName
-	 */
-	void removeDestination(String destinationName)
-	{
-		Destination destination = new Destination(data, name, destinationName);
-		destination.delete();
-	}
-	
-	/**
-	 * getCurrentDestination() returns the current destination.
-	 * 
-	 * @return
-	 */
-	Destination getCurrentDestination()
-	{
-		return currentDestination;
-	}
-	
-	/**
-	 * setCurrentDestination() attempts to fetch the destination by string name, and sets the current
-	 * destination to the destination fetched.
-	 * Not case sensitive.
-	 * Returns false upon fail.
-	 * 
-	 * @param destination
-	 */
-	boolean setCurrentDestination(String destination)
-	{
-		currentDestination = new Destination(data, name, destination);
-		if (currentDestination == null)
-			return false;
-		data.set("ships." + name + ".currentDestination", destination);
+		//Keep the ship name updated on the dock so the ship belonging to it can easily be found.
+		this.dock.updateShipName(null);
+		dock.updateShipName(name);
 		
-		return true;
+		//Set the dock
+		this.dock = dock;
+		
+		//If the old dock was temporary it should be removed.
+		if (dock.getDestination().equalsIgnoreCase("temp"))
+		{
+			new Destination(data, "temp", true).docks.remove(dock.getID());
+			dock.delete();
+		}
+			
 	}
 	
 	/**
@@ -459,13 +410,11 @@ public class Ship
 		newShip.setWidth(width);
 		newShip.setBroken(broken);
 		newShip.setConsumePart(consumePart);
-		newShip.setCurrentDestination(currentDestination.getName());
+		newShip.setDock(dock);
 		newShip.setFuel(fuel);
 		if (owner != null)
 			newShip.setOwner(owner);
 		newShip.setRepairItem(repairItem);
-		for (String d: destinations)
-			newShip.addDestination(d, getDestination(d).getLocation());
 		data.getConfigurationSection("ships.").set(name, null);
 		name = newName;
 	}

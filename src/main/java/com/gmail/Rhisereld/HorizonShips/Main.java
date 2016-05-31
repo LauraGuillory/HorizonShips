@@ -76,8 +76,6 @@ public class Main extends JavaPlugin implements CommandExecutor
 	@Override
 	public void onDisable()
 	{
-		//Remove all destinations in the middle of being defined.
-		hcp.cancelDestinationsInProgress();
 		data.saveConfig();
 		config = null;
 		data = null;

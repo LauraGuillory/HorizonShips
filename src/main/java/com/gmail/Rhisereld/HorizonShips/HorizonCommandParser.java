@@ -29,9 +29,7 @@ public class HorizonCommandParser implements CommandExecutor
 	
 	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
 	HashMap<String, String> confirmDelete = new HashMap<String, String>();
-	HashMap<String, String> confirmAddDestination = new HashMap<String, String>();
 	HashMap<String, String> confirmRemoveDestination = new HashMap<String, String>();
-	HashMap<String, String> confirmAdjust = new HashMap<String, String>();
 	HashMap<String, String> confirmTransfer = new HashMap<String, String>();
 	
     public HorizonCommandParser(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, JavaPlugin plugin) 
@@ -71,17 +69,17 @@ public class HorizonCommandParser implements CommandExecutor
 				}
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "You don't have permission to use this commend!");
+					sender.sendMessage(ChatColor.RED + "You don't have permission to use this command!");
 					return false;
 				}
 			
-			//ship create [shipName] [destinationName]
+			//ship create [shipName]
 			if (args[0].equalsIgnoreCase("create"))
 				if (args.length == 3)
-					return shipCreate(sender, args);
+					return shipCreate(sender, args[1]);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName] [destinationName]");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName]");
 					return false;
 				}
 			
@@ -104,12 +102,20 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 				
-				//ship add destination [shipName] [destinationName]
+				//ship add destination [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
-					if (args.length >= 4)
-						return addDestination(sender, args);
+					if (args.length >= 3)
+						return addDestination(sender, args[2]);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add destination [shipName] "
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "
+								+ "add destination [destinationName]");
+				
+				//ship add dock [destinationName]
+				if (args[1].equalsIgnoreCase("dock"))
+					if (args.length >= 3)
+						return addDock(sender, args[2]);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add dock "
 								+ "[destinationName]");
 				
 				//ship add pilot [shipName] [pilotName]
@@ -132,13 +138,21 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 				
-				//ship remove destination [shipName] [destinationName]
+				//ship remove destination [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
 					if (args.length >= 4)
 						return removeDestination(sender, args);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove destination [shipName] "
-								+ "[destinationName]");
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "
+								+ "remove destination [destinationName]");
+				
+				//ship remove dock [destinationName] [dockNumber]
+				if (args[1].equalsIgnoreCase("dock"))
+					if (args.length >= 4)
+						return removeDock(sender, args);
+					else
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "
+								+ "remove dock [destinationName] [dockNumber]");
 				
 				//ship remove pilot [shipName] [pilotName]
 				if (args[1].equalsIgnoreCase("pilot"))
@@ -150,17 +164,6 @@ public class HorizonCommandParser implements CommandExecutor
 				
 				return false;
 			}
-			
-			//ship adjust [north/east/south/west/up/down]
-			if (args[0].equalsIgnoreCase("adjust"))
-				if (args.length == 2)
-					return adjustDestination(sender, args);
-				else
-				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship adjust "
-							+ "[north/east/south/west/up/down]");
-					return false;
-				}
 			
 			//ship list
 			if (args[0].equalsIgnoreCase("list"))
@@ -295,44 +298,26 @@ public class HorizonCommandParser implements CommandExecutor
 				
 				//ship confirm create
 				if (args[1].equalsIgnoreCase("create"))
-					return confirmCreate(sender, args);
+					return confirmCreate(sender);
 
 				//ship confirm delete
 				if (args[1].equalsIgnoreCase("delete"))
-					return confirmDelete(sender, args);
+					return confirmDelete(sender);
 				
-				//ship confirm add destination
-				if (args[1].equalsIgnoreCase("add"))
-					if (args.length >= 3 && args[2].equalsIgnoreCase("destination"))
-						return confirmAddDestination(sender, args);
-					else
-					{
-						sender.sendMessage(ChatColor.RED + "Incorrect format.");
-						return true;
-					}
-
-				//ship confirm remove destination
+				//ship confirm remove
 				if (args[1].equalsIgnoreCase("remove"))
-					if (args.length >= 3 && args[2].equalsIgnoreCase("destination"))
-						return confirmRemoveDestination(sender, args);
-					else
-					{
-						sender.sendMessage(ChatColor.RED + "Incorrect format.");
-						return true;
-					}
-
-				//ship confirm adjust
-				if (args[1].equalsIgnoreCase("adjust"))
-					return confirmAdjust(sender, args);
+					//ship confirm remove destination
+					if (args[2].equalsIgnoreCase("destination"))
+						return confirmRemoveDestination(sender);
 				
 				//ship confirm transfer
 				if (args[1].equalsIgnoreCase("transfer"))
-					return confirmTransfer(sender, args);
+					return confirmTransfer(sender);
 			}
 			
 			//ship cancel
 			if (args[0].equalsIgnoreCase("cancel"))
-				return cancelAction(sender, args);
+				return cancelAction(sender);
 			
 			//ship [shipName]
 			//If not any recognised command, assume ship and request information on it.
@@ -350,7 +335,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean shipCreate(CommandSender sender, String[] args)
+	private boolean shipCreate(CommandSender sender, String arg)
 	{
 		Player player;
 		
@@ -372,7 +357,7 @@ public class HorizonCommandParser implements CommandExecutor
 
 		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
 				+ " Type '/ship confirm create' to confirm.");
-		confirmCreate.put(player.getName(), args[1] + " " + args[2]);
+		confirmCreate.put(player.getName(), arg);
 		confirmCreateTimeout(sender);
 		
 		return true;
@@ -402,16 +387,71 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		return true;
 	}
+
+	/**
+	 * addDock() performs all the checks necessary for the /ship add dock command,
+	 * then attempts to add a dock to a given destination.
+	 * 
+	 * @param sender
+	 * @param destination
+	 * @return
+	 */
+	private boolean addDock(CommandSender sender, String destination)
+	{
+		Player player;
+		
+		//Check that the sender is a player
+		if (sender instanceof Player)
+			player = Bukkit.getPlayer(sender.getName());
+		else
+		{
+			sender.sendMessage(ChatColor.RED + "This command cannot be used by the console.");
+			return false;
+		}
+		
+		//Check that the player has permission
+		if (!player.hasPermission("horizonships.admin.dock.add"))
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to create a destination.");
+			return false;
+		}
+		
+		try { shipHandler.addDock(player, destination); } 
+		catch (IllegalArgumentException e)
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			return false;
+		}
+		sender.sendMessage(ChatColor.YELLOW + "Ship dock created and assigned ID: ");
+		return true;
+	}
 	
 	/**
-	 * addDestination() performs all the checks necessary for the /ship add destination command,
+	 * removeDock() performs all the checks necessary for the /ship remove dock command,
 	 * then sets aside the action to be carried out when it is confirmed.
 	 * 
 	 * @param sender
 	 * @param args
 	 * @return
 	 */
-	private boolean addDestination(CommandSender sender, String[] args)
+	private boolean removeDock(CommandSender sender, String[] args)
+	{
+		String dock = args[3];
+		String destination = args[2];
+		
+		//Check the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.admin.dock.remove") && sender instanceof Player)
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a dock.");
+			return false;
+		}
+		
+		shipHandler.removeDock(sender, destination, dock);
+		sender.sendMessage(ChatColor.YELLOW + "Ship dock with ID: " + dock + " removed.");
+		return true;
+	}
+	
+	private boolean addDestination(CommandSender sender, String destination)
 	{
 		Player player;
 		
@@ -431,10 +471,8 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		sender.sendMessage(ChatColor.YELLOW + "The ship will be pasted inside your current WorldEdit selection. Is this correct? "
-				+ " Type '/ship confirm add destination' to confirm.");
-		confirmAddDestination.put(player.getName(), args[2] + " " + args[3]);
-		confirmAddDestinationTimeout(sender);
+		shipHandler.addDestination(sender, destination);
+		sender.sendMessage(ChatColor.YELLOW + "Empty destination " + destination + " created.");
 		return true;
 	}
 	
@@ -456,48 +494,10 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + "Are you sure you wish to remove the destination " + args[3] + " from "
-				+ args[2] + "? Type '/ship confirm remove destination' to confirm.");
+						+ args[2] + "? All docks at this destination will be removed. Type '/ship confirm remove "
+						+ "destination' to confirm.");
 		confirmRemoveDestination.put(sender.getName(), args[2] + " " + args[3]);
 		confirmRemoveDestinationTimeout(sender);
-		return true;
-	}
-	
-	/**
-	 * adjustDestination() performs all the checks necessary for the /ship adjust [direction] command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean adjustDestination(CommandSender sender, String[] args)
-	{		
-		//Check there's something to adjust
-		if (!confirmAdjust.containsKey(sender.getName()))
-		{
-			sender.sendMessage(ChatColor.RED + "You are not currently adjusting a destination!");
-			return false;
-		}
-		
-		//Adjust
-		Player player = Bukkit.getPlayer(sender.getName()); //Sender must be a player if their name is in the list.
-		String [] arguments = confirmAdjust.get(player.getName()).split(" ");
-		
-		try {
-			shipHandler.adjustDestination(player, args[1], arguments[0]);
-		} catch (MaxChangedBlocksException e) {
-			sender.sendMessage(ChatColor.RED + "Ship too large!");
-			return false;
-		} catch (DataException | RegionOperationException | IncompleteRegionException | IOException e) {
-			sender.sendMessage(ChatColor.RED + e.getMessage());
-			sender.sendMessage(ChatColor.RED + "Unable to adjust destination. Please contact an administrator.");
-			e.printStackTrace();
-			return false;
-		} catch (IllegalArgumentException e) {
-			sender.sendMessage(ChatColor.RED + e.getMessage());
-			return false;
-		}
-		
 		return true;
 	}
 	
@@ -986,7 +986,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean confirmCreate(CommandSender sender, String[] args)
+	private boolean confirmCreate(CommandSender sender)
 	{
 		Player player;
 		
@@ -996,13 +996,13 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		String[] arguments = confirmCreate.get(sender.getName()).split(" ");
+		String argument = confirmCreate.get(sender.getName());
 		confirmCreate.remove(sender.getName());
 		player = Bukkit.getPlayer(sender.getName());
 
 		try {
-			shipHandler.createShip(arguments[0], player, arguments[1]);
-			player.sendMessage(ChatColor.YELLOW + "Ship " + arguments[0] + " created!");
+			shipHandler.createShip(argument, player);
+			player.sendMessage(ChatColor.YELLOW + "Ship " + argument + " created!");
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
@@ -1027,7 +1027,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean confirmDelete(CommandSender sender, String[] args)
+	private boolean confirmDelete(CommandSender sender)
 	{	
 		if (confirmDelete.get(sender.getName()) == null)
 		{
@@ -1057,60 +1057,13 @@ public class HorizonCommandParser implements CommandExecutor
 	}
 	
 	/**
-	 * confirmAddDestination() performs the delayed action for the /ship add destination command.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean confirmAddDestination(CommandSender sender, String[] args)
-	{
-		Player player;
-		String name = sender.getName();
-		
-		if (confirmAddDestination.get(name) == null)
-		{
-			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-			return false;
-		}
-
-		//Paste ship
-		player = Bukkit.getPlayer(name);
-		String[] arguments = confirmAddDestination.get(name).split(" ");
-		confirmAddDestination.remove(name);
-		try {
-			shipHandler.testDestination(player, arguments[0], arguments[1]);
-		} catch (DataException | IOException e) {
-			sender.sendMessage(ChatColor.RED + e.getMessage());
-			player.sendMessage(ChatColor.RED + "Couldn't paste ship. Please report this to an Administrator.");
-			e.printStackTrace();
-			return false;
-		} catch (MaxChangedBlocksException e) {
-			player.sendMessage(ChatColor.RED + "Ship too large!");
-			return false;
-		} catch (IllegalArgumentException e) {
-			player.sendMessage(ChatColor.RED + e.getMessage());
-			return false;
-		}
-	
-		sender.sendMessage(ChatColor.YELLOW + "Ship pasted for reference. Adjust the destination of the ship using "
-			+ "'/ship adjust [north/east/south/west/up/down'. To confirm placement, type "
-			+ "'/ship confirm adjust'.");
-	
-		//Remove confirmation for destination, add confirmation for tweaking
-		confirmAdjust.put(name, arguments[0] + " " + arguments[1]);
-		confirmAdjustTimeout(sender);
-		return true;
-	}
-	
-	/**
 	 * confirmRemoveDestination() performs the delayed action for the /ship remove destination command.
 	 * 
 	 * @param sender
 	 * @param args
 	 * @return
 	 */
-	private boolean confirmRemoveDestination(CommandSender sender, String[] args)
+	private boolean confirmRemoveDestination(CommandSender sender)
 	{
 		String name = sender.getName();
 		
@@ -1133,34 +1086,7 @@ public class HorizonCommandParser implements CommandExecutor
 		sender.sendMessage(ChatColor.YELLOW + "Destination removed.");
 		return true;
 	}
-	
-	/**
-	 * confirmAdjust() finalises the adjusted destination.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean confirmAdjust(CommandSender sender, String[] args)
-	{
-		String name = sender.getName();
-		
-		if (confirmAdjust.get(name) == null)
-		{
-			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
-			return false;
-		}
 
-		//Add destination
-		Player player = Bukkit.getPlayer(name);
-		String[] arguments = confirmAdjust.get(name).split(" ");
-		shipHandler.addDestination(player, arguments[0], arguments[1]);
-		confirmAdjust.remove(name);
-
-		sender.sendMessage(ChatColor.YELLOW + "Ship destination created.");
-		return true;
-	}
-	
 	/**
 	 * confirmTransfer() calls shipHandler to perform the action of transferring ownership
 	 * of a ship, that has previously been set aside by transferShip()
@@ -1169,7 +1095,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean confirmTransfer(CommandSender sender, String[] args)
+	private boolean confirmTransfer(CommandSender sender)
 	{
 		String name = sender.getName();
 		
@@ -1201,7 +1127,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean cancelAction(CommandSender sender, String[] args)
+	private boolean cancelAction(CommandSender sender)
 	{
 		String name = sender.getName();
 		
@@ -1219,33 +1145,10 @@ public class HorizonCommandParser implements CommandExecutor
 			return true;
 		}
 		
-		if (confirmAddDestination.containsKey(name))
-		{
-			confirmAddDestination.remove(name);
-			sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
-			return true;
-		}
-		
 		if (confirmRemoveDestination.containsKey(name))
 		{
 			confirmRemoveDestination.remove(name);
 			sender.sendMessage(ChatColor.YELLOW + "Destination removal cancelled.");
-			return true;
-		}
-		
-		if (confirmAdjust.containsKey(name))
-		{
-			confirmAdjust.remove(name);
-			shipHandler.cancelDestination(name);
-			sender.sendMessage(ChatColor.YELLOW + "Ship destination cancelled.");
-			return true;
-		}
-		
-		if (confirmTransfer.containsKey(name))
-		{
-			confirmTransfer.remove(name);
-			shipHandler.cancelDestination(name);
-			sender.sendMessage(ChatColor.YELLOW + "Ship ownership transfer cancelled.");
 			return true;
 		}
 		
@@ -1298,27 +1201,6 @@ public class HorizonCommandParser implements CommandExecutor
 	}
 	
 	/**
-	 * confirmAddDestinationTimeout() removes the player from the list of players who are in the process 
-	 * of adding a destination and removes the destination being made.
-	 * 
-	 * @param sender
-	 */
-	private void confirmAddDestinationTimeout(final CommandSender sender)
-	{
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
-		{
-			public void run()
-			{
-				if (confirmAddDestination.containsKey(sender.getName()))
-				{
-					confirmAddDestination.remove(sender.getName());
-					sender.sendMessage(ChatColor.RED + "You timed out.");
-				}
-			}			
-		} , 400);
-	}
-	
-	/**
 	 * confirmRemoveDestinationTimeout() removes the player from the list of players who are in the process
 	 * of removing a destination.
 	 * 
@@ -1337,28 +1219,6 @@ public class HorizonCommandParser implements CommandExecutor
 				}
 			}			
 		} , 400);
-	}
-	
-	/**
-	 * confirmAdjustTimeout() removes the player from the list of players who are in the process 
-	 * of adding a destination and removes the destination being made.
-	 * 
-	 * @param sender
-	 */
-	private void confirmAdjustTimeout(final CommandSender sender)
-	{
-		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
-		{
-			public void run()
-			{
-				if (confirmAdjust.containsKey(sender.getName()))
-				{
-					shipHandler.cancelDestination(sender.getName());
-					confirmAdjust.remove(sender.getName());
-					sender.sendMessage(ChatColor.RED + "You timed out.");
-				}
-			}			
-		} , 6000);
 	}
 	
 	/**
@@ -1501,19 +1361,5 @@ public class HorizonCommandParser implements CommandExecutor
 		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
 		
 		return true;
-	}
-	
-	/**
-	 * cancelDestinationsInProgress() immediately cancels all of the destinations that are currently being defined,
-	 * in the case of a sudden server shutdown or reload.
-	 */
-	protected void cancelDestinationsInProgress()
-	{
-		for (String s: confirmAdjust.keySet())
-		{
-			shipHandler.cancelDestination(s);
-			confirmAdjust.remove(s);
-			Bukkit.getLogger().info(s);
-		}
 	}
 }

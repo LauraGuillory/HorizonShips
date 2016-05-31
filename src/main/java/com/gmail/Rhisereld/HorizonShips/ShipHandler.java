@@ -1,6 +1,7 @@
 package com.gmail.Rhisereld.HorizonShips;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -22,12 +22,9 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.Plugin;
 
 import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldedit.regions.RegionOperationException;
 
 @SuppressWarnings("deprecation")
 public class ShipHandler 
@@ -65,7 +62,7 @@ public class ShipHandler
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
-	void createShip(String shipName, Player player, String destinationName) throws DataException, IOException, NullPointerException, IllegalArgumentException
+	void createShip(String shipName, Player player) throws DataException, IOException, NullPointerException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
 		if (data.contains("ships."))
@@ -82,7 +79,7 @@ public class ShipHandler
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		
-		new Ship(data, shipName, destinationName, s);
+		new Ship(data, shipName, s);
 	}
 
 	/**
@@ -111,187 +108,130 @@ public class ShipHandler
 		Ship ship = new Ship(data, shipName);
 		ship.deleteShip();
 	}
-
+	
 	/**
-	 * testDestination() pastes the named ship inside the current WorldEdit selection of the player for visualisation purposes.
-	 * Checks that there isn't already a destination by that name.
-	 * Checks that the player has permission.
+	 * addDestination() creates a new destination. This destination does not have a physical location; it serves
+	 * to group and organise that numerous docks that will belong to the destination.
 	 * 
 	 * @param sm
 	 * @param player
 	 * @param shipName
 	 * @param destinationName
-	 * @throws MaxChangedBlocksException
-	 * @throws DataException
-	 * @throws IOException
 	 */
-	void testDestination(Player player, String shipName, String destinationName) throws MaxChangedBlocksException, DataException, IOException, IllegalArgumentException
+	void addDestination(Player player, String destinationName)
+	{
+		new Destination(data, destinationName, false);
+	}
+	
+	/**
+	 * removeDestination() removes the destination and all its docks.
+	 * 
+	 * @param shipName
+	 * @param destinationName
+	 */
+	void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
 	{	
-		//Check that the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
-
-		//Check that there isn't already a destination by that name.
-		if (ship.getDestination(destinationName) == null)
-			throw new IllegalArgumentException("This ship already has a destination by that name.");
+		//Check that the destination exists
+		Destination destination;
+		try { destination = new Destination(data, destinationName, true); }
+		//When creating a new destination, this will only be thrown if the destination doesn't exist.
+		catch (IllegalArgumentException e) { throw e; }
 		
-		//Check that the destination doesn't collide with any other destinations.
-		Set<String> shipStrings;
-		ConfigurationSection configSection = data.getConfigurationSection("ships");
-		Location currentLocation = ship.getCurrentDestination().getLocation();	
-		SchematicManager sm = new SchematicManager(currentLocation.getWorld());
-		Selection s = sm.getPlayerSelection(player);
-		if (configSection != null)
+		//If there are any ships at that destination, create temporary docks for them.
+		ArrayList<Dock> docks = destination.docks;
+		for (Dock d: docks)
 		{
-			shipStrings = configSection.getKeys(false);
-			Set<String> destinations;
-			
-			for (String ss: shipStrings)
+			if (d.getShip() != null)
 			{
-				Ship checkShip = new Ship(data, ss);
-				destinations = checkShip.getAllDestinations();
-				for (String d: destinations)
+				Ship ship = new Ship(data, d.getShip());
+				ship.setDock(new Dock(data, "temp", d.getLocation(), d.getLength(), d.getHeight(), d.getWidth()));
+			}
+		}
+	}
+	
+	/**
+	 * addDock() adds a new dock to the destination provided.
+	 * 
+	 * @param player
+	 * @param destination
+	 * @param length
+	 * @param width
+	 * @param height
+	 * @throws IllegalArgumentException
+	 */
+	void addDock(Player player, String destination) throws IllegalArgumentException
+	{	
+		//Check that the dock doesn't collide with any other destinations.
+		Set<String> destinations = new HashSet<String>();
+		boolean skipCollisionTesting = false;
+		
+		//Get the current selection of the player, which is used to determine the region of the new dock.
+		SchematicManager sm = new SchematicManager(player.getWorld());
+		Selection s = sm.getPlayerSelection(player);
+		
+		//Get the names of all the destinations saved, including temporary destinations.
+		try { destinations = data.getConfigurationSection("docks").getKeys(false);}
+		catch (IllegalArgumentException e) { skipCollisionTesting = true; }
+		
+		//New dock being verified
+		Location newMin = s.getMinimumPoint();
+		Location newMax = s.getMaximumPoint();
+		
+		if (!skipCollisionTesting)
+		{
+			for (String d: destinations)
+			{
+				Destination dest;
+				try {dest = new Destination(data, d, true);}
+				catch (IllegalArgumentException e) {continue;}
+				
+				for (Dock dock: dest.docks)
 				{
-					Location min = new Destination(data, ss, d).getLocation();
-					Location max = new Location(min.getWorld(), min.getX() + ship.getLength(), min.getY() + ship.getHeight(), min.getZ() 
-												+ ship.getWidth());
-					
-					Location newMin = s.getMinimumPoint();
-					Location newMax = new Location(newMin.getWorld(), newMin.getX() + checkShip.getLength(), newMin.getY() + checkShip.getHeight(), 
-													newMin.getZ() + checkShip.getWidth());
-					
-					if (min.getWorld() == null)
-						continue;
+					//Existing dock to check against
+					Location min = dock.getLocation();
+					Location max = new Location(min.getWorld(), min.getX() + dock.getLength(), min.getY() + dock.getHeight(), min.getZ() 
+												+ dock.getWidth());
 					
 					//Check if the regions intersect.
 					if (min.getWorld().equals(newMin.getWorld())
 							&& (newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
 							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMax.getY() <= max.getY())
 							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()))
-						throw new IllegalArgumentException("Collision detected: There is already another destination here!");
+						throw new IllegalArgumentException("Collision detected: There is already another dock here!");
 				}
 			}
 		}
-
-		//Save schematic from current destination	
-		Location loc2 = new Location(currentLocation.getWorld(), 
-				currentLocation.getBlockX() + ship.getLength(), 
-				currentLocation.getBlockY() + ship.getHeight(), 
-				currentLocation.getBlockZ() + ship.getWidth());
-		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");	
 		
-		//Test schematic at new destination
-		sm = new SchematicManager(s.getWorld());
-		sm.loadSchematic(s, ship.getName() + "\\ship");
-		
-		//Players currently testing a destination
-		schemManagers.put(player.getName(), sm);
+		//Add the dock
+		int length = Math.abs(newMax.getBlockX() - newMin.getBlockX());
+		int height = Math.abs(newMax.getBlockY() - newMin.getBlockY());
+		int width = Math.abs(newMax.getBlockZ() - newMin.getBlockZ());
+		new Dock(data, destination, s.getMinimumPoint(), length, height, width);
 	}
 	
-	/**
-	 * adjustDestination() undoes the previous changes made stored in the SchematicManager object, and pastes the ship
-	 * in the new location one block in the direction given.
-	 * Checks that the direction is valid.
-	 * 
-	 * @param sm
-	 * @param player
-	 * @param direction
-	 * @param shipName
-	 * @throws MaxChangedBlocksException
-	 * @throws DataException
-	 * @throws IOException
-	 * @throws RegionOperationException
-	 * @throws IncompleteRegionException
-	 */
-	void adjustDestination(Player player, String direction, String shipName) throws MaxChangedBlocksException, DataException, IOException, RegionOperationException, IncompleteRegionException
+	void removeDock(CommandSender sender, String destinationName, String dockNumber) throws IllegalArgumentException, NumberFormatException
 	{
-		Vector dir;
-		SchematicManager sm = schemManagers.get(player.getName());
-		Selection s = sm.getPlayerSelection(player);
+		//Check that the destination exists
+		try { @SuppressWarnings("unused")
+		Destination destination = new Destination(data, destinationName, true); }
+		//When creating a new destination, this will only be thrown if the destination doesn't exist.
+		catch (IllegalArgumentException e) { throw e; }
 		
-		switch (direction)
+		//Check that the dock exists (throws NumberFormatException if number isn't valid)
+		int dockID = Integer.parseInt(dockNumber);
+		Dock dock = new Dock(data, destinationName, dockID);
+		if (!dock.exists())
+			throw new IllegalArgumentException("That dock does not exist!");
+		
+		//If there are any ships at that dock, create a temporary dock for them.
+		if (dock.getShip() != null)
 		{
-			case "north": 	dir = new Vector(0, 0, -1);
-							break;
-			case "south": 	dir = new Vector(0, 0, 1);
-							break;
-			case "east": 	dir = new Vector(1, 0, 0);
-							break;
-			case "west": 	dir = new Vector(-1, 0, 0);
-							break;
-			case "up": 		dir = new Vector(0, 1, 0);
-							break;
-			case "down": 	dir = new Vector(0, -1, 0);
-							break;
-			default:		throw new IllegalArgumentException("That is not a valid direction.");		
+			Ship ship = new Ship(data, dock.getShip());
+			ship.setDock(new Dock(data, "temp", dock.getLocation(), dock.getLength(), dock.getHeight(), dock.getWidth()));
 		}
 		
-		//Undo previous paste.
-		sm.undoSession();
-		
-		//Shift 1 block in direction specified.
-		sm.shiftSelection(player, s, dir);
-		
-		//Paste
-		sm.loadSchematic(s, shipName + "\\ship");
-	}
-	
-	/**
-	 * cancelDestination() removes the ship previously pasted for visualisation purposes.
-	 * 
-	 * @param sm
-	 */
-	void cancelDestination(String name)
-	{
-		SchematicManager sm = schemManagers.get(name);
-		schemManagers.remove(name);
-		sm.undoSession();
-	}
-	
-	/**
-	 * addDestination() officially adds the destination by storing its location and name. It also removes the 
-	 * ship previously pasted for visualisation purposes.
-	 * 
-	 * @param sm
-	 * @param player
-	 * @param shipName
-	 * @param destinationName
-	 */
-	void addDestination(Player player, String shipName, String destinationName)
-	{
-		SchematicManager sm = schemManagers.get(player.getName());
-
-		Ship ship = new Ship(data, shipName);
-		ship.addDestination(destinationName, sm.getPlayerSelection(player).getMinimumPoint());
-		
-		//Undo paste.
-		sm.undoSession();
-	}
-	
-	/**
-	 * removeDestination() removes the destination and all its information from the ship given.
-	 * 
-	 * @param shipName
-	 * @param destinationName
-	 */
-	void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
-	{
-		//Check that the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
-		
-		//Check that the destination exists
-		Destination destination = ship.getDestination(destinationName);
-		if (destination.getName() == null)
-			throw new IllegalArgumentException("That destination does not exist!");
-		
-		//Check that the ship isn't currently at that destination
-		if (destinationName.equalsIgnoreCase(ship.getCurrentDestination().getName()))
-			throw new IllegalArgumentException("You are currently at that destination! You have to leave it first.");
-		
-		ship.removeDestination(destinationName);
+		//Delete the dock
+		dock.delete();
 	}
 	
 	/**
@@ -354,7 +294,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Make sure they are not trying to fly to the current destination
-		if (ship.getCurrentDestination().getName().equalsIgnoreCase(destination))
+		if (ship.getDock().getDestination().equalsIgnoreCase(destination))
 			throw new IllegalArgumentException("You are already at that destination!");
 		
 		//Make sure the player is a permitted pilot
@@ -369,41 +309,70 @@ public class ShipHandler
 		if (ship.getFuel() == 0)
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
-		//Make sure the destination is valid.		
-		if (ship.getDestination(destination).getName() == null)
+		//Make sure the destination is valid.
+		if (data.getConfigurationSection("docks." + destination) == null || destination.equalsIgnoreCase("temp"))
 		{
-			Set<String> destinations = ship.getAllDestinations();
+			Set<String> destinations = data.getConfigurationSection("docks.").getKeys(false);
 			String message = "That destination does not exist. Valid destinations: ";
 			
 			if (destinations.isEmpty())
 				message += "None";
 			else
 				for (String d: destinations)
-					message += d + " ";
+					if (!d.equalsIgnoreCase("temp"))
+						message += d + " ";
 			
 			throw new IllegalArgumentException(message);
 		}
 
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		Location currentLocation = ship.getCurrentDestination().getLocation();
+		Location currentLocation = ship.getDock().getLocation();
 		Location loc2 = new Location(currentLocation.getWorld(), 
 				currentLocation.getBlockX() + ship.getLength(), 
 				currentLocation.getBlockY() + ship.getHeight(), 
 				currentLocation.getBlockZ() + ship.getWidth());
 		
 		sm.saveSchematic(currentLocation, loc2, ship.getName() + "\\ship");
+		
+		//Choose an appropriate dock for the ship.
+		//The ship should dock in the smallest dock that still fits it.
+		Dock dock;
+		int spareVolume;
+		int chosenID = -1;
+		int chosenSpareVolume = -1;
+		for (String id: data.getConfigurationSection("docks." + destination).getKeys(false))
+		{
+			dock = new Dock(data, destination, Integer.parseInt(id));
+			if (dock.getLength() >= ship.getLength() &&
+					dock.getHeight() >= ship.getHeight() &&
+					dock.getWidth() >= ship.getWidth())
+			{
+				spareVolume = dock.getLength() * dock.getHeight() * dock.getWidth() 
+						- ship.getLength() * dock.getHeight() * dock.getWidth();
+				if (chosenSpareVolume == -1 || chosenSpareVolume > spareVolume)
+				{
+					chosenSpareVolume = spareVolume;
+					chosenID = Integer.parseInt(id);
+				}
+			}
+		}
+		
+		if (chosenID == -1)
+			throw new IllegalArgumentException("There are no docks at that location that fit the ship!");
+		
+		Dock newDock = new Dock(data, destination, chosenID);
 
 		//Paste schematic at new location
-		Destination newDestination = ship.getDestination(destination);
-		sm = new SchematicManager(newDestination.getLocation().getWorld());		//Each schematic manager may only apply to one world.
-		sm.loadSchematic(newDestination.getLocation(), ship.getName() + "\\ship");
+		Location newLocation = new Dock(data, destination, chosenID).getLocation();
+		sm = new SchematicManager(newLocation.getWorld());		//Each schematic manager may only apply to one world.
+		sm.loadSchematic(newLocation, ship.getName() + "\\ship");
 
 		//Teleport all players from old to new location
-		teleportPlayers(ship, newDestination.getLocation());
+		teleportPlayers(ship, newLocation);
 		
 		//Teleport all other entities from old to new location
-		teleportEntities(ship, newDestination.getLocation());
+		teleportEntities(ship, newLocation);
 
 		//Erase old location
 		sm.eraseArea(currentLocation, loc2);
@@ -412,11 +381,11 @@ public class ShipHandler
 		if (prof != null && professionReq != null && prof.isValidProfession(professionReq))
 			prof.addExperience(uuid, professionReq, config.getInt("professionReqs." + professionReq + ".exp"));
 		
-		//No event if destination is "DeepSpace"
-		if (destination.equalsIgnoreCase("DeepSpace"))
+		//No event if the location is limbo
+		if (destination.equalsIgnoreCase(config.getString("limbo_name")))
 		{
-			//Change current destination but do nothing else.
-			ship.setCurrentDestination(destination);
+			//Change the current dock
+			ship.setDock(newDock);
 			return;
 		}
 
@@ -438,8 +407,8 @@ public class ShipHandler
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
 		
-		//Change current destination
-		ship.setCurrentDestination(destination);
+		//Change the current dock
+		ship.setDock(newDock);
 	}
 	
 	/**
@@ -669,7 +638,7 @@ public class ShipHandler
 
 		//Organise some information
 		//Destinations
-		Set<String> destinations = ship.getAllDestinations();
+		Set<String> destinations = data.getConfigurationSection("docks.").getKeys(false);
 		String destinationString = "";
 		
 		for (String d: destinations)
@@ -700,7 +669,7 @@ public class ShipHandler
 			pilotsString = pilotsString.substring(0, pilotsString.length() - 2);
 		
 		//Current destination
-		String currentDestination = ship.getCurrentDestination().getName();
+		String currentDestination = ship.getDock().getDestination();
 		
 		//Dimensions
 		String dimensions = ship.getLength() + "x" + ship.getHeight() + "x" + ship.getWidth();
@@ -935,7 +904,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Teleport the player there
-		player.teleport(ship.getCurrentDestination().getLocation(), TeleportCause.PLUGIN);
+		player.teleport(ship.getDock().getLocation(), TeleportCause.PLUGIN);
 	}
 	
 	/**
@@ -1034,7 +1003,7 @@ public class ShipHandler
 			final Location playerLocation = p.getLocation();
 			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() 
 			{
-				Location oldLocation = ship.getCurrentDestination().getLocation();
+				Location oldLocation = ship.getDock().getLocation();
 			
 				public void run() 
 				{ 
@@ -1059,7 +1028,7 @@ public class ShipHandler
 	 */
 	private void teleportEntities(Ship ship, Location newLocation)
 	{
-		Location oldLocation = ship.getCurrentDestination().getLocation();
+		Location oldLocation = ship.getDock().getLocation();
 		Set<Entity> entitiesInside = getEntitiesInsideRegion(ship);
 
 		for (Entity e: entitiesInside)		
@@ -1085,7 +1054,7 @@ public class ShipHandler
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 		Set<Player> playersInside = new HashSet<Player>();
-		Location location = ship.getCurrentDestination().getLocation();
+		Location location = ship.getDock().getLocation();
 
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(location.getWorld())
@@ -1106,9 +1075,9 @@ public class ShipHandler
 	 */
 	private Set<Entity> getEntitiesInsideRegion(Ship ship)
 	{
-		List<Entity> entities = ship.getCurrentDestination().getLocation().getWorld().getEntities();
+		List<Entity> entities = ship.getDock().getLocation().getWorld().getEntities();
 		Set<Entity> entitiesInside = new HashSet<Entity>();
-		Location location = ship.getCurrentDestination().getLocation();
+		Location location = ship.getDock().getLocation();
 		
 		for (Entity e: entities)
 			if (e.getWorld().equals(location.getWorld())

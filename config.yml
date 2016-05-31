@@ -17,3 +17,4 @@ events:
     probability: 3
   fuelLeak:
     probability: 1
+limbo_name: space

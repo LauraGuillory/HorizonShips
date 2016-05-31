@@ -1,132 +1,100 @@
 package com.gmail.Rhisereld.HorizonShips;
 
+import java.util.ArrayList;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-/**
- * This class contains all the information pertaining to a single destination.
- * A ship always has one or more destinations.
- */
+//Destinations are used to group docks. They do not have a physical location.
+//Each dock within a destination is identified by a number.
 public class Destination 
 {
-	private FileConfiguration data;
-	private String shipName;
-	private String destinationName;
-	private Location location;
+	String name;
+	ArrayList<Dock> docks = new ArrayList<Dock>();
+	FileConfiguration data;
 
 	/**
-	 * Constructor for fetching an existing destination from the data file.
+	 * Constructor for destination.
+	 * If loadFromFile is false, a new, empty destination will be created.
 	 * 
 	 * @param data
-	 * @param shipName
-	 * @param destinationName
+	 * @param name
 	 */
-	public Destination(FileConfiguration data, String shipName, String destinationName)
+	Destination(FileConfiguration data, String name, boolean loadFromFile) throws IllegalArgumentException
 	{
-		if (!data.contains("ships." + shipName + ".destinations"))
-			return;
-		
-		Set<String> destinations;
-		try { destinations = data.getConfigurationSection("ships." + shipName + ".destinations").getKeys(false); }
-		catch (NullPointerException e)
-		{ return; }
-		
-		boolean foundDestination = false;
-		
-		for (String d: destinations)
-			if (d.equalsIgnoreCase(destinationName))
-			{
-				destinationName = d;	//configuration fetching is case sensitive - use string from config for case insensitivity
-				foundDestination = true;
-			}
-		
-		if (!foundDestination)
-			return;
-		
-		this.shipName = shipName;
-		this.destinationName = destinationName;
+		this.name = name;
 		this.data = data;
-		location = new Location(Bukkit.getWorld(data.getString("ships." + shipName + ".destinations." + destinationName + ".world")),
-								data.getInt("ships." + shipName + ".destinations." + destinationName + ".x"),
-								data.getInt("ships." + shipName + ".destinations." + destinationName + ".y"),
-								data.getInt("ships." + shipName + ".destinations." + destinationName + ".z"));
+		
+		Set<String> dockNames = null;
+		try {dockNames = data.getConfigurationSection("docks.").getKeys(false); }
+		catch (NullPointerException e) { }
+		
+		//New destination
+		if (!loadFromFile)
+		{
+			if (dockNames != null && dockNames.contains(name))
+				throw new IllegalArgumentException("A destination already exists by that name.");
+			
+			data.set("docks." + name + ".exists", true);
+			return;
+		}
+		
+		//Existing destination - load docks from data.yml
+		//Check that the destination actually exists
+		if (dockNames != null && !dockNames.contains(name))
+			throw new IllegalArgumentException("That destination does not exist!");
+		
+		Set<String> docks = null;
+		try { docks = data.getConfigurationSection("docks." + name).getKeys(false); }
+		catch (NullPointerException e) { return; }
+		
+		//Add all dock objects on file to the list.
+		int ID;
+		Dock dock;
+		for (String d: docks)
+		{
+			try { ID = Integer.parseInt(d); }
+			catch (NumberFormatException e) { continue; }
+			dock = new Dock(data, name, ID);
+			if (dock.exists())
+				this.docks.set(ID, dock);
+		}
 	}
 	
 	/**
-	 * Constructor for creating an entirely new destination and adding it to the data file.
+	 * numberofDocks() returns the number of docks that this destination currently holds.
 	 * 
-	 * @param data
-	 * @param shipName
-	 * @param destinationName
+	 * @return The number of docks that this destination currently holds.
+	 */
+	int numberOfDocks()
+	{
+		return docks.size();
+	}
+	
+	/**
+	 * addDock() creates a new dock and adds it to the list of docks at this destination.
+	 * 
 	 * @param location
+	 * @param length
+	 * @param height
+	 * @param width
 	 */
-	public Destination(FileConfiguration data, String shipName, String destinationName, Location location)
+	int addDock(Location location, int length, int height, int width)
 	{
-		this.shipName = shipName;
-		this.destinationName = destinationName;
-		this.location = location;
-		this.data = data;
-		
-		data.set("ships." + shipName + ".destinations." + destinationName + ".world", location.getWorld().getName());
-		data.set("ships." + shipName + ".destinations." + destinationName + ".x", location.getBlockX());
-		data.set("ships." + shipName + ".destinations." + destinationName + ".y", location.getBlockY());
-		data.set("ships." + shipName + ".destinations." + destinationName + ".z", location.getBlockZ());
+		Dock dock = new Dock(data, name, location, length, height, width);
+		docks.set(dock.getID(), dock);
+		return dock.getID();
 	}
 	
 	/**
-	 * delete() removes all information pertaining to this destination.
-	 * The instance should not continue to be used after this is called.
+	 * removeDock() removes the dock that fits the ID given from file.
 	 * 
+	 * @param ID
 	 */
-	void delete()
+	void removeDock(int ID)
 	{
-		data.getConfigurationSection("ships." + shipName + ".destinations.").set(destinationName, null);
-	}
-	
-	/**
-	 * getShipName() returns the name of the ship to which this destination pertains to.
-	 * 
-	 * @return
-	 */
-	String getShipName()
-	{
-		return shipName;
-	}
-	
-	/**
-	 * getDestinationName() returns the name of the destination.
-	 * 
-	 * @return
-	 */
-	String getName()
-	{
-		return destinationName;
-	}
-	
-	/**
-	 * getLocation() returns the location of the destination.
-	 * 
-	 * @return
-	 */
-	Location getLocation()
-	{
-		return location;
-	}
-	
-	/**
-	 * exists() returns true if the destination was present in the data value.
-	 * (Relies on the "world" field in the data value returning null.)
-	 * 
-	 * @return
-	 */
-	boolean exists()
-	{
-		if (location.getWorld() == null)
-			return false;
-		else 
-			return true;
+		docks.get(ID).delete();
+		docks.remove(ID);
 	}
 }

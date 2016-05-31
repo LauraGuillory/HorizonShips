@@ -125,7 +125,7 @@ public class ShipEvent
 			//Choose a player to damage
 			Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
 			List<Player> playersOnShip = new ArrayList<Player>();
-			Location location = ship.getCurrentDestination().getLocation();
+			Location location = ship.getDock().getLocation();
 
 			for (Player p: onlinePlayers)
 				if (p.getWorld().equals(location.getWorld())
@@ -180,7 +180,7 @@ public class ShipEvent
 		//Create list of locations that have a block directly below and somewhere above them.
 		List<Location> potentialLocations = new ArrayList<Location>();
 		boolean hasBlockAbove;
-		Location location = ship.getCurrentDestination().getLocation();
+		Location location = ship.getDock().getLocation();
 		Location testLoc;
 		int yAbove;
 		int length = ship.getLength();
@@ -334,6 +334,6 @@ public class ShipEvent
 	private String triggerNone(Player player, Ship ship)
 	{
 		return "The journey is uneventful, and " + player.getDisplayName() + ChatColor.YELLOW + " touches down at " 
-					+ ship.getCurrentDestination().getName() + " without any problems.";
+					+ ship.getDock().getDestination() + " without any problems.";
 	}
 }
