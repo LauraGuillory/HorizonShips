@@ -110,8 +110,15 @@ public class ShipHandler
 		if (!shipFound)
 			throw new IllegalArgumentException("Ship not found.");
 		
-		//Delete all information on the ship.
+		//Remove the ship reference the dock it is inhabiting.
 		Ship ship = new Ship(data, shipName);
+		ship.getDock().updateShipName(null);
+		
+		//If it is inhabiting a temporary dock, delete the dock.
+		if (ship.getDock().getDestination().equalsIgnoreCase("temp"))
+			ship.getDock().delete();
+		
+		//Delete all information on the ship.
 		ship.deleteShip();
 	}
 	
@@ -1109,7 +1116,7 @@ public class ShipHandler
 		
 		//Get the names of all the destinations saved, including temporary destinations.
 		try { destinations = data.getConfigurationSection("docks").getKeys(false);}
-		catch (IllegalArgumentException e) { skipCollisionTesting = true; }
+		catch (NullPointerException e) { skipCollisionTesting = true; }
 		
 		if (!skipCollisionTesting)
 		{
