@@ -59,7 +59,14 @@ public class ShipRegionNotifier implements Listener
 		if (playersInsideDocks.containsKey(player.getName()))
 		{			
 			String[] arguments = playersInsideDocks.get(player.getName()).split(" ");
-			Dock dock = new Dock(data, arguments[0], Integer.parseInt(arguments[1]));
+			int ID = 0;
+			try { ID = Integer.parseInt(arguments[1]); }
+			catch (NumberFormatException e) 
+			{
+				playersInsideDocks.remove(player.getName());
+				return;
+			}
+			Dock dock = new Dock(data, arguments[0], ID);
 			min = dock.getLocation();
 			max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(), 
 					min.getBlockZ() + dock.getWidth());
@@ -128,7 +135,7 @@ public class ShipRegionNotifier implements Listener
 							player.sendMessage(ChatColor.GOLD + "The ship " + ship.getName() + " is docked here.");
 						}
 						//Add player to list of players inside this ship
-						playersInsideDocks.put(player.getName(), dest + dock.getID());
+						playersInsideDocks.put(player.getName(), dest + " " + dock.getID());
 						//No need to check the rest if it's found.
 						break;
 					}

@@ -42,7 +42,7 @@ public class Destination
 		
 		//Existing destination - load docks from data.yml
 		//Check that the destination actually exists
-		if (dockNames != null && !dockNames.contains(name))
+		if (!data.getBoolean("docks." + name + ".exists"))
 			throw new IllegalArgumentException("That destination does not exist!");
 		
 		Set<String> docks = null;
@@ -83,11 +83,14 @@ public class Destination
 	 * @param height
 	 * @param width
 	 */
-	int addDock(Location location, int length, int height, int width)
+	Dock addDock(Location location, int length, int height, int width) throws IllegalArgumentException
 	{
 		Dock dock = new Dock(data, name, location, length, height, width);
-		docks.set(dock.getID(), dock);
-		return dock.getID();
+		if (this.docks.size() > dock.getID())
+			this.docks.set(dock.getID(), dock);
+		else
+			this.docks.add(dock);
+		return dock;
 	}
 	
 	/**
@@ -99,5 +102,26 @@ public class Destination
 	{
 		docks.get(ID).delete();
 		docks.remove(ID);
+	}
+	
+	/**
+	 * getDock() returns the dock at this destination with the ID given.
+	 * 
+	 * @param ID
+	 * @return
+	 */
+	Dock getDock(int ID)
+	{
+		return docks.get(ID);
+	}
+	
+	/**
+	 * getName() returns the name of the destination.
+	 * 
+	 * @return
+	 */
+	String getName()
+	{
+		return name;
 	}
 }

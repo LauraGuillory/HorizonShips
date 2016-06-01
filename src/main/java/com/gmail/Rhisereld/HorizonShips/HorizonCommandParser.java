@@ -770,6 +770,7 @@ public class HorizonCommandParser implements CommandExecutor
 			shipHandler.shipInfo(sender, args[0]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -1282,6 +1283,17 @@ public class HorizonCommandParser implements CommandExecutor
 		{
 			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [destinationName]");
 			sender.sendMessage("Remove a destination. Ships currently at this destination will be assigned a temporary "
+					+ "dock until they leave.");
+		}
+		if (sender.hasPermission("horizonships.admin.dock.add") && player != null)
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship add dock [destinationName]");
+			sender.sendMessage("Add a new dock at the given destination, using your current WorldEdit selection.");
+		}
+		if (sender.hasPermission("horizonships.admin.dock.remove"))
+		{
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove dock [destinationName]");
+			sender.sendMessage("Remove a dock. Ships currently at this dock will be assigned a temporary "
 					+ "dock until they leave.");
 		}
 		if (sender.hasPermission("horizonships.admin.forcerefuel"))

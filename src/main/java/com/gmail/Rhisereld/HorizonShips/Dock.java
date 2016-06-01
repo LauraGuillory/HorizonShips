@@ -1,5 +1,7 @@
 package com.gmail.Rhisereld.HorizonShips;
 
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,9 +23,13 @@ public class Dock
 	 * @param data
 	 * @param name
 	 */
-	Dock(FileConfiguration data, String destination, int id)
+	Dock(FileConfiguration data, String destination, int id) throws IllegalArgumentException
 	{
 		this.data = data;
+		
+		if (data.getString("docks." + destination + "." + id + ".world") == null)
+			throw new IllegalArgumentException("That dock does not exist.");
+		
 		this.destination = destination;
 		this.id = id;
 		this.location = new Location(Bukkit.getWorld(data.getString("docks." + destination + "." + id + ".world")),
@@ -56,10 +62,16 @@ public class Dock
 		//If any of the docks no longer exist between 0 and i-1 where i is the number of docks,
 		//the new dock will take that number.
 		//Otherwise, the new ID will be i.
-		try { for (int i = 0; i < data.getConfigurationSection("docks." + destination).getKeys(false).size(); i++)
-					if (!new Dock(data, destination, i).exists())
-						this.id = i; }
+		Set<String> docks = null;
+		try { docks = data.getConfigurationSection("docks." + destination).getKeys(false); }
 		catch (NullPointerException e) { this.id = 0; }
+		
+		if (docks != null)
+			for (int i = 0; i < docks.size(); i++)
+			{
+				try { new Dock(data, destination, i); }
+				catch (IllegalArgumentException e) { this.id = i; }
+			}
 		
 		setLocation(location);
 		setLength(length);
@@ -183,7 +195,7 @@ public class Dock
 	 */
 	boolean exists()
 	{
-		if (location.getWorld() == null)
+		if (location == null)
 			return false;
 		else 
 			return true;

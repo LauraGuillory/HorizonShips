@@ -112,11 +112,12 @@ public class ShipHandler
 		
 		//Remove the ship reference the dock it is inhabiting.
 		Ship ship = new Ship(data, shipName);
-		ship.getDock().updateShipName(null);
+		Dock dock = ship.getDock();
+		dock.updateShipName(shipName);
 		
 		//If it is inhabiting a temporary dock, delete the dock.
-		if (ship.getDock().getDestination().equalsIgnoreCase("temp"))
-			ship.getDock().delete();
+		if (dock.getDestination().equalsIgnoreCase("temp"))
+			dock.delete();
 		
 		//Delete all information on the ship.
 		ship.deleteShip();
@@ -157,7 +158,8 @@ public class ShipHandler
 			if (d.getShip() != null)
 			{
 				Ship ship = new Ship(data, d.getShip());
-				ship.setDock(new Dock(data, "temp", d.getLocation(), d.getLength(), d.getHeight(), d.getWidth()));
+				Dock dock = new Dock(data, "temp", d.getLocation(), d.getLength(), d.getHeight(), d.getWidth());
+				ship.setDock(dock);
 			}
 		}
 	}
@@ -172,8 +174,12 @@ public class ShipHandler
 	 * @param height
 	 * @throws IllegalArgumentException
 	 */
-	void addDock(Player player, String destination) throws IllegalArgumentException
+	void addDock(Player player, String destinationName) throws IllegalArgumentException
 	{	
+		//Check that the destination exists.
+		try { new Destination(data, destinationName, true); }
+		catch (IllegalArgumentException e) { throw e; };
+		
 		//Get the current selection of the player, which is used to determine the region of the new dock.
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
@@ -188,7 +194,7 @@ public class ShipHandler
 		int length = Math.abs(newMax.getBlockX() - newMin.getBlockX());
 		int height = Math.abs(newMax.getBlockY() - newMin.getBlockY());
 		int width = Math.abs(newMax.getBlockZ() - newMin.getBlockZ());
-		new Dock(data, destination, s.getMinimumPoint(), length, height, width);
+		new Dock(data, destinationName, s.getMinimumPoint(), length, height, width);
 	}
 	
 	void removeDock(CommandSender sender, String destinationName, String dockNumber) throws IllegalArgumentException, NumberFormatException
@@ -209,7 +215,8 @@ public class ShipHandler
 		if (dock.getShip() != null)
 		{
 			Ship ship = new Ship(data, dock.getShip());
-			ship.setDock(new Dock(data, "temp", dock.getLocation(), dock.getLength(), dock.getHeight(), dock.getWidth()));
+			Dock tempDock = new Dock(data, "temp", dock.getLocation(), dock.getLength(), dock.getHeight(), dock.getWidth());
+			ship.setDock(tempDock);
 		}
 		
 		//Delete the dock
@@ -277,7 +284,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Make sure they are not trying to fly to the current destination
-		if (ship.getDock().getDestination().equalsIgnoreCase(destinationName))
+		if (ship.getDestination().getName().equalsIgnoreCase(destinationName))
 			throw new IllegalArgumentException("You are already at that destination!");
 		
 		//Make sure the player is a permitted pilot
@@ -595,7 +602,7 @@ public class ShipHandler
 		Ship ship = new Ship(data, shipName);
 		
 		//Check the ship actually exists
-		if (ship.getName() == null)
+		if (!ship.exists())
 			throw new IllegalArgumentException("Ship not found.");
 		
 		//Check that the person checking is the owner, a permitted pilot, an admin, or the console
@@ -640,7 +647,7 @@ public class ShipHandler
 			pilotsString = pilotsString.substring(0, pilotsString.length() - 2);
 		
 		//Current destination
-		String currentDestination = ship.getDock().getDestination();
+		String currentDestination = ship.getDestination().getName();
 		
 		//Dimensions
 		String dimensions = ship.getLength() + "x" + ship.getHeight() + "x" + ship.getWidth();
@@ -679,7 +686,7 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "OWNER: " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "DESTINATIONS: " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "CURRENT LOCATION: " + ChatColor.WHITE + currentDestination);
-			sender.sendMessage(ChatColor.YELLOW + "DOCK NUMBER: " + ChatColor.WHITE + ship.getDock().getID());
+			sender.sendMessage(ChatColor.YELLOW + "DOCK NUMBER: " + ChatColor.WHITE + ship.getDock());
 			sender.sendMessage(ChatColor.YELLOW + "DIMENSIONS: " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "PERMITTED PILOTS: " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "MECHANICAL CONDITION: " + conditionStatus + condition);
@@ -693,13 +700,12 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
-			sender.sendMessage(ChatColor.YELLOW + "Dock number:           " + ChatColor.WHITE + ship.getDock().getID());
+			sender.sendMessage(ChatColor.YELLOW + "Dock number:           " + ChatColor.WHITE + ship.getDock());
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:      " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + conditionStatus + condition);
 			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + fuelStatus + Integer.toString(ship.getFuel()));
 		}
-
 	}
 	
 	/**

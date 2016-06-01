@@ -20,7 +20,8 @@ public class Ship
 {
 	private FileConfiguration data;
 	private String name;
-	private Dock dock;
+	private Destination destination;
+	private int dock;
 	private int fuel;
 	private boolean broken;
 	private String repairItem;
@@ -40,12 +41,12 @@ public class Ship
 	public Ship(FileConfiguration data, String name)
 	{
 		String path = "ships." + name + ".";
-		this.data = data;
+		if (data.getConfigurationSection("ships." + name) == null) //Ship doesn't exist
+			throw new IllegalArgumentException("Ship does not exist.");
+		this.data = data;	
 		this.name = name;		
-		
-		dock = new Dock(data, data.getString("ships." + name + ".dock.destination"), data.getInt("ships." + name + ".dock.id"));
-		if (dock.getLocation().getWorld() == null) //Ship does not exist.
-			return;
+		destination = new Destination(data, data.getString(path + "dock.destination"), true);
+		dock = data.getInt(path + "dock.id");
 		fuel = data.getInt(path + "fuel");
 		broken = data.getBoolean(path + "broken");
 		repairItem = data.getString(path + "repairItem");
@@ -77,6 +78,7 @@ public class Ship
 	public Ship(FileConfiguration data, String name, Selection selection) throws DataException, IOException
 	{
 		this.data = data;
+		String path = "ships." + name + ".";
 		
 		Location min = selection.getMinimumPoint();
 		Location max = selection.getMaximumPoint();
@@ -86,8 +88,14 @@ public class Ship
 		setLength(max.getBlockX() - min.getBlockX());
 		setWidth(max.getBlockZ() - min.getBlockZ());
 		setHeight(max.getBlockY() - min.getBlockY());
-		setDock(new Dock(data, "temp", selection.getMinimumPoint(), length, height, width));
-		dock.updateShipName(name);
+		
+		//Try to make a new temp destination. If it already exists that's fine.
+		try { destination = new Destination(data, "temp", false); }
+		catch (IllegalArgumentException e) { destination = new Destination(data, "temp", true); }
+		Dock tempDock = destination.addDock(min, length, height, width);
+		tempDock.updateShipName(name);
+		data.set(path + ".dock.destination", destination.getName());
+		data.set(path + "dock.id", tempDock.getID());
 		
 		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
 		sm.saveSchematic(selection, name + "\\ship");
@@ -113,7 +121,7 @@ public class Ship
 	 */
 	Dock getDock()
 	{
-		return dock;
+		return destination.getDock(dock);
 	}
 	
 	/**
@@ -121,24 +129,49 @@ public class Ship
 	 * 
 	 * @param dock
 	 */
-	void setDock(Dock dock)
+	void setDock(Dock dock) throws IllegalArgumentException
 	{
+		Dock oldDock = destination.getDock(this.dock);
+		
 		//Keep the ship name updated on the dock so the ship belonging to it can easily be found.
-		if (this.dock != null)
-			this.dock.updateShipName(null);
+		oldDock.updateShipName(null);
 		dock.updateShipName(name);
 		
 		//If the old dock was temporary it should be removed.
-		if (this.dock != null && this.dock.getDestination().equalsIgnoreCase("temp"))
+		if (oldDock != null && oldDock.getDestination().equalsIgnoreCase("temp"))
 		{
-			new Destination(data, "temp", true).docks.remove(this.dock.getID());
-			this.dock.delete();
+			Destination destination;
+			try { destination = new Destination(data, "temp", false); }
+			catch (IllegalArgumentException e) { destination = new Destination(data, "temp", true); }
+			destination.docks.remove(oldDock);
+			oldDock.delete();
 		}
 			
 		//Set the dock
-		this.dock = dock;
-		data.set("ships." + name + ".dock.destination", dock.getDestination());
-		data.set("ships." + name + ".dock.ID", dock.getID());
+		this.dock = dock.getID();
+		data.set("ships." + name + ".dock.destination", destination.getName());
+		data.set("ships." + name + ".dock.ID", this.dock);
+	}
+	
+	/**
+	 * getDestination() returns the destination at which the ship is currently located.
+	 * 
+	 * @return
+	 */
+	Destination getDestination()
+	{
+		return destination;
+	}
+	
+	/**
+	 * setDestination() sets the name of the destination at which the ship is currently located.
+	 * 
+	 * @param destination
+	 * @return
+	 */
+	void setDestination(Destination destination)
+	{
+		this.destination = destination;
 	}
 	
 	/**
@@ -409,7 +442,8 @@ public class Ship
 		newShip.setWidth(width);
 		newShip.setBroken(broken);
 		newShip.setConsumePart(consumePart);
-		newShip.setDock(dock);
+		newShip.setDestination(destination);
+		newShip.setDock(destination.getDock(dock));
 		newShip.setFuel(fuel);
 		if (owner != null)
 			newShip.setOwner(owner);
@@ -418,5 +452,16 @@ public class Ship
 		newShip.setRepairItem(repairItem);
 		data.getConfigurationSection("ships.").set(name, null);
 		name = newName;
+	}
+	
+	/**
+	 * exists() returns true if the ship exists on file, false otherwise.
+	 * 
+	 */
+	boolean exists()
+	{
+		if (name == null)
+			return false;
+		return true;
 	}
 }
