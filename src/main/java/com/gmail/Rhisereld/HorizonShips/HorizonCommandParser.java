@@ -138,7 +138,7 @@ public class HorizonCommandParser implements CommandExecutor
 				
 				//ship remove destination [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
-					if (args.length >= 4)
+					if (args.length >= 3)
 						return removeDestination(sender, args);
 					else
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "

@@ -99,7 +99,11 @@ public class ShipRegionNotifier implements Listener
 				//Go through each dock.
 				for (String d: docks)
 				{
-					dock = new Dock(data, dest, Integer.parseInt(d));
+					int ID;
+					try { ID = Integer.parseInt(d); }
+					catch (NumberFormatException e) { continue; }
+					
+					dock = new Dock(data, dest, ID);
 					min = dock.getLocation();
 					max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(), 
 							min.getBlockZ() + dock.getWidth());

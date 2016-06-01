@@ -61,6 +61,9 @@ public class ShipProtector implements Listener
 			
 			for (String d: docks)
 			{
+				if (d.equalsIgnoreCase("exists"))
+					continue;
+				
 				dock = new Dock(data, dest, Integer.parseInt(d));
 				
 				//If the dock doesn't have a ship inhabiting it, continue to the next dock.
@@ -131,7 +134,11 @@ public class ShipProtector implements Listener
 			
 			for (String d: docks)
 			{
-				dock = new Dock(data, dest, Integer.parseInt(d));
+				int ID;
+				try { ID = Integer.parseInt(d); }
+				catch (NumberFormatException e) { continue; }
+				
+				dock = new Dock(data, dest, ID);
 				
 				//If the dock doesn't have a ship inhabiting it, continue to the next dock.
 				if (dock.getShip() == null)
