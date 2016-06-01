@@ -77,23 +77,17 @@ public class Ship
 	public Ship(FileConfiguration data, String name, Selection selection) throws DataException, IOException
 	{
 		this.data = data;
-		this.name = name;
-		fuel = 10;
-		broken = false;
-		pilots = new ArrayList<UUID>();
 		
 		Location min = selection.getMinimumPoint();
 		Location max = selection.getMaximumPoint();
-		length = max.getBlockX() - min.getBlockX();
-		width = max.getBlockZ() - min.getBlockZ();
-		height = max.getBlockY() - min.getBlockY();
-		dock = new Dock(data, "temp", selection.getMinimumPoint(), length, height, width);
-		data.set("ships." + name + ".fuel", fuel);
-		data.set("ships." + name + ".broken", broken);
-		data.set("ships." + name + ".pilots", pilots);
-		data.set("ships." + name + ".length", length);
-		data.set("ships." + name + ".width", width);
-		data.set("ships." + name + ".height", height);
+		setName(name);
+		setFuel(10);
+		setBroken(false);
+		setLength(max.getBlockX() - min.getBlockX());
+		setWidth(max.getBlockZ() - min.getBlockZ());
+		setHeight(max.getBlockY() - min.getBlockY());
+		setDock(new Dock(data, "temp", selection.getMinimumPoint(), length, height, width));
+		dock.updateShipName(name);
 		
 		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
 		sm.saveSchematic(selection, name + "\\ship");
@@ -130,19 +124,21 @@ public class Ship
 	void setDock(Dock dock)
 	{
 		//Keep the ship name updated on the dock so the ship belonging to it can easily be found.
-		this.dock.updateShipName(null);
+		if (this.dock != null)
+			this.dock.updateShipName(null);
 		dock.updateShipName(name);
 		
-		//Set the dock
-		this.dock = dock;
-		
 		//If the old dock was temporary it should be removed.
-		if (dock.getDestination().equalsIgnoreCase("temp"))
+		if (this.dock != null && this.dock.getDestination().equalsIgnoreCase("temp"))
 		{
-			new Destination(data, "temp", true).docks.remove(dock.getID());
-			dock.delete();
+			new Destination(data, "temp", true).docks.remove(this.dock.getID());
+			this.dock.delete();
 		}
 			
+		//Set the dock
+		this.dock = dock;
+		data.set("ships." + name + ".dock.destination", dock.getDestination());
+		data.set("ships." + name + ".dock.ID", dock.getID());
 	}
 	
 	/**
@@ -162,6 +158,7 @@ public class Ship
 	 */
 	void setBroken(boolean broken)
 	{
+		this.broken = broken;
 		data.set("ships." + name + ".broken", broken);
 	}
 
@@ -245,6 +242,7 @@ public class Ship
 	 */
 	void setFuel(int fuel)
 	{
+		this.fuel = fuel;
 		data.set("ships." + name + ".fuel", fuel);
 	}
 	
@@ -254,6 +252,7 @@ public class Ship
 	 */
 	void reduceFuel()
 	{
+
 		data.set("ships." + name + ".fuel", --fuel);
 	}
 	
@@ -414,6 +413,8 @@ public class Ship
 		newShip.setFuel(fuel);
 		if (owner != null)
 			newShip.setOwner(owner);
+		for (UUID p: pilots)
+			newShip.addPilot(p);
 		newShip.setRepairItem(repairItem);
 		data.getConfigurationSection("ships.").set(name, null);
 		name = newName;

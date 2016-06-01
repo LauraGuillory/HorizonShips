@@ -23,6 +23,7 @@ public class Dock
 	 */
 	Dock(FileConfiguration data, String destination, int id)
 	{
+		this.data = data;
 		this.destination = destination;
 		this.id = id;
 		this.location = new Location(Bukkit.getWorld(data.getString("docks." + destination + "." + id + ".world")),
@@ -32,6 +33,7 @@ public class Dock
 		this.length = data.getInt("docks." + destination + "." + id + ".length");
 		this.height = data.getInt("docks." + destination + "." + id + ".height");
 		this.width = data.getInt("docks." + destination + "." + id + ".width");
+		this.ship = data.getString("docks." + destination + "." + id + ".ship");
 	}
 	
 	/**
@@ -45,23 +47,24 @@ public class Dock
 	 */
 	Dock(FileConfiguration data, String destination, Location location, int length, int height, int width)
 	{
+		this.data = data;
 		this.destination = destination;
 		this.id = 0;
 		
 		//Determines the ID number of the new dock. 
+		//If there are no docks the new ID will be 0.
 		//If any of the docks no longer exist between 0 and i-1 where i is the number of docks,
 		//the new dock will take that number.
 		//Otherwise, the new ID will be i.
-		//If there are no docks the new ID will be 0.
 		try { for (int i = 0; i < data.getConfigurationSection("docks." + destination).getKeys(false).size(); i++)
 					if (!new Dock(data, destination, i).exists())
 						this.id = i; }
 		catch (NullPointerException e) { this.id = 0; }
 		
-		this.location = location;
-		this.length = length;
-		this.height = height;
-		this.width = width;
+		setLocation(location);
+		setLength(length);
+		setHeight(height);
+		setWidth(width);
 	}
 	
 	/**
@@ -103,6 +106,10 @@ public class Dock
 	void setLocation(Location location)
 	{
 		this.location = location;
+		data.set("docks." + destination + "." + id + ".world", location.getWorld().getName());
+		data.set("docks." + destination + "." + id + ".x", location.getBlockX());
+		data.set("docks." + destination + "." + id + ".y", location.getBlockY());
+		data.set("docks." + destination + "." + id + ".z", location.getBlockZ());
 	}
 	
 	/**
@@ -123,6 +130,7 @@ public class Dock
 	void setLength(int length)
 	{
 		this.length = length;
+		data.set("docks." + destination + "." + id + ".length", length);
 	}
 	
 	/**
@@ -143,6 +151,7 @@ public class Dock
 	void setHeight(int height)
 	{
 		this.height = height;
+		data.set("docks." + destination + "." + id + ".height", height);
 	}
 	
 	/**
@@ -163,6 +172,7 @@ public class Dock
 	void setWidth(int width)
 	{
 		this.width = width;
+		data.set("docks." + destination + "." + id + ".width", width);
 	}
 	
 	/**
@@ -198,6 +208,7 @@ public class Dock
 	void updateShipName(String shipName)
 	{
 		ship = shipName;
+		data.set("docks." + destination + "." + id + ".ship", ship);
 	}
 	
 	/**
