@@ -62,18 +62,19 @@ public class ShipHandler
 	 * @throws NullPointerException
 	 * @throws IllegalArgumentException
 	 */
-	void createShip(String shipName, Player player) throws DataException, IOException, NullPointerException, IllegalArgumentException
+	void createShip(String shipName, Player player) throws DataException, IOException, IllegalArgumentException
 	{
 		//Check a ship doesn't already exist by that name.
 		if (data.contains("ships."))
 		{
-			Set<String> ships;
+			Set<String> ships = null;
 			try { ships = data.getConfigurationSection("ships").getKeys(false); }
 			catch (NullPointerException e)
-			{ return; }
-			for (String sh : ships)
-				if (sh.equalsIgnoreCase(shipName))
-					throw new IllegalArgumentException("A ship already exists by that name.");
+			{}
+			if (ships != null)
+				for (String sh : ships)
+					if (sh.equalsIgnoreCase(shipName))
+						throw new IllegalArgumentException("A ship already exists by that name.");
 		}
 				
 		SchematicManager sm = new SchematicManager(player.getWorld());

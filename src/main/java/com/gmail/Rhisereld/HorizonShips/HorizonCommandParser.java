@@ -73,7 +73,7 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship create [shipName]
 			if (args[0].equalsIgnoreCase("create"))
-				if (args.length == 3)
+				if (args.length == 2)
 					return shipCreate(sender, args[1]);
 				else
 				{
@@ -1006,16 +1006,12 @@ public class HorizonCommandParser implements CommandExecutor
 		confirmCreate.remove(sender.getName());
 		player = Bukkit.getPlayer(sender.getName());
 
-		try {
-			shipHandler.createShip(argument, player);
-			player.sendMessage(ChatColor.YELLOW + "Ship " + argument + " created!");
+		try {	shipHandler.createShip(argument, player);
+				player.sendMessage(ChatColor.YELLOW + "Ship " + argument + " created!");
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
 			e.printStackTrace();
-			return false;
-		} catch (NullPointerException e) {
-			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());

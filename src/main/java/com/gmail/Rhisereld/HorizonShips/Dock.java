@@ -52,9 +52,11 @@ public class Dock
 		//If any of the docks no longer exist between 0 and i-1 where i is the number of docks,
 		//the new dock will take that number.
 		//Otherwise, the new ID will be i.
-		for (int i = 0; i < data.getConfigurationSection("docks." + destination).getKeys(false).size(); i++)
-			if (!new Dock(data, destination, i).exists())
-				this.id = i;
+		//If there are no docks the new ID will be 0.
+		try { for (int i = 0; i < data.getConfigurationSection("docks." + destination).getKeys(false).size(); i++)
+					if (!new Dock(data, destination, i).exists())
+						this.id = i; }
+		catch (NullPointerException e) { this.id = 0; }
 		
 		this.location = location;
 		this.length = length;
