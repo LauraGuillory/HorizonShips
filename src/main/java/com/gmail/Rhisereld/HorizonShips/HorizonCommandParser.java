@@ -1269,7 +1269,7 @@ public class HorizonCommandParser implements CommandExecutor
 		sender.sendMessage(ChatColor.GOLD + "Horizon Ships allows you to maintain and travel in ships!");
 		if (sender.hasPermission("horizonships.admin.ship.create") && player != null)
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship create [shipName] [destinationName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship create [shipName]");
 			sender.sendMessage("Create a new ship at a starter destination, using your current WorldEdit selection.");
 		}
 		if (sender.hasPermission("horizonships.admin.ship.delete"))
@@ -1279,13 +1279,14 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.admin.destination.add") && player != null)
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship add destination [shipName] [destinationName]");
-			sender.sendMessage("Add a destination to the given ship, using your current WorldEdit selection.");
+			sender.sendMessage(ChatColor.YELLOW + "/ship add destination [destinationName]");
+			sender.sendMessage("Add a new destination, using your current WorldEdit selection.");
 		}
 		if (sender.hasPermission("horizonships.admin.destination.remove"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [shipName] [destinationName]");
-			sender.sendMessage("Remove a destination from the given ship.");
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove destination [destinationName]");
+			sender.sendMessage("Remove a destination. Ships currently at this destination will be assigned a temporary "
+					+ "dock until they leave.");
 		}
 		if (sender.hasPermission("horizonships.admin.forcerefuel"))
 		{
