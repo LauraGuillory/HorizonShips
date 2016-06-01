@@ -58,7 +58,10 @@ public class Destination
 			catch (NumberFormatException e) { continue; }
 			dock = new Dock(data, name, ID);
 			if (dock.exists())
-				this.docks.set(ID, dock);
+				if (this.docks.size() > ID)
+					this.docks.set(ID, dock);
+				else
+					this.docks.add(dock);
 		}
 	}
 	

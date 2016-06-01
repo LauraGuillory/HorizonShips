@@ -76,9 +76,14 @@ public class ShipHandler
 					if (sh.equalsIgnoreCase(shipName))
 						throw new IllegalArgumentException("A ship already exists by that name.");
 		}
-				
+		
+		//Check for collisions
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
+		Location newMin = s.getMinimumPoint();
+		Location newMax = s.getMaximumPoint();
+		if (checkForCollisions(newMin, newMax))
+			throw new IllegalArgumentException("Collision detected: There is already another dock here!");
 		
 		new Ship(data, shipName, s);
 	}
@@ -162,46 +167,15 @@ public class ShipHandler
 	 */
 	void addDock(Player player, String destination) throws IllegalArgumentException
 	{	
-		//Check that the dock doesn't collide with any other destinations.
-		Set<String> destinations = new HashSet<String>();
-		boolean skipCollisionTesting = false;
-		
 		//Get the current selection of the player, which is used to determine the region of the new dock.
 		SchematicManager sm = new SchematicManager(player.getWorld());
 		Selection s = sm.getPlayerSelection(player);
 		
-		//Get the names of all the destinations saved, including temporary destinations.
-		try { destinations = data.getConfigurationSection("docks").getKeys(false);}
-		catch (IllegalArgumentException e) { skipCollisionTesting = true; }
-		
-		//New dock being verified
+		//Check for collisions
 		Location newMin = s.getMinimumPoint();
 		Location newMax = s.getMaximumPoint();
-		
-		if (!skipCollisionTesting)
-		{
-			for (String d: destinations)
-			{
-				Destination dest;
-				try {dest = new Destination(data, d, true);}
-				catch (IllegalArgumentException e) {continue;}
-				
-				for (Dock dock: dest.docks)
-				{
-					//Existing dock to check against
-					Location min = dock.getLocation();
-					Location max = new Location(min.getWorld(), min.getX() + dock.getLength(), min.getY() + dock.getHeight(), min.getZ() 
-												+ dock.getWidth());
-					
-					//Check if the regions intersect.
-					if (min.getWorld().equals(newMin.getWorld())
-							&& (newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
-							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMax.getY() <= max.getY())
-							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()))
-						throw new IllegalArgumentException("Collision detected: There is already another dock here!");
-				}
-			}
-		}
+		if (checkForCollisions(newMin, newMax))
+			throw new IllegalArgumentException("Collision detected: There is already another dock here!");
 		
 		//Add the dock
 		int length = Math.abs(newMax.getBlockX() - newMin.getBlockX());
@@ -1122,5 +1096,46 @@ public class ShipHandler
 	String getName(UUID uuid)
 	{
 		return data.getString("uuids." + uuid);
+	}
+	
+	/**
+	 * checkForCollisions() is used to ensure that any new dock does not intersect with any existing docks.
+	 * 
+	 */
+	boolean checkForCollisions(Location newMin, Location newMax)
+	{
+		Set<String> destinations = new HashSet<String>();
+		boolean skipCollisionTesting = false;
+		
+		//Get the names of all the destinations saved, including temporary destinations.
+		try { destinations = data.getConfigurationSection("docks").getKeys(false);}
+		catch (IllegalArgumentException e) { skipCollisionTesting = true; }
+		
+		if (!skipCollisionTesting)
+		{
+			for (String d: destinations)
+			{
+				Destination dest;
+				try {dest = new Destination(data, d, true);}
+				catch (IllegalArgumentException e) {continue;}
+				
+				for (Dock dock: dest.docks)
+				{
+					//Existing dock to check against
+					Location min = dock.getLocation();
+					Location max = new Location(min.getWorld(), min.getX() + dock.getLength(), min.getY() + dock.getHeight(), min.getZ() 
+												+ dock.getWidth());
+					
+					//Check if the regions intersect.
+					if (min.getWorld().equals(newMin.getWorld())
+							&& (newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
+							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMax.getY() <= max.getY())
+							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()))
+						return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }
