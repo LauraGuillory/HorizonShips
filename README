@@ -42,12 +42,12 @@ FEATURES
 	deleted at its old location each time it moves.
 - The schematic is updated each time a ship moves (enabling players to customise 
 	their ship and store items in it).
-- A ship may have a list of destinations that it may travel to, which are 
-	predefined by an administrator.
-- A ship may be piloted to any of its destinations by a player.
+- The server has a list of destinations that are predefined by an administrator.
+- A ship may be piloted to any of these destinations by a player.
 - Each ship may have a list of players who are authorised to pilot it.
 	This is defined by the owner or the administrator.
 - Each time a ship travels, there is a chance of a special event occuring.
+- Ships can break down after travel.
 - A player may diagnose a damaged ship to discover which item is required
 	to repair it. The item required is configurable, including custom names,
 	and whether the item is consumed upon repair.
