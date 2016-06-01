@@ -35,33 +35,46 @@ public class ShipProtector implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreakBlock(BlockBreakEvent event)
 	{
-		Set<String> ships;
-		try { ships = data.getConfigurationSection("ships").getKeys(false); }
-		catch (NullPointerException e)
-		{ return; }
-		
-		Ship ship;
+		Set<String> destinations;
+		Set<String> docks;
+		Dock dock;
 		Location min;
 		Location max;
 		Player player = event.getPlayer();
-		int x = event.getBlock().getX();
-		int y = event.getBlock().getY();
-		int z = event.getBlock().getZ();
+		int x = player.getLocation().getBlockX();
+		int y = player.getLocation().getBlockY();
+		int z = player.getLocation().getBlockZ();
+		Ship ship;
 		
-		//Check if the block is in any destination of any ship.
-		for (String s: ships)
+		//Get all the destinations. If there are none, return because there are no regions to protect.
+		try { destinations = data.getConfigurationSection("docks").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
+		
+		//Check if the block is in any dock with a ship inside.
+		for (String dest: destinations)
 		{
-			ship = new Ship(data, s);
-			Set<String> destinations = ship.getAllDestinations();
+			//Get all the docks. If there are none, continue to the next destination.
+			try { docks = data.getConfigurationSection("docks." + dest).getKeys(false); }
+			catch (NullPointerException e)
+			{ continue; }
 			
-			for (String d: destinations)
+			for (String d: docks)
 			{
-				min = ship.getDestination(d).getLocation();
-				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockZ() + ship.getWidth());
+				dock = new Dock(data, dest, Integer.parseInt(d));
 				
-				if (min.getWorld() == null)
+				//If the dock doesn't have a ship inhabiting it, continue to the next dock.
+				if (dock.getShip() == null)
 					continue;
+				
+				//If the dock isn't loaded in the world, no point protecting it.
+				if (!dock.exists())
+					continue;
+				
+				//Now check if the block is within the ship region.
+				min = dock.getLocation();
+				max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(),
+						min.getBlockZ() + dock.getWidth());
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x
@@ -69,12 +82,13 @@ public class ShipProtector implements Listener
 						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 				{
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
-					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) && !ship.isPilot(player.getUniqueId())
-							&& !player.hasPermission("horizonships.admin.canbuildinsideships"))
+					ship = new Ship(data, dock.getShip());
+					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) 
+							&& !ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.canbuildinsideships"))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
-					}	
+					}
 					//If the player IS, make sure they have access.
 					else
 						event.setCancelled(false);
@@ -91,33 +105,46 @@ public class ShipProtector implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event)
 	{
-		Set<String> ships;
-		try { ships = data.getConfigurationSection("ships").getKeys(false); }
-		catch (NullPointerException e)
-		{ return; }
-		
-		Ship ship;
+		Set<String> destinations;
+		Set<String> docks;
+		Dock dock;
 		Location min;
 		Location max;
 		Player player = event.getPlayer();
-		int x = event.getBlock().getX();
-		int y = event.getBlock().getY();
-		int z = event.getBlock().getZ();
+		int x = player.getLocation().getBlockX();
+		int y = player.getLocation().getBlockY();
+		int z = player.getLocation().getBlockZ();
+		Ship ship;
 		
-		//Check if the block is in any destination of any ship.
-		for (String s: ships)
+		//Get all the destinations. If there are none, return because there are no regions to protect.
+		try { destinations = data.getConfigurationSection("docks").getKeys(false); }
+		catch (NullPointerException e)
+		{ return; }
+		
+		//Check if the block is in any dock with a ship inside.
+		for (String dest: destinations)
 		{
-			ship = new Ship(data, s);
-			Set<String> destinations = ship.getAllDestinations();
+			//Get all the docks. If there are none, continue to the next destination.
+			try { docks = data.getConfigurationSection("docks." + dest).getKeys(false); }
+			catch (NullPointerException e)
+			{ continue; }
 			
-			for (String d: destinations)
+			for (String d: docks)
 			{
-				min = ship.getDestination(d).getLocation();
-				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockZ() + ship.getWidth());
+				dock = new Dock(data, dest, Integer.parseInt(d));
 				
-				if (min.getWorld() == null)
+				//If the dock doesn't have a ship inhabiting it, continue to the next dock.
+				if (dock.getShip() == null)
 					continue;
+				
+				//If the dock isn't loaded in the world, no point protecting it.
+				if (!dock.exists())
+					continue;
+				
+				//Now check if the block is within the ship region.
+				min = dock.getLocation();
+				max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(),
+						min.getBlockZ() + dock.getWidth());
 				
 				if (min.getWorld().equals(player.getLocation().getWorld()) 
 						&& min.getBlockX() <= x && max.getBlockX() >= x
@@ -125,12 +152,13 @@ public class ShipProtector implements Listener
 						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 				{
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
-					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) && !ship.isPilot(player.getUniqueId())
-							&& !player.hasPermission("horizonships.admin.canbuildinsideship"))
+					ship = new Ship(data, dock.getShip());
+					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) 
+							&& !ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.canbuildinsideships"))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
-					}	
+					}
 					//If the player IS, make sure they have access.
 					else
 						event.setCancelled(false);

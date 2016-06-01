@@ -13,10 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldedit.regions.RegionOperationException;
 
 @SuppressWarnings("deprecation")
 public class HorizonCommandParser implements CommandExecutor 
@@ -335,7 +333,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean shipCreate(CommandSender sender, String arg)
+	private boolean shipCreate(CommandSender sender, String shipName)
 	{
 		Player player;
 		
@@ -357,7 +355,7 @@ public class HorizonCommandParser implements CommandExecutor
 
 		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
 				+ " Type '/ship confirm create' to confirm.");
-		confirmCreate.put(player.getName(), arg);
+		confirmCreate.put(player.getName(), shipName);
 		confirmCreateTimeout(sender);
 		
 		return true;
@@ -451,6 +449,13 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
+	/**
+	 * addDestination() adds a new destination which is used to group docks.
+	 * 
+	 * @param sender
+	 * @param destination
+	 * @return
+	 */
 	private boolean addDestination(CommandSender sender, String destination)
 	{
 		Player player;
@@ -471,7 +476,7 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		shipHandler.addDestination(sender, destination);
+		shipHandler.addDestination(destination);
 		sender.sendMessage(ChatColor.YELLOW + "Empty destination " + destination + " created.");
 		return true;
 	}
@@ -989,14 +994,15 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean confirmCreate(CommandSender sender)
 	{
 		Player player;
+		String argument = confirmCreate.get(sender.getName());
 		
-		if (confirmCreate.get(sender.getName()) == null)
+		//Check that the player actually has a delayed /ship create action.
+		if (argument == null)
 		{
 			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
 			return false;
 		}
 		
-		String argument = confirmCreate.get(sender.getName());
 		confirmCreate.remove(sender.getName());
 		player = Bukkit.getPlayer(sender.getName());
 
@@ -1010,7 +1016,6 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		} catch (NullPointerException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
-			e.printStackTrace();
 			return false;
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());

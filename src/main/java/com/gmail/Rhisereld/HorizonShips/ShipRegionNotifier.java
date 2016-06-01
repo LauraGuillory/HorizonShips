@@ -13,14 +13,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
- * ShipRegionNotifier monitors all player's locations and notifies them if they enter or leave a region that defines a ship.
+ * ShipRegionNotifier monitors all player's locations and notifies them if they enter or leave a region that defines a dock.
  * 
  * @author Rhisereld
  */
 public class ShipRegionNotifier implements Listener
 {
 	FileConfiguration data;
-	HashMap<String, String> playersInsideShip = new HashMap<String, String>();
+	HashMap<String, String> playersInsideDocks = new HashMap<String, String>();
 	
 	public ShipRegionNotifier(FileConfiguration data)
 	{
@@ -43,64 +43,91 @@ public class ShipRegionNotifier implements Listener
 		if (event.getFrom().getBlockX() == x && event.getFrom().getBlockY() == y && event.getFrom().getBlockZ() == z)
 			return;
 
-		//Check if the new destination is inside any of these ships
-		Set<String> ships;
+		//Check if the new destination is inside any docks
+		Set<String> destinations;
+		Set<String> docks;
 		
-		try { ships = data.getConfigurationSection("ships").getKeys(false); }
+		try { destinations = data.getConfigurationSection("docks.").getKeys(false); }
 		catch (NullPointerException e)
 		{ return; }
 		
-		Ship ship;
 		Location min;
 		Location max;
 		Player player = event.getPlayer();
 		
 		//If player is currently inside a ship, detect leaving the region
-		if (playersInsideShip.containsKey(player.getName()))
+		if (playersInsideDocks.containsKey(player.getName()))
 		{			
-			ship = new Ship(data, playersInsideShip.get(player.getName()));
-			min = ship.getCurrentDestination().getLocation();
-			max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-					min.getBlockZ() + ship.getWidth());
+			String[] arguments = playersInsideDocks.get(player.getName()).split(" ");
+			Dock dock = new Dock(data, arguments[0], Integer.parseInt(arguments[1]));
+			min = dock.getLocation();
+			max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(), 
+					min.getBlockZ() + dock.getWidth());
 			
-			if (min.getWorld() == null)
+			//If the dock isn't in a world that's loaded, how is the player inside it?
+			if (!dock.exists())
+			{
+				playersInsideDocks.remove(player.getName());
 				return;
+			}
 
+			//Check if the player has left the dock region.
 			if (!min.getWorld().equals(player.getLocation().getWorld()) 
 					|| min.getBlockX() > x || max.getBlockX() < x
 					|| min.getBlockY() >= y || max.getBlockY() < y
 					|| min.getBlockZ() > z || max.getBlockZ() < z)
 			{
 				//If so, notify the player
-				player.sendMessage(ChatColor.GOLD + "Now leaving ship: " + ship.getName());
-				//Remove player from list of players inside this ship
-				playersInsideShip.remove(player.getName());
+				player.sendMessage(ChatColor.GOLD + "Now leaving dock " + dock.getID() + " at destination " 
+				+ dock.getDestination() + ".");
+				//Remove player from list of players inside this dock
+				playersInsideDocks.remove(player.getName());
 			}
 		}
-		//If player is not currently inside a ship, detect entering the region
+		//If player is not currently inside a dock, detect entering the region
 		else
 		{	
-			for (String s: ships)
+			for (String dest: destinations)
 			{
-				ship = new Ship(data, s);
-				min = ship.getCurrentDestination().getLocation();
-				max = new Location(min.getWorld(), min.getBlockX() + ship.getLength(), min.getBlockY() + ship.getHeight(), 
-						min.getBlockZ() + ship.getWidth());
+				//Get the docks at this destination. If there are no docks, continue to the next destination immediately.
+				try { docks = data.getConfigurationSection("docks." + dest).getKeys(false); }
+				catch (NullPointerException e)
+				{ continue; }
 				
-				if (min.getWorld() == null)
-					continue;
+				Dock dock;
 				
-				if (min.getWorld().equals(player.getLocation().getWorld()) 
-						&& min.getBlockX() <= x && max.getBlockX() >= x
-						&& min.getBlockY() < y && max.getBlockY() >= y
-						&& min.getBlockZ() <= z && max.getBlockZ() >= z)
+				//Go through each dock.
+				for (String d: docks)
 				{
-					//If so, notify the player
-					player.sendMessage(ChatColor.GOLD + "Now entering ship: " + ship.getName());
-					//Add player to list of players inside this ship
-					playersInsideShip.put(player.getName(), ship.getName());
-					//No need to check the rest if it's found.
-					break;
+					dock = new Dock(data, dest, Integer.parseInt(d));
+					min = dock.getLocation();
+					max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(), 
+							min.getBlockZ() + dock.getWidth());
+					
+					//If the dock isn't in a world that's loaded, skip it.
+					if (!dock.exists())
+						continue;
+					
+					//Check if the player is within the region.
+					if (min.getWorld().equals(player.getLocation().getWorld()) 
+							&& min.getBlockX() <= x && max.getBlockX() >= x
+							&& min.getBlockY() < y && max.getBlockY() >= y
+							&& min.getBlockZ() <= z && max.getBlockZ() >= z)
+					{
+						//If so, notify the player
+						player.sendMessage(ChatColor.GOLD + "Now entering dock " + dock.getID() + " at destination " 
+											+ dest + ".");
+						//If a ship is docked here, notify the player of that as well.
+						if (dock.getShip() != null)
+						{
+							Ship ship = new Ship(data, dock.getShip());
+							player.sendMessage(ChatColor.GOLD + "The ship " + ship.getName() + " is docked here.");
+						}
+						//Add player to list of players inside this ship
+						playersInsideDocks.put(player.getName(), dest + dock.getID());
+						//No need to check the rest if it's found.
+						break;
+					}
 				}
 			}
 		}

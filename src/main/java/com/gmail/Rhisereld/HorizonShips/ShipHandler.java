@@ -118,7 +118,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	void addDestination(Player player, String destinationName)
+	void addDestination(String destinationName)
 	{
 		new Destination(data, destinationName, false);
 	}
@@ -268,6 +268,7 @@ public class ShipHandler
 	 * moveShip() handles all the actions required when a player pilots a ship from one destination to another.
 	 * It saves the schematic at current location, pastes the schematic at the new location, teleports all the players within the
 	 * ship's region to the new location, erases the old ship, and reduces the ship fuel by one.
+	 * The dock to move the ship to is also selected based on ship size.
 	 * 
 	 * @param player
 	 * @param destination
@@ -276,7 +277,7 @@ public class ShipHandler
 	 * @throws MaxChangedBlocksException
 	 * @throws IllegalArgumentException
 	 */
-	void moveShip(Player player, String destination) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
+	void moveShip(Player player, String destinationName) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
 	{
 		//Ensure that the player has the tier requirement
 		UUID uuid = player.getUniqueId();
@@ -294,7 +295,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
 		//Make sure they are not trying to fly to the current destination
-		if (ship.getDock().getDestination().equalsIgnoreCase(destination))
+		if (ship.getDock().getDestination().equalsIgnoreCase(destinationName))
 			throw new IllegalArgumentException("You are already at that destination!");
 		
 		//Make sure the player is a permitted pilot
@@ -309,21 +310,11 @@ public class ShipHandler
 		if (ship.getFuel() == 0)
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
-		//Make sure the destination is valid.
-		if (data.getConfigurationSection("docks." + destination) == null || destination.equalsIgnoreCase("temp"))
-		{
-			Set<String> destinations = data.getConfigurationSection("docks.").getKeys(false);
-			String message = "That destination does not exist. Valid destinations: ";
-			
-			if (destinations.isEmpty())
-				message += "None";
-			else
-				for (String d: destinations)
-					if (!d.equalsIgnoreCase("temp"))
-						message += d + " ";
-			
-			throw new IllegalArgumentException(message);
-		}
+		//Check that the destination exists
+		Destination destination;
+		try { destination = new Destination(data, destinationName, true); }
+		//When creating a new destination, this will only be thrown if the destination doesn't exist.
+		catch (IllegalArgumentException e) { throw e; }
 
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
@@ -343,7 +334,7 @@ public class ShipHandler
 		int chosenSpareVolume = -1;
 		for (String id: data.getConfigurationSection("docks." + destination).getKeys(false))
 		{
-			dock = new Dock(data, destination, Integer.parseInt(id));
+			dock = new Dock(data, destinationName, Integer.parseInt(id));
 			if (dock.getLength() >= ship.getLength() &&
 					dock.getHeight() >= ship.getHeight() &&
 					dock.getWidth() >= ship.getWidth())
@@ -361,10 +352,10 @@ public class ShipHandler
 		if (chosenID == -1)
 			throw new IllegalArgumentException("There are no docks at that location that fit the ship!");
 		
-		Dock newDock = new Dock(data, destination, chosenID);
+		Dock newDock = new Dock(data, destinationName, chosenID);
 
 		//Paste schematic at new location
-		Location newLocation = new Dock(data, destination, chosenID).getLocation();
+		Location newLocation = newDock.getLocation();
 		sm = new SchematicManager(newLocation.getWorld());		//Each schematic manager may only apply to one world.
 		sm.loadSchematic(newLocation, ship.getName() + "\\ship");
 
@@ -382,7 +373,7 @@ public class ShipHandler
 			prof.addExperience(uuid, professionReq, config.getInt("professionReqs." + professionReq + ".exp"));
 		
 		//No event if the location is limbo
-		if (destination.equalsIgnoreCase(config.getString("limbo_name")))
+		if (destinationName.equalsIgnoreCase(config.getString("limbo_name")))
 		{
 			//Change the current dock
 			ship.setDock(newDock);
@@ -532,8 +523,6 @@ public class ShipHandler
 				return;
 			}
 		}
-
-		
 		
 		//If they are and the item is consumable, remove one of that item
 		if (ship.getConsumePart())
@@ -820,7 +809,7 @@ public class ShipHandler
 	}
 	
 	/**
-	 * removePilot() ensures that the sender is an owner of theship or an administrator,
+	 * removePilot() ensures that the sender is an owner of the ship or an administrator,
 	 * then removes the pilot given from the list of permitted pilots for the ship given.
 	 * 
 	 * @param sender
