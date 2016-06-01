@@ -679,6 +679,7 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "OWNER: " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "DESTINATIONS: " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "CURRENT LOCATION: " + ChatColor.WHITE + currentDestination);
+			sender.sendMessage(ChatColor.YELLOW + "DOCK NUMBER: " + ChatColor.WHITE + ship.getDock().getID());
 			sender.sendMessage(ChatColor.YELLOW + "DIMENSIONS: " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "PERMITTED PILOTS: " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "MECHANICAL CONDITION: " + conditionStatus + condition);
@@ -692,6 +693,7 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
+			sender.sendMessage(ChatColor.YELLOW + "Dock number:           " + ChatColor.WHITE + ship.getDock().getID());
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:      " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + conditionStatus + condition);
