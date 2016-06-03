@@ -134,4 +134,13 @@ public class Destination
 	{
 		return docks;
 	}
+	
+	/**
+	 * delete() removes the destination and all contained docks from file.
+	 * The instance should not continue to be used after this is called.
+	 */
+	void delete()
+	{
+		data.getConfigurationSection("docks").set(name, null);
+	}
 }

@@ -149,6 +149,10 @@ public class ShipHandler
 	 */
 	void removeDestination(String destinationName) throws IllegalArgumentException
 	{	
+		//Make sure the destination isn't "temp" - that's reserved.
+		if (destinationName.equalsIgnoreCase("temp"))
+			throw new IllegalArgumentException("You cannot remove that destination.");
+		
 		//Check that the destination exists
 		Destination destination;
 		try { destination = new Destination(data, destinationName, true); }
@@ -166,6 +170,9 @@ public class ShipHandler
 				ship.setDock(dock);
 			}
 		}
+		
+		//Remove the destination
+		destination.delete();
 	}
 	
 	/**
