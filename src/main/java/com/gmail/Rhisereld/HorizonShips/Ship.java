@@ -143,7 +143,7 @@ public class Ship
 			Destination destination;
 			try { destination = new Destination(data, "temp", false); }
 			catch (IllegalArgumentException e) { destination = new Destination(data, "temp", true); }
-			destination.docks.remove(oldDock);
+			destination.getDocks().remove(oldDock);
 			oldDock.delete();
 		}
 			

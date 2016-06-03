@@ -10,9 +10,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 //Each dock within a destination is identified by a number.
 public class Destination 
 {
-	String name;
-	ArrayList<Dock> docks = new ArrayList<Dock>();
-	FileConfiguration data;
+	private String name;
+	private ArrayList<Dock> docks = new ArrayList<Dock>();
+	private FileConfiguration data;
 
 	/**
 	 * Constructor for destination.
@@ -123,5 +123,15 @@ public class Destination
 	String getName()
 	{
 		return name;
+	}
+	
+	/**
+	 * getDocks() returns all docks in this destination.
+	 * 
+	 * @return
+	 */
+	ArrayList<Dock> getDocks()
+	{
+		return docks;
 	}
 }

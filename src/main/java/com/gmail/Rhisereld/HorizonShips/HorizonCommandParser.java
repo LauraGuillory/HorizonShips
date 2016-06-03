@@ -180,6 +180,18 @@ public class HorizonCommandParser implements CommandExecutor
 				if (args[1].equalsIgnoreCase("destinations"))
 					return listDestinations(sender);
 				
+				//ship list docks [destination]
+				if (args[1].equalsIgnoreCase("docks"))
+				{
+					if (args.length < 3)
+					{
+						sender.sendMessage(ChatColor.RED + "For which destination? Use /ship list docks [destination].");
+						return false;
+					}
+					
+					return listDocks(sender, args[2]);
+				}
+				
 				sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations");
 				return false;
 			}
@@ -624,6 +636,19 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		shipHandler.listDestinations(sender);
+		return true;
+	}
+	
+	private boolean listDocks(CommandSender sender, String destination)
+	{
+		//Check that the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.list") && sender instanceof Player)
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
+			return false;
+		}
+		
+		shipHandler.listDocks(sender, destination);
 		return true;
 	}
 	
@@ -1371,8 +1396,8 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.list"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship list ships/destinations");
-			sender.sendMessage("Provides a list of all current ships or all current destinations.");
+			sender.sendMessage(ChatColor.YELLOW + "/ship list ships/destinations/docks");
+			sender.sendMessage("Provides a list of all current ships, destinations or docks.");
 		}
 		if (sender.hasPermission("horizonships.info"))
 		{

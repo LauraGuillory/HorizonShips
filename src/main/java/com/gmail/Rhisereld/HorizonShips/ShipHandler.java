@@ -152,7 +152,7 @@ public class ShipHandler
 		catch (IllegalArgumentException e) { throw e; }
 		
 		//If there are any ships at that destination, create temporary docks for them.
-		ArrayList<Dock> docks = destination.docks;
+		ArrayList<Dock> docks = destination.getDocks();
 		for (Dock d: docks)
 		{
 			if (d.getShip() != null)
@@ -201,8 +201,7 @@ public class ShipHandler
 	void removeDock(CommandSender sender, String destinationName, String dockNumber) throws IllegalArgumentException, NumberFormatException
 	{
 		//Check that the destination exists
-		try { @SuppressWarnings("unused")
-		Destination destination = new Destination(data, destinationName, true); }
+		try { new Destination(data, destinationName, true); }
 		//When creating a new destination, this will only be thrown if the destination doesn't exist.
 		catch (IllegalArgumentException e) { throw e; }
 		
@@ -282,6 +281,32 @@ public class ShipHandler
 		}
 		
 		sender.sendMessage(ChatColor.YELLOW + list);
+	}
+	
+	/**
+	 * listDocks() sends the sender a list of docks of the requested destination.
+	 * 
+	 * @param sender
+	 * @param docks
+	 */
+	void listDocks(CommandSender sender, String destinationName)
+	{
+		//Check that the destination exists
+		try { new Destination(data, destinationName, true); }
+		//When creating a new destination, this will only be thrown if the destination doesn't exist.
+		catch (IllegalArgumentException e) { throw e; }
+		
+
+		sender.sendMessage(ChatColor.YELLOW + "Destination " + destinationName + " contains...");
+		
+		Destination destination = new Destination(data, destinationName, true);
+		for (Dock d: destination.getDocks())
+		{
+			sender.sendMessage(ChatColor.YELLOW + "Dock " + d.getID() + " at (" + d.getLocation().getBlockX() + "," 
+								+ d.getLocation().getBlockY() + "," + d.getLocation().getBlockZ() + ") to ("
+								+ (d.getLocation().getBlockX() + d.getLength()) + "," + (d.getLocation().getBlockY() 
+								+ d.getHeight()) + "," + (d.getLocation().getBlockZ() + d.getWidth()) + ").");
+		}
 	}
 	
 	/**
@@ -1165,7 +1190,7 @@ public class ShipHandler
 				try {dest = new Destination(data, d, true);}
 				catch (IllegalArgumentException e) {continue;}
 				
-				for (Dock dock: dest.docks)
+				for (Dock dock: dest.getDocks())
 				{
 					//Existing dock to check against
 					Location min = dock.getLocation();
