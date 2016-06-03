@@ -165,7 +165,24 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship list
 			if (args[0].equalsIgnoreCase("list"))
-				return listShips(sender, args);
+			{
+				if (args.length < 2)
+				{
+					sender.sendMessage(ChatColor.RED + "Incorrect format.");
+					return false;
+				}
+				
+				//ship list ships
+				if (args[1].equalsIgnoreCase("ships"))
+					return listShips(sender);
+				
+				//ship list destinations
+				if (args[1].equalsIgnoreCase("destinations"))
+					return listDestinations(sender);
+				
+				sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations");
+				return false;
+			}
 			
 			//ship pilot [destination]
 			if (args[0].equalsIgnoreCase("pilot"))
@@ -414,13 +431,14 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		try { shipHandler.addDock(player, destination); } 
+		int dockID = -1;
+		try { dockID = shipHandler.addDock(player, destination); } 
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
-		sender.sendMessage(ChatColor.YELLOW + "Ship dock created and assigned ID: ");
+		sender.sendMessage(ChatColor.YELLOW + "Ship dock created and assigned ID: " + dockID);
 		return true;
 	}
 	
@@ -569,14 +587,14 @@ public class HorizonCommandParser implements CommandExecutor
 	}
 	
 	/**
-	 * listShips() performs all the checks necessary for the /ship list command,
+	 * listShips() performs all the checks necessary for the /ship list ships command,
 	 * then calls the shipHandler class to carry out the action.
 	 * 
 	 * @param sender
 	 * @param args
 	 * @return
 	 */
-	private boolean listShips(CommandSender sender, String[] args)
+	private boolean listShips(CommandSender sender)
 	{
 		//Check that the player has permission OR is the console
 		if (!sender.hasPermission("horizonships.list") && sender instanceof Player)
@@ -586,6 +604,26 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		
 		shipHandler.listShips(sender);
+		return true;
+	}
+	
+	/**
+	 * listDestinations performs all the checks necessary for the /ship list destinations command,
+	 * then calls the shipHandler class to carry out the action.
+	 * 
+	 * @param sender
+	 * @return
+	 */
+	private boolean listDestinations(CommandSender sender)
+	{
+		//Check that the player has permission OR is the console
+		if (!sender.hasPermission("horizonships.list") && sender instanceof Player)
+		{
+			sender.sendMessage(ChatColor.RED + "You don't have permission to view this.");
+			return false;
+		}
+		
+		shipHandler.listDestinations(sender);
 		return true;
 	}
 	
@@ -1333,8 +1371,8 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.list"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship list");
-			sender.sendMessage("Provides a list of all current ships.");
+			sender.sendMessage(ChatColor.YELLOW + "/ship list ships/destinations");
+			sender.sendMessage("Provides a list of all current ships or all current destinations.");
 		}
 		if (sender.hasPermission("horizonships.info"))
 		{

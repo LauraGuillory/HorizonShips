@@ -174,7 +174,7 @@ public class ShipHandler
 	 * @param height
 	 * @throws IllegalArgumentException
 	 */
-	void addDock(Player player, String destinationName) throws IllegalArgumentException
+	int addDock(Player player, String destinationName) throws IllegalArgumentException
 	{	
 		//Check that the destination exists.
 		try { new Destination(data, destinationName, true); }
@@ -194,7 +194,8 @@ public class ShipHandler
 		int length = Math.abs(newMax.getBlockX() - newMin.getBlockX());
 		int height = Math.abs(newMax.getBlockY() - newMin.getBlockY());
 		int width = Math.abs(newMax.getBlockZ() - newMin.getBlockZ());
-		new Dock(data, destinationName, s.getMinimumPoint(), length, height, width);
+		Dock dock = new Dock(data, destinationName, s.getMinimumPoint(), length, height, width);
+		return dock.getID();
 	}
 	
 	void removeDock(CommandSender sender, String destinationName, String dockNumber) throws IllegalArgumentException, NumberFormatException
@@ -243,6 +244,36 @@ public class ShipHandler
 			list = list.concat(ship + ", ");
 		
 		if (ships.size() == 0)
+			list = list.concat("None.");
+		else if (list.length() > 0)
+		{
+			list = list.substring(0, list.length() - 2);
+			list = list.concat(".");
+		}
+		
+		sender.sendMessage(ChatColor.YELLOW + list);
+	}
+	
+	/**
+	 * listDestinations() sends the sender a list of names of all the existing destinations.
+	 * 
+	 * @param sender
+	 */
+	void listDestinations(CommandSender sender)
+	{
+		Set<String> destinations;
+		try { destinations = data.getConfigurationSection("docks").getKeys(false); }
+		catch (NullPointerException e)
+		{ 
+			sender.sendMessage(ChatColor.YELLOW + "Destinations currently saved: None");
+			return;
+		}
+		String list = "Destinations currently saved: ";
+		
+		for (String dest: destinations)
+			list = list.concat(dest + ", ");
+		
+		if (destinations.size() == 0)
 			list = list.concat("None.");
 		else if (list.length() > 0)
 		{
