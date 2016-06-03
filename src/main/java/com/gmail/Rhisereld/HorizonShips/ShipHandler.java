@@ -132,8 +132,12 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	void addDestination(String destinationName)
+	void addDestination(String destinationName) throws IllegalArgumentException
 	{
+		//Make sure the destination isn't "temp" - that's reserved.
+		if (destinationName.equalsIgnoreCase("temp"))
+			throw new IllegalArgumentException("You cannot make a destination by that name.");
+		
 		new Destination(data, destinationName, false);
 	}
 	
