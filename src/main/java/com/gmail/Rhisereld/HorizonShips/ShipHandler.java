@@ -147,7 +147,7 @@ public class ShipHandler
 	 * @param shipName
 	 * @param destinationName
 	 */
-	void removeDestination(String shipName, String destinationName) throws IllegalArgumentException
+	void removeDestination(String destinationName) throws IllegalArgumentException
 	{	
 		//Check that the destination exists
 		Destination destination;

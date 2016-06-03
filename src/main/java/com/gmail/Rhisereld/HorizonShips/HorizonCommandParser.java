@@ -139,7 +139,7 @@ public class HorizonCommandParser implements CommandExecutor
 				//ship remove destination [destinationName]
 				if (args[1].equalsIgnoreCase("destination"))
 					if (args.length >= 3)
-						return removeDestination(sender, args);
+						return removeDestination(sender, args[2]);
 					else
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "
 								+ "remove destination [destinationName]");
@@ -192,7 +192,7 @@ public class HorizonCommandParser implements CommandExecutor
 					return listDocks(sender, args[2]);
 				}
 				
-				sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations");
+				sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, docks");
 				return false;
 			}
 			
@@ -519,7 +519,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean removeDestination(CommandSender sender, String[] args)
+	private boolean removeDestination(CommandSender sender, String destination)
 	{
 		//Check the player has permission OR is the console
 		if (!sender.hasPermission("horizonships.admin.destination.remove") && sender instanceof Player)
@@ -528,10 +528,10 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		sender.sendMessage(ChatColor.YELLOW + "Are you sure you wish to remove the destination " + args[3] + " from "
-						+ args[2] + "? All docks at this destination will be removed. Type '/ship confirm remove "
+		sender.sendMessage(ChatColor.YELLOW + "Are you sure you wish to remove the destination " + destination 
+						+ "? All docks at this destination will be removed. Type '/ship confirm remove "
 						+ "destination' to confirm.");
-		confirmRemoveDestination.put(sender.getName(), args[2] + " " + args[3]);
+		confirmRemoveDestination.put(sender.getName(), destination);
 		confirmRemoveDestinationTimeout(sender);
 		return true;
 	}
@@ -1139,10 +1139,10 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 
 		//Remove destination
-		String[] arguments = confirmRemoveDestination.get(name).split(" ");
+		String destination = confirmRemoveDestination.get(name);
 		confirmRemoveDestination.remove(name);
 		try {
-			shipHandler.removeDestination(arguments[0], arguments[1]);
+			shipHandler.removeDestination(destination);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
