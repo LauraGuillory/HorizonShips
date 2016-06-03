@@ -1141,12 +1141,20 @@ public class ShipHandler
 					Location max = new Location(min.getWorld(), min.getX() + dock.getLength(), min.getY() + dock.getHeight(), min.getZ() 
 												+ dock.getWidth());
 					
-					//Check if the regions intersect.
-					if (min.getWorld().equals(newMin.getWorld())
-							&& (newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
-							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMax.getY() <= max.getY())
-							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()))
-						return true;
+					if (min.getWorld().equals(newMin.getWorld()))
+					{
+						//New dock is inside the old dock
+						if ((newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
+							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMin.getY() <= max.getY())
+							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMin.getZ() <= max.getZ()))
+							return true;
+						
+						//Old dock is inside the new dock
+						if ((max.getX() >= newMin.getX() && max.getX() <= newMax.getX() || min.getX() >= newMin.getX() && min.getX() <= newMax.getX())
+							&& (max.getY() >= newMin.getY() && max.getY() <= newMax.getY() || min.getY() >= newMin.getY() && min.getY() <= newMax.getY())
+							&& (max.getZ() >= newMin.getZ() && max.getZ() <= newMax.getZ() || min.getZ() >= newMin.getZ() && min.getZ() <= newMax.getZ()))
+							return true;
+					}
 				}
 			}
 		}

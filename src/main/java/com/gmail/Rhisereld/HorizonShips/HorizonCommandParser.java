@@ -815,7 +815,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	public boolean transferShip(CommandSender sender, String[] args)
+	private boolean transferShip(CommandSender sender, String[] args)
 	{
 		Player player;
 		
@@ -851,7 +851,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	public boolean renameShip(CommandSender sender, String[] args)
+	private boolean renameShip(CommandSender sender, String[] args)
 	{
 		//Check that they have permission.
 		if (!sender.hasPermission("horizonships.rename") && !sender.hasPermission("horizonships.admin.rename"))
@@ -880,7 +880,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	public boolean teleport(CommandSender sender, String shipName)
+	private boolean teleport(CommandSender sender, String shipName)
 	{
 		//Check that they have permission and is a player
 		if (!sender.hasPermission("horizonships.admin.teleport") || !(sender instanceof Player))
@@ -908,7 +908,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	public boolean forceRefuel(CommandSender sender, String shipName)
+	private boolean forceRefuel(CommandSender sender, String shipName)
 	{
 		//Check that they have permission
 		if (!sender.hasPermission("horizonships.admin.forcerefuel"))
@@ -936,7 +936,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	public boolean forceRepair(CommandSender sender, String shipName)
+	private boolean forceRepair(CommandSender sender, String shipName)
 	{
 		//Check that they have permission
 		if (!sender.hasPermission("horizonships.admin.forcerepair"))
@@ -964,7 +964,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	public boolean forceBreak(CommandSender sender, String shipName)
+	private boolean forceBreak(CommandSender sender, String shipName)
 	{
 		//Check that they have permission
 		if (!sender.hasPermission("horizonships.admin.forcebreak"))
