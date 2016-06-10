@@ -85,7 +85,7 @@ public class ShipHandler
 		if (checkForCollisions(newMin, newMax))
 			throw new IllegalArgumentException("Collision detected: There is already another dock here!");
 		
-		new Ship(data, shipName, s);
+		new Ship(data, shipName, newMin, newMax);
 	}
 
 	/**
@@ -97,21 +97,12 @@ public class ShipHandler
 	 */
 	void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
 	{
-		Set<String> ships = new HashSet<String>();
-		try { ships = data.getConfigurationSection("ships").getKeys(false); }
-		catch (NullPointerException e)
-		{ }
-		boolean shipFound = false;
-		
 		//Check that the ship exists
-		for (String s : ships)
-			if (s.equalsIgnoreCase(shipName))
-				shipFound = true;
-		if (!shipFound)
-			throw new IllegalArgumentException("Ship not found.");
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Remove the ship reference the dock it is inhabiting.
-		Ship ship = new Ship(data, shipName);
 		Dock dock = ship.getDock();
 		dock.updateShipName(shipName);
 		
@@ -665,12 +656,10 @@ public class ShipHandler
 	 */
 	void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
 	{
-		//Get the ship
-		Ship ship = new Ship(data, shipName);
-		
-		//Check the ship actually exists
-		if (!ship.exists())
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Check that the person checking is the owner, a permitted pilot, an admin, or the console
 		Player player = null;
@@ -785,12 +774,10 @@ public class ShipHandler
 	 */
 	void setOwner(CommandSender sender, String shipName, String owner) throws IllegalArgumentException
 	{
-		//Get the ship
-		Ship ship = new Ship(data, shipName);
-		
-		//Ensure the ship actually exists
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Set the new owner
 		UUID uuid = getUUID(owner);
@@ -810,12 +797,10 @@ public class ShipHandler
 	 */
 	void transfer(Player owner, String shipName, String newOwner)
 	{
-		//Get the ship
-		Ship ship = new Ship(data, shipName);
-		
-		//Ensure the ship actually exists
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Ensure the player is the owner of the ship
 		if (!owner.getUniqueId().equals(ship.getOwner()))
@@ -840,10 +825,10 @@ public class ShipHandler
 	 */
 	void addPilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
@@ -876,10 +861,10 @@ public class ShipHandler
 	 */
 	void removePilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
@@ -912,13 +897,15 @@ public class ShipHandler
 	 * @param shipName
 	 * @param newName
 	 * @throws IllegalArgumentException
+	 * @throws IOException 
+	 * @throws DataException 
 	 */
-	void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException
+	void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException, DataException, IOException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
@@ -927,12 +914,15 @@ public class ShipHandler
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Check that a ship doesn't already exist by the new name
-		Ship newShip = new Ship(data, newName);
-		if (newShip.getName() != null)
-			throw new IllegalArgumentException("A ship already exists by that name.");
+		try { new Ship(data, newName); }
+		catch (IllegalArgumentException e)
+		{
+			//Change the name
+			ship.rename(newName);
+			return;
+		}
 		
-		//Change the name
-		ship.rename(newName);
+		throw new IllegalArgumentException("A ship already exists by that name.");
 	}
 	
 	/**
@@ -944,10 +934,10 @@ public class ShipHandler
 	 */
 	void teleport(Player player, String shipName) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Teleport the player there
 		player.teleport(ship.getDock().getLocation(), TeleportCause.PLUGIN);
@@ -961,10 +951,10 @@ public class ShipHandler
 	 */
 	void forceRefuel(String shipName) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Refuel the ship.
 		ship.setFuel(config.getInt("refuel.maxtank"));
@@ -978,10 +968,10 @@ public class ShipHandler
 	 */
 	void forceRepair(String shipName) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Repair the ship.
 		ship.setBroken(false);
@@ -995,10 +985,10 @@ public class ShipHandler
 	 */
 	void forceBreak(String shipName) throws IllegalArgumentException
 	{
-		//Make sure the ship exists
-		Ship ship = new Ship(data, shipName);
-		if (ship.getName() == null)
-			throw new IllegalArgumentException("Ship not found.");
+		//Get the ship - exception will be thrown if it doesn't exist
+		Ship ship;
+		try { ship = new Ship(data, shipName); }
+		catch (IllegalArgumentException e) { throw e; }
 		
 		//Break the ship
 		ship.setBroken(true);

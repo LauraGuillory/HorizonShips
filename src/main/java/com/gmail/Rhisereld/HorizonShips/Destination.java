@@ -1,6 +1,7 @@
 package com.gmail.Rhisereld.HorizonShips;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Location;
@@ -11,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class Destination 
 {
 	private String name;
-	private ArrayList<Dock> docks = new ArrayList<Dock>();
+	private Set<Integer> docks = new HashSet<Integer>();
 	private FileConfiguration data;
 
 	/**
@@ -45,23 +46,20 @@ public class Destination
 		if (!data.getBoolean("docks." + name + ".exists"))
 			throw new IllegalArgumentException("That destination does not exist!");
 		
-		Set<String> docks = null;
-		try { docks = data.getConfigurationSection("docks." + name).getKeys(false); }
+		Set<String> dockList;
+		try { dockList = data.getConfigurationSection("docks." + name).getKeys(false); }
 		catch (NullPointerException e) { return; }
 		
 		//Add all dock objects on file to the list.
 		int ID;
 		Dock dock;
-		for (String d: docks)
+		for (String d: dockList)
 		{
 			try { ID = Integer.parseInt(d); }
 			catch (NumberFormatException e) { continue; }
 			dock = new Dock(data, name, ID);
 			if (dock.exists())
-				if (this.docks.size() > ID)
-					this.docks.set(ID, dock);
-				else
-					this.docks.add(dock);
+					this.docks.add(dock.getID());
 		}
 	}
 	
@@ -86,10 +84,7 @@ public class Destination
 	Dock addDock(Location location, int length, int height, int width) throws IllegalArgumentException
 	{
 		Dock dock = new Dock(data, name, location, length, height, width);
-		if (this.docks.size() > dock.getID())
-			this.docks.set(dock.getID(), dock);
-		else
-			this.docks.add(dock);
+		docks.add(dock.getID());
 		return dock;
 	}
 	
@@ -98,10 +93,16 @@ public class Destination
 	 * 
 	 * @param ID
 	 */
-	void removeDock(int ID)
+	void removeDock(int ID) throws IllegalArgumentException
 	{
-		docks.get(ID).delete();
-		docks.remove(ID);
+		if (docks.contains(ID))
+		{
+			Dock dock = new Dock(data, name, ID);
+			dock.delete();
+			docks.remove(ID);
+		}
+		else
+			throw new IllegalArgumentException("That dock does not exist!");
 	}
 	
 	/**
@@ -112,7 +113,7 @@ public class Destination
 	 */
 	Dock getDock(int ID)
 	{
-		return docks.get(ID);
+		return new Dock(data, name, ID);
 	}
 	
 	/**
@@ -132,7 +133,11 @@ public class Destination
 	 */
 	ArrayList<Dock> getDocks()
 	{
-		return docks;
+		ArrayList<Dock> dockList = new ArrayList<Dock>();
+		
+		for (Integer d: docks)
+			dockList.add(new Dock(data, name, d));
+		return dockList;
 	}
 	
 	/**

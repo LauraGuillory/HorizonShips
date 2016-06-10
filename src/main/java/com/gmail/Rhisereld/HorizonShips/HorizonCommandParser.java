@@ -168,7 +168,8 @@ public class HorizonCommandParser implements CommandExecutor
 			{
 				if (args.length < 2)
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect format.");
+					sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, "
+							+ "docks");
 					return false;
 				}
 				
@@ -262,7 +263,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship rename [shipName] [newShipName]
 			if (args[0].equalsIgnoreCase("rename"))
 				if (args.length == 3)
-					return renameShip(sender, args);
+					return renameShip(sender, args[1], args[2]);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship rename "
@@ -914,7 +915,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean renameShip(CommandSender sender, String[] args)
+	private boolean renameShip(CommandSender sender, String oldName, String newName)
 	{
 		//Check that they have permission.
 		if (!sender.hasPermission("horizonships.rename") && !sender.hasPermission("horizonships.admin.rename"))
@@ -925,13 +926,19 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		//Perform the action.
 		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
-		try { shipHandler.rename(sender, args[1], args[2]); }
+		try { shipHandler.rename(sender, oldName, newName); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
+		} catch (DataException | IOException e) 
+		{
+			sender.sendMessage(ChatColor.RED + e.getMessage());
+			sender.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+			e.printStackTrace();
+			return false;
 		}
-		sender.sendMessage(ChatColor.YELLOW + "Ship renamed from " + args[1] + " to " + args[2]);
+		sender.sendMessage(ChatColor.YELLOW + "Ship renamed from " + oldName + " to " + newName);
 		return true;
 	}
 	

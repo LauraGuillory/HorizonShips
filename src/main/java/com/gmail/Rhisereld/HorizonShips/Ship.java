@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
 
 /**
@@ -75,13 +74,11 @@ public class Ship
 	 * @throws DataException
 	 * @throws IOException
 	 */
-	public Ship(FileConfiguration data, String name, Selection selection) throws DataException, IOException
+	public Ship(FileConfiguration data, String name, Location min, Location max) throws DataException, IOException
 	{
 		this.data = data;
 		String path = "ships." + name + ".";
 		
-		Location min = selection.getMinimumPoint();
-		Location max = selection.getMaximumPoint();
 		setName(name);
 		setFuel(10);
 		setBroken(false);
@@ -97,8 +94,8 @@ public class Ship
 		data.set(path + ".dock.destination", destination.getName());
 		data.set(path + "dock.id", tempDock.getID());
 		
-		SchematicManager sm = new SchematicManager(selection.getMinimumPoint().getWorld());
-		sm.saveSchematic(selection, name + "\\ship");
+		SchematicManager sm = new SchematicManager(min.getWorld());
+		sm.saveSchematic(min, max, name + "\\ship");
 	}
 	
 	/**
@@ -150,7 +147,7 @@ public class Ship
 		//Set the dock
 		this.dock = dock.getID();
 		data.set("ships." + name + ".dock.destination", destination.getName());
-		data.set("ships." + name + ".dock.ID", this.dock);
+		data.set("ships." + name + ".dock.id", this.dock);
 	}
 	
 	/**
@@ -432,10 +429,14 @@ public class Ship
 	 * rename() takes all of the data under the old ship name and transfers it to a new ship name.
 	 * 
 	 * @param newName
+	 * @throws IOException 
+	 * @throws DataException 
 	 */
-	void rename(String newName)
+	void rename(String newName) throws DataException, IOException
 	{
-		Ship newShip = new Ship(data, newName);
+		Location min = destination.getDock(dock).getLocation();
+		Location max = new Location(min.getWorld(), min.getX() + length, min.getY() + height, min.getZ() + width);
+		Ship newShip = new Ship(data, newName, min, max);
 		newShip.setName(newName);
 		newShip.setLength(length);
 		newShip.setHeight(height);
