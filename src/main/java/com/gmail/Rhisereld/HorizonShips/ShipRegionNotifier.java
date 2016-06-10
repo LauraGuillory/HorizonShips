@@ -81,7 +81,7 @@ public class ShipRegionNotifier implements Listener
 			//Check if the player has left the dock region.
 			if (!min.getWorld().equals(player.getLocation().getWorld()) 
 					|| min.getBlockX() > x || max.getBlockX() < x
-					|| min.getBlockY() >= y || max.getBlockY() < y
+					|| min.getBlockY() > y || max.getBlockY() < y
 					|| min.getBlockZ() > z || max.getBlockZ() < z)
 			{
 				//If so, notify the player
@@ -122,7 +122,7 @@ public class ShipRegionNotifier implements Listener
 					//Check if the player is within the region.
 					if (min.getWorld().equals(player.getLocation().getWorld()) 
 							&& min.getBlockX() <= x && max.getBlockX() >= x
-							&& min.getBlockY() < y && max.getBlockY() >= y
+							&& min.getBlockY() <= y && max.getBlockY() >= y
 							&& min.getBlockZ() <= z && max.getBlockZ() >= z)
 					{
 						//If so, notify the player
