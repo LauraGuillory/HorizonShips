@@ -237,14 +237,14 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
-			//ship setowner [shipName] [playerName]
+			//ship setowner [playerName] [shipName]
 			if (args[0].equalsIgnoreCase("setowner"))
-				if (args.length == 3)
+				if (args.length >= 3)
 					return setOwner(sender, args);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship setowner "
-							+ "[shipName] [playerName]");
+							+ "[playerName] [shipName]");
 					return false;
 				}
 			
@@ -899,9 +899,18 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + "You don't have permission to set the owner of a ship.");
 			return false;
 		}
+		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 3; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
 
 		try {
-			shipHandler.setOwner(sender, args[1], args[2]);
+			shipHandler.setOwner(sender, sb.toString(), args[1]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
@@ -1435,12 +1444,12 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.pilot.remove"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship remove pilot [shipName] [pilotName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship remove pilot [pilotName] [shipName]");
 			sender.sendMessage("Remove a pilot from the authentication list of the ship that allows them to pilot it.");
 		}
 		if (sender.hasPermission("horizonships.admin.setowner"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship setowner [shipName] [playerName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship setowner [playerName] [shipName]");
 			sender.sendMessage("Sets the player as the owner of the ship.");
 		}
 		if (sender.hasPermission("horizonships.admin.teleport"))
