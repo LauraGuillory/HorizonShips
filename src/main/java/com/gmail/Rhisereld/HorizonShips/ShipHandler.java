@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -345,6 +346,10 @@ public class ShipHandler
 		if (ship == null)
 			throw new IllegalArgumentException("You are not inside a ship.");
 		
+		//Make sure they are not trying to fly to a temporary destination
+		if (destinationName.equalsIgnoreCase("temp"))
+			throw new IllegalArgumentException("You are not permitted to travel to that destination.");
+		
 		//Make sure they are not trying to fly to the current destination
 		if (ship.getDestination().getName().equalsIgnoreCase(destinationName))
 			throw new IllegalArgumentException("You are already at that destination!");
@@ -362,8 +367,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
 		//Check that the destination exists
-		Destination destination;
-		try { destination = new Destination(data, destinationName, true); }
+		try { new Destination(data, destinationName, true); }
 		//When creating a new destination, this will only be thrown if the destination doesn't exist.
 		catch (IllegalArgumentException e) { throw e; }
 
@@ -383,25 +387,28 @@ public class ShipHandler
 		int spareVolume;
 		int chosenID = -1;
 		int chosenSpareVolume = -1;
-		for (String id: data.getConfigurationSection("docks." + destination).getKeys(false))
-		{
-			dock = new Dock(data, destinationName, Integer.parseInt(id));
-			if (dock.getLength() >= ship.getLength() &&
+		ConfigurationSection docks = data.getConfigurationSection("docks." + destinationName);
+		if (docks != null)
+			for (String id: docks.getKeys(false))
+			{
+				try { dock = new Dock(data, destinationName, Integer.parseInt(id)); }
+				catch (NumberFormatException e) { continue; }
+				if (dock.getLength() >= ship.getLength() &&
 					dock.getHeight() >= ship.getHeight() &&
 					dock.getWidth() >= ship.getWidth())
-			{
-				spareVolume = dock.getLength() * dock.getHeight() * dock.getWidth() 
-						- ship.getLength() * dock.getHeight() * dock.getWidth();
-				if (chosenSpareVolume == -1 || chosenSpareVolume > spareVolume)
 				{
-					chosenSpareVolume = spareVolume;
-					chosenID = Integer.parseInt(id);
+					spareVolume = dock.getLength() * dock.getHeight() * dock.getWidth() 
+							- ship.getLength() * dock.getHeight() * dock.getWidth();
+					if (chosenSpareVolume == -1 || chosenSpareVolume > spareVolume)
+					{
+						chosenSpareVolume = spareVolume;
+						chosenID = Integer.parseInt(id);
+					}
 				}
 			}
-		}
 		
 		if (chosenID == -1)
-			throw new IllegalArgumentException("There are no docks at that location that fit the ship!");
+			throw new IllegalArgumentException("There are no docks at that destination that fit the ship!");
 		
 		Dock newDock = new Dock(data, destinationName, chosenID);
 
