@@ -83,7 +83,7 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship delete [shipName]
 			if (args[0].equalsIgnoreCase("delete"))
-				if (args.length == 2)
+				if (args.length >= 2)
 					return shipDelete(sender, args);
 				else
 				{
@@ -362,7 +362,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean shipCreate(CommandSender sender, String[] shipName)
+	private boolean shipCreate(CommandSender sender, String[] args)
 	{
 		Player player;
 		
@@ -386,17 +386,17 @@ public class HorizonCommandParser implements CommandExecutor
 				+ " Type '/ship confirm create' to confirm.");
 		
 		//Put together a string of the name.
-		StringBuilder sb = new StringBuilder();
-		for (String s : shipName)
+		StringBuilder shipName = new StringBuilder();
+		for (String s: args)
 		{
 			if (s.equalsIgnoreCase("create"))
 				continue;
-			sb.append(s);
-			sb.append(" ");
+			shipName.append(s);
+			shipName.append(" ");
 		}
-		sb.deleteCharAt(sb.length()-1);
+		shipName.deleteCharAt(shipName.length()-1);
 		
-		confirmCreate.put(player.getName(), sb.toString());
+		confirmCreate.put(player.getName(), shipName.toString());
 		confirmCreateTimeout(sender);
 		
 		return true;
@@ -419,9 +419,21 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		sender.sendMessage(ChatColor.YELLOW + "Are you sure you want to delete the ship " + args[1] + "?"
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (String s: args)
+		{
+			if (s.equalsIgnoreCase("delete"))
+				continue;
+			sb.append(s);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
+		sender.sendMessage(ChatColor.YELLOW + "Are you sure you want to delete the ship " + sb.toString() + "?"
 				+ " Type '/ship confirm delete' to confirm.");
-		confirmDelete.put(sender.getName(), args[1]);
+		
+		confirmDelete.put(sender.getName(), sb.toString());
 		confirmDeleteTimeout(sender);
 		
 		return true;
@@ -1076,10 +1088,10 @@ public class HorizonCommandParser implements CommandExecutor
 	private boolean confirmCreate(CommandSender sender)
 	{
 		Player player;
-		String argument = confirmCreate.get(sender.getName());
+		String shipName = confirmCreate.get(sender.getName());
 		
 		//Check that the player actually has a delayed /ship create action.
-		if (argument == null)
+		if (shipName == null)
 		{
 			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
 			return false;
@@ -1088,8 +1100,8 @@ public class HorizonCommandParser implements CommandExecutor
 		confirmCreate.remove(sender.getName());
 		player = Bukkit.getPlayer(sender.getName());
 
-		try {	shipHandler.createShip(argument, player);
-				player.sendMessage(ChatColor.YELLOW + "Ship " + argument + " created!");
+		try {	shipHandler.createShip(shipName, player);
+				player.sendMessage(ChatColor.YELLOW + "Ship " + shipName + " created!");
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
@@ -1112,21 +1124,27 @@ public class HorizonCommandParser implements CommandExecutor
 	 */
 	private boolean confirmDelete(CommandSender sender)
 	{	
-		if (confirmDelete.get(sender.getName()) == null)
+		String shipName = confirmDelete.get(sender.getName());
+		
+		if (shipName == null)
 		{
 			sender.sendMessage(ChatColor.RED + "There is nothing for you to confirm.");
 			return false;
 		}
 		
+		Bukkit.getLogger().info(shipName);
+		
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		try {
-		shipHandler.deleteShip(sender, confirmDelete.get(sender.getName()));
-		} catch (IllegalArgumentException e) {
+		try { shipHandler.deleteShip(sender, shipName); } 
+		catch (IllegalArgumentException e)
+		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			confirmDelete.remove(sender.getName());
 			return false;
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
 			confirmDelete.remove(sender.getName());
