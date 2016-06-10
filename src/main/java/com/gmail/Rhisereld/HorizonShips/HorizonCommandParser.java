@@ -152,13 +152,13 @@ public class HorizonCommandParser implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship "
 								+ "remove dock [destinationName] [dockNumber]");
 				
-				//ship remove pilot [shipName] [pilotName]
+				//ship remove pilot [pilotName] [shipName]
 				if (args[1].equalsIgnoreCase("pilot"))
 					if (args.length >= 4)
 						return removePilot(sender, args);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove pilot [shipName] "
-								+ "[pilotName]");
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship remove "
+								+ "pilot pilotName] [shipName]");
 				
 				return false;
 			}
@@ -618,9 +618,18 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 3; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		//Remove pilot
 		try {
-			shipHandler.removePilot(sender, args[2], args[3]);
+			shipHandler.removePilot(sender, sb.toString(), args[2]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
