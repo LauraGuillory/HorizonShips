@@ -272,8 +272,8 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship tp [shipName]
 			if (args[0].equalsIgnoreCase("tp"))
-				if (args.length == 2)
-					return teleport(sender, args[1]);
+				if (args.length >= 2)
+					return teleport(sender, args);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship tp "
@@ -1009,7 +1009,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	private boolean teleport(CommandSender sender, String shipName)
+	private boolean teleport(CommandSender sender, String[] args)
 	{
 		//Check that they have permission and is a player
 		if (!sender.hasPermission("horizonships.admin.teleport") || !(sender instanceof Player))
@@ -1018,15 +1018,24 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 1; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		//Perform the action
 		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
-		try { shipHandler.teleport((Player) sender, shipName); }
+		try { shipHandler.teleport((Player) sender, sb.toString()); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
-		sender.sendMessage(ChatColor.YELLOW + "Teleporting to ship: " + shipName);
+		sender.sendMessage(ChatColor.YELLOW + "Teleporting to ship: " + sb.toString());
 		return true;
 	}
 	
