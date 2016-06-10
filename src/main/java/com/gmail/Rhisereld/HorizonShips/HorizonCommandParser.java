@@ -73,8 +73,8 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship create [shipName]
 			if (args[0].equalsIgnoreCase("create"))
-				if (args.length == 2)
-					return shipCreate(sender, args[1]);
+				if (args.length >= 2)
+					return shipCreate(sender, args);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName]");
@@ -362,7 +362,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean shipCreate(CommandSender sender, String shipName)
+	private boolean shipCreate(CommandSender sender, String[] shipName)
 	{
 		Player player;
 		
@@ -384,7 +384,19 @@ public class HorizonCommandParser implements CommandExecutor
 
 		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
 				+ " Type '/ship confirm create' to confirm.");
-		confirmCreate.put(player.getName(), shipName);
+		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (String s : shipName)
+		{
+			if (s.equalsIgnoreCase("create"))
+				continue;
+			sb.append(s);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
+		confirmCreate.put(player.getName(), sb.toString());
 		confirmCreateTimeout(sender);
 		
 		return true;
