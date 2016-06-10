@@ -116,13 +116,13 @@ public class HorizonCommandParser implements CommandExecutor
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add dock "
 								+ "[destinationName]");
 				
-				//ship add pilot [shipName] [pilotName]
+				//ship add pilot [pilotName] [shipName] 
 				if (args[1].equalsIgnoreCase("pilot"))
 					if (args.length >= 4)
-						return addPilot(sender,args);
+						return addPilot(sender, args);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add pilot [shipName] "
-								+ "[pilotName]");
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add pilot [pilotName] "
+								+ "[shipName]");
 				
 				return false;
 			}
@@ -577,10 +577,19 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + "You don't have permission to add a pilot.");
 			return false;
 		}
+		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 3; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
 				
 		//Add pilot
 		try {
-			shipHandler.addPilot(sender, args[2], args[3]);
+			shipHandler.addPilot(sender, sb.toString(), args[2]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
@@ -1412,7 +1421,7 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.pilot.add"))
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship add pilot [shipName] [pilotName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship add pilot [pilotName] [shipName]");
 			sender.sendMessage("Add a pilot to the authentication list of the ship that allows them to pilot it.");
 		}
 		if (sender.hasPermission("horizonships.pilot.remove"))
