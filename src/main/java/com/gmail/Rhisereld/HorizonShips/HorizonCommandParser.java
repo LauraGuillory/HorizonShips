@@ -305,8 +305,8 @@ public class HorizonCommandParser implements CommandExecutor
 					}
 				//ship force break [shipName]
 				else if (args[1].equalsIgnoreCase("break"))
-					if (args.length == 3)
-						return forceBreak(sender, args[2]);
+					if (args.length >= 3)
+						return forceBreak(sender, args);
 					else
 					{
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force break "
@@ -1111,7 +1111,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	private boolean forceBreak(CommandSender sender, String shipName)
+	private boolean forceBreak(CommandSender sender, String[] args)
 	{
 		//Check that they have permission
 		if (!sender.hasPermission("horizonships.admin.forcebreak"))
@@ -1120,15 +1120,24 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		//Perform the action
-		try { new ShipHandler(prof, data, config, plugin).forceBreak(shipName); }
+		try { new ShipHandler(prof, data, config, plugin).forceBreak(sb.toString()); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
 		
-		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to break.");
+		sender.sendMessage(ChatColor.YELLOW + "You forced " + sb.toString() + " to break.");
 		return true;
 	}
 	
