@@ -871,11 +871,19 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		try {
-			shipHandler.shipInfo(sender, args[0]);
+			shipHandler.shipInfo(sender, sb.toString());
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
-			e.printStackTrace();
 			return false;
 		}
 		
