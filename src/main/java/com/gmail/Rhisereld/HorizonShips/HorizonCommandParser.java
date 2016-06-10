@@ -168,8 +168,7 @@ public class HorizonCommandParser implements CommandExecutor
 			{
 				if (args.length < 2)
 				{
-					sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, "
-							+ "docks");
+					sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, docks");
 					return false;
 				}
 				

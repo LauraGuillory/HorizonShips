@@ -79,7 +79,9 @@ public class ShipHandler
 		
 		//Check for collisions
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		Selection s = sm.getPlayerSelection(player);
+		Selection s = null;
+		try { s = sm.getPlayerSelection(player); }
+		catch (NullPointerException e) { throw new IllegalArgumentException(e.getMessage()); }
 		Location newMin = s.getMinimumPoint();
 		Location newMax = s.getMaximumPoint();
 		if (checkForCollisions(newMin, newMax))
@@ -184,7 +186,9 @@ public class ShipHandler
 		
 		//Get the current selection of the player, which is used to determine the region of the new dock.
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		Selection s = sm.getPlayerSelection(player);
+		Selection s;
+		try { s = sm.getPlayerSelection(player); }
+		catch (NullPointerException e) { throw new IllegalArgumentException(e.getMessage()); }
 		
 		//Check for collisions
 		Location newMin = s.getMinimumPoint();
