@@ -56,7 +56,7 @@ public class Destination
 		for (String d: dockList)
 		{
 			try { ID = Integer.parseInt(d); }
-			catch (NumberFormatException e) { continue; }
+			catch (IllegalArgumentException e) { continue; }
 			dock = new Dock(data, name, ID);
 			if (dock.exists())
 					this.docks.add(dock.getID());

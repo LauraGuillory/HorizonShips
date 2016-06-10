@@ -66,7 +66,14 @@ public class ShipRegionNotifier implements Listener
 				playersInsideDocks.remove(player.getName());
 				return;
 			}
-			Dock dock = new Dock(data, arguments[0], ID);
+			Dock dock;
+			try { dock = new Dock(data, arguments[0], ID); }
+			catch (IllegalArgumentException e) 
+			{
+				//Remove player from list of players inside this dock
+				playersInsideDocks.remove(player.getName());
+				return;
+			}
 			min = dock.getLocation();
 			max = new Location(min.getWorld(), min.getBlockX() + dock.getLength(), min.getBlockY() + dock.getHeight(), 
 					min.getBlockZ() + dock.getWidth());

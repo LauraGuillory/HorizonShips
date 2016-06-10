@@ -146,7 +146,8 @@ public class Ship
 			
 		//Set the dock
 		this.dock = dock.getID();
-		data.set("ships." + name + ".dock.destination", destination.getName());
+		this.destination = new Destination(data, dock.getDestination(), true);
+		data.set("ships." + name + ".dock.destination", this.destination.getName());
 		data.set("ships." + name + ".dock.id", this.dock);
 	}
 	

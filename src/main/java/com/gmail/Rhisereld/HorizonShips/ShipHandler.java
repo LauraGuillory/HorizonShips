@@ -159,9 +159,13 @@ public class ShipHandler
 		{
 			if (d.getShip() != null)
 			{
-				Ship ship = new Ship(data, d.getShip());
-				Dock dock = new Dock(data, "temp", d.getLocation(), d.getLength(), d.getHeight(), d.getWidth());
-				ship.setDock(dock);
+				Ship ship;
+				try { 
+						ship = new Ship(data, d.getShip());
+						Dock dock = new Dock(data, "temp", d.getLocation(), d.getLength(), d.getHeight(), d.getWidth());
+						ship.setDock(dock);
+					}
+				catch (IllegalArgumentException e) {}
 			}
 		}
 		
@@ -393,6 +397,11 @@ public class ShipHandler
 			{
 				try { dock = new Dock(data, destinationName, Integer.parseInt(id)); }
 				catch (NumberFormatException e) { continue; }
+				
+				//Check that the dock isn't alread occupied
+				if (dock.getShip() != null)
+					continue;
+				
 				if (dock.getLength() >= ship.getLength() &&
 					dock.getHeight() >= ship.getHeight() &&
 					dock.getWidth() >= ship.getWidth())
