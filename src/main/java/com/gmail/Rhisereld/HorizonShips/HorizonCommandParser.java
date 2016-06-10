@@ -295,8 +295,8 @@ public class HorizonCommandParser implements CommandExecutor
 					}
 				//ship force repair [shipName]
 				else if (args[1].equalsIgnoreCase("repair"))
-					if (args.length == 3)
-						return forceRepair(sender, args[2]);
+					if (args.length >= 3)
+						return forceRepair(sender, args);
 					else
 					{
 						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force repair "
@@ -1074,7 +1074,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param shipName
 	 * @return
 	 */
-	private boolean forceRepair(CommandSender sender, String shipName)
+	private boolean forceRepair(CommandSender sender, String[] args)
 	{
 		//Check that they have permission
 		if (!sender.hasPermission("horizonships.admin.forcerepair"))
@@ -1083,15 +1083,24 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		//Perform the action
-		try { new ShipHandler(prof, data, config, plugin).forceRepair(shipName); }
+		try { new ShipHandler(prof, data, config, plugin).forceRepair(sb.toString()); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
 		
-		sender.sendMessage(ChatColor.YELLOW + "You forced " + shipName + " to repair.");
+		sender.sendMessage(ChatColor.YELLOW + "You forced " + sb.toString() + " to repair.");
 		return true;
 	}
 	
