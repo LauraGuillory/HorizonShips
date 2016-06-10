@@ -248,14 +248,14 @@ public class HorizonCommandParser implements CommandExecutor
 					return false;
 				}
 			
-			//ship transfer [shipName] [playerName]
+			//ship transfer [playerName] [shipName]
 			if (args[0].equalsIgnoreCase("transfer"))
-				if (args.length == 3)
+				if (args.length >= 3)
 					return transferShip(sender, args);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship transfer "
-							+ "[shipName] [playerName]");
+							+ "[playerName] [shipName]");
 					return false;
 				}
 			
@@ -949,11 +949,20 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < args.length; i++)
+		{
+			sb.append(args[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		sender.sendMessage(ChatColor.YELLOW + "Are you sure that you want to transfer ownership of "
-							+ args[1] + " to " + args[2] + "? You will lose all ownership rights and "
+							+ sb.toString() + " to " + args[1] + "? You will lose all ownership rights and "
 							+ "access to the ship. This action cannot be undone. Type /ship confirm "
 							+ "transfer to confirm.");
-		confirmTransfer.put(sender.getName(), args[1] + " " + args[2]);
+		confirmTransfer.put(sender.getName(), args[1] + " " + sb.toString());
 		confirmTransferTimeout(sender);
 		return true;
 	}
@@ -1237,13 +1246,22 @@ public class HorizonCommandParser implements CommandExecutor
 		String[] arguments = confirmTransfer.get(name).split(" ");
 		confirmTransfer.remove(name);
 		
+		//Put together a string of the name.
+		StringBuilder sb = new StringBuilder();
+		for (int i = 1; i < arguments.length; i++)
+		{
+			sb.append(arguments[i]);
+			sb.append(" ");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		
 		try {
-			shipHandler.transfer(player, arguments[0], arguments[1]);
+			shipHandler.transfer(player, sb.toString(), arguments[0]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
-		sender.sendMessage(ChatColor.YELLOW + "You transfer ownership of " + arguments[0] + " to " + arguments[1] + ".");
+		sender.sendMessage(ChatColor.YELLOW + "You transfer ownership of " + sb.toString() + " to " + arguments[0] + ".");
 		return false;
 	}
 	
@@ -1489,7 +1507,7 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		if (sender.hasPermission("horizonships.transfer") && player != null)
 		{
-			sender.sendMessage(ChatColor.YELLOW + "/ship transfer [shipName] [playerName]");
+			sender.sendMessage(ChatColor.YELLOW + "/ship transfer [playerName] [shipName]");
 			sender.sendMessage("Transfer ownership of a ship to another player.");
 		}	
 		if (sender.hasPermission("horizonships.rename"))
