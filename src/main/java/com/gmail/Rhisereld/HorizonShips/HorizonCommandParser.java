@@ -261,14 +261,24 @@ public class HorizonCommandParser implements CommandExecutor
 			
 			//ship rename [shipName] [newShipName]
 			if (args[0].equalsIgnoreCase("rename"))
-				if (args.length == 3)
+			{
+				if (args.length < 3)
+				{
+					sender.sendMessage(ChatColor.RED + "Not enough arguments! Correct usage: /ship rename [shipName]"
+							+ " [newShipName]. For this command, ship names must use an underscore instead of a space. "
+							+ "Example: NSS_Exodus");
+					return false;
+				}
+				else if (args.length == 3)
 					return renameShip(sender, args[1], args[2]);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship rename "
-							+ "[shipName] [newShipName]");
+					sender.sendMessage(ChatColor.RED + "Too many arguments! Correct usage: /ship rename [shipName] "
+							+ "[newShipName]. For this command, ship names must use an underscore instead of a space. "
+							+ "Example: NSS_Exodus");
 					return false;
 				}
+			}
 			
 			//ship tp [shipName]
 			if (args[0].equalsIgnoreCase("tp"))
@@ -982,7 +992,7 @@ public class HorizonCommandParser implements CommandExecutor
 	 * @param args
 	 * @return
 	 */
-	private boolean renameShip(CommandSender sender, String oldName, String newName)
+	private boolean renameShip(CommandSender sender, String arg1, String arg2)
 	{
 		//Check that they have permission.
 		if (!sender.hasPermission("horizonships.rename") && !sender.hasPermission("horizonships.admin.rename"))
@@ -991,12 +1001,19 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
+		//Format the old name - replace underscores with spaces
+		String oldName = arg1.replace('_', ' ');
+		
+		//Format the new name
+		String newName = arg2.replace('_', ' ');
+		
 		//Perform the action.
 		ShipHandler shipHandler = new ShipHandler(prof, data, config, plugin);
 		try { shipHandler.rename(sender, oldName, newName); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
+			e.printStackTrace();
 			return false;
 		} catch (DataException | IOException e) 
 		{

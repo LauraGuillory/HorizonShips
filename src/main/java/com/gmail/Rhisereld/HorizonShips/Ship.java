@@ -435,23 +435,24 @@ public class Ship
 	 */
 	void rename(String newName) throws DataException, IOException
 	{
-		Location min = destination.getDock(dock).getLocation();
-		Location max = new Location(min.getWorld(), min.getX() + length, min.getY() + height, min.getZ() + width);
-		Ship newShip = new Ship(data, newName, min, max);
-		newShip.setName(newName);
-		newShip.setLength(length);
-		newShip.setHeight(height);
-		newShip.setWidth(width);
-		newShip.setBroken(broken);
-		newShip.setConsumePart(consumePart);
-		newShip.setDestination(destination);
-		newShip.setDock(destination.getDock(dock));
-		newShip.setFuel(fuel);
+		String path = "ships." + newName + ".";
+		
+		data.set(path + "fuel", fuel);
+		data.set(path + "broken", broken);
+		data.set(path + "length", length);
+		data.set(path + "width", width);
+		data.set(path + "height", height);
+		data.set(path + "consumePart", consumePart);
+		data.set(path + "repairItem", repairItem);
+		data.set(path + "dock.destination", destination.getName());
+		data.set(path + "dock.id", dock);
 		if (owner != null)
-			newShip.setOwner(owner);
+			data.set(path + "owner", owner);
+		List<String> pilotStrings = new ArrayList<String>();
 		for (UUID p: pilots)
-			newShip.addPilot(p);
-		newShip.setRepairItem(repairItem);
+			pilotStrings.add(p.toString());
+		data.set(path + "pilots", pilotStrings);
+	
 		data.getConfigurationSection("ships.").set(name, null);
 		name = newName;
 	}
