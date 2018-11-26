@@ -311,7 +311,7 @@ class Ship
 		data.set(path + "dock.destination", destination.getName());
 		data.set(path + "dock.id", dock);
 		if (owner != null)
-			data.set(path + "owner", owner);
+			data.set(path + "owner", owner.toString());
 		List<String> pilotStrings = new ArrayList<>();
 		for (UUID p: pilots)
 			pilotStrings.add(p.toString());
