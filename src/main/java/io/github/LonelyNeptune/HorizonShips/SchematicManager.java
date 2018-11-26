@@ -1,10 +1,9 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,10 +11,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
-
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
@@ -23,28 +20,23 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
-import com.sk89q.worldedit.regions.RegionOperationException;
-import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.schematic.MCEditSchematicFormat;
 
-@SuppressWarnings("deprecation")
-public class SchematicManager 
+class SchematicManager
 {
 	private final WorldEditPlugin wep;
-	private final WorldEdit worldEdit;
 	private final EditSession editSession;
 	/**
-	 * Constructor: Creates a SchematicManager object that contains an EditSession detailing all the changes that have been made.
-	 * 				The object can be retained for purposes of undoing/redoing.
-	 * 				Can only apply to one world (create another for a different world).
+	 * Constructor: Creates a SchematicManager object that contains an EditSession detailing all the changes that have
+	 * 				been made. The object can be retained for purposes of undoing/redoing. Can only apply to one world
+	 * 				(create another for a different world).
 	 * 
 	 * @param world - the world to which this session applies.
-	 * @return SchematicManager
 	 */
-	public SchematicManager(World world)
+	SchematicManager(World world)
 	{
 		wep = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
-		worldEdit = wep.getWorldEdit();
+		WorldEdit worldEdit = wep.getWorldEdit();
 		editSession = worldEdit.getEditSessionFactory().getEditSession(new BukkitWorld(world), 10000000);
 	}
 	
@@ -54,7 +46,7 @@ public class SchematicManager
 	 * 
 	 * @param loc1 - the first apex of the cuboid
 	 * @param loc2 - the second apex of the cuboid
-	 * @param schematicName - the name under which the schematic will be saved.
+	 * @param path - the path under which the schematic will be saved.
 	 * @throws DataException
 	 * @throws IOException
 	 */
@@ -63,7 +55,8 @@ public class SchematicManager
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator
+				+ path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = getMin(loc1, loc2);
@@ -80,8 +73,8 @@ public class SchematicManager
 	 * saveSchematic() copies the blocks found inside the selection given and saves them to a schematic in
 	 * \plugins\HorizonShips\schematics\.
 	 * 
-	 * @param selection
-	 * @param schematicName - the name under which the selection will be saved.
+	 * @param selection - the selection of blocks to be saved
+	 * @param path - the path under which the selection will be saved.
 	 * @throws DataException
 	 * @throws IOException
 	 */
@@ -90,7 +83,8 @@ public class SchematicManager
 		File file;
 		CuboidClipboard clipboard;
 		
-		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator
+				+ path + ".schematic");
 		file.getParentFile().mkdirs(); //Ensure the directory exists.
 		
 		Vector min = loc2Vector(selection.getMinimumPoint());
@@ -106,9 +100,9 @@ public class SchematicManager
 	/**
 	 * loadSchematic() loads the schematic found in \plugins\HorizonShips\schematics\ and pastes them at the
 	 * origin provided.
-	 * 
-	 * @param schematicName - the name of the schematic to be loaded.
+	 *
 	 * @param l - the location at which to paste the schematic into the world.
+	 * @param path - the name of the schematic to be loaded.
 	 * @throws MaxChangedBlocksException
 	 * @throws DataException
 	 * @throws IOException
@@ -117,7 +111,8 @@ public class SchematicManager
 	{
 		File file;
 		
-		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator
+				+ path + ".schematic");
 		Vector origin = new Vector(l.getX(), l.getY(), l.getZ());
 		
 		editSession.enableQueue();
@@ -130,10 +125,9 @@ public class SchematicManager
 	/**
 	 * loadSchematic() loads the schematic found in \plugins\HorizonShips\schematics\ and pastes them inside
 	 * the selection provided.
-	 * 
-	 * @param schematicName
-	 * @param s
-	 * @param path
+	 *
+	 * @param s - the area selection to load the schematic into
+	 * @param path - the path of the schematic to load
 	 * @throws MaxChangedBlocksException
 	 * @throws DataException
 	 * @throws IOException
@@ -142,7 +136,8 @@ public class SchematicManager
 	{
 		File file;
 		
-		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator
+				+ path + ".schematic");
 		Vector origin = s.getNativeMinimumPoint();
 		
 		editSession.enableQueue();
@@ -152,46 +147,20 @@ public class SchematicManager
 		editSession.flushQueue();
 	}
 	
-	/**
-	 * deleteSchematic() removes the schematic file and its parent directory.
-	 * 
-	 * @param path
-	 * @param name
-	 */
-	void deleteSchematic(String path, String name)
+	// deleteSchematic() removes the schematic file and its parent directory.
+	void deleteSchematic(String path)
 	{
-		File file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + path + ".schematic");
+		File file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"
+				+ File.separator + path + ".schematic");
 		file.delete();
 		
 		//Delete directory
-		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"  + File.separator + name);
+		file = new File("plugins" + File.separator + "HorizonShips"  + File.separator + "schematics"
+				+ File.separator + "ship");
 		file.delete();	
 	}
-	
-	/**
-	 * undoSession() undoes all of the actions undertaken with the current edit session 
-	 * (i.e. everything done with the current object)
-	 */
-	void undoSession()
-	{
-		editSession.undo(editSession);
-	}
-	
-	/**
-	 * redoSession() redoes all of the actions undertaken with the current edit session
-	 * that may have been undone.
-	 */
-	void redoSession()
-	{
-		editSession.redo(editSession);
-	}
 
-	/**
-	 * getMin() returns a Vector containing the minimum point of the cuboid specified by two locations.
-	 * @param l1
-	 * @param l2
-	 * @return
-	 */
+	// getMin() returns a Vector containing the minimum point of the cuboid specified by two locations.
 	private Vector getMin(Location l1, Location l2) 
 	{
 		return new Vector(Math.min(l1.getBlockX(), l2.getBlockX()),
@@ -199,12 +168,7 @@ public class SchematicManager
 		                  Math.min(l1.getBlockZ(), l2.getBlockZ()));
 	}
 
-	/**
-	 * getMax() returns a Vector containing the maximum point of the cuboid specified by two locations.
-	 * @param l1
-	 * @param l2
-	 * @return
-	 */
+	// getMax() returns a Vector containing the maximum point of the cuboid specified by two locations.
 	private Vector getMax(Location l1, Location l2) 
 	{
 		return new Vector(Math.max(l1.getBlockX(), l2.getBlockX()),
@@ -249,48 +213,12 @@ public class SchematicManager
 		return s;
 	}
 	
-	/**
-	 * setPlayerSelection() sets the player's selection to the selection given.
-	 * 
-	 * @param s
-	 * @param player
-	 */
-	void setPlayerSelection(Selection s, Player player)
-	{
-		wep.setSelection(player, s);
-	}
-	
-	/**
-	 * shiftSelection() moves the player's current selection one block in the given direction.
-	 * 
-	 * @param player
-	 * @param selection
-	 * @param dir
-	 * @return
-	 * @throws RegionOperationException
-	 * @throws IncompleteRegionException
-	 */
-	Selection shiftSelection(Player player, Selection selection, Vector dir) throws RegionOperationException, IncompleteRegionException
-	{		
-		RegionSelector rs = selection.getRegionSelector();
-		
-		rs.getRegion().shift(dir);
-		rs.learnChanges();
-		
-		return wep.getSelection(player);
-	}
-	
-	/**
-	 * eraseArea() sets all of the blocks inside the region defined by two locations to air.
-	 * 
-	 * @param loc1
-	 * @param loc2
-	 */
+	// eraseArea() sets all of the blocks inside the region defined by two locations to air.
 	void eraseArea(Location loc1, Location loc2)
 	{
 		Location min = getMinLocation(loc1, loc2);
 		Location max = getMaxLocation(loc1, loc2);
-		List<Material> droppables = new ArrayList<Material>();
+		List<Material> droppables = new ArrayList<>();
 		droppables.add(Material.TRAP_DOOR);
 		droppables.add(Material.IRON_TRAPDOOR);
 		droppables.add(Material.REDSTONE_TORCH_ON);

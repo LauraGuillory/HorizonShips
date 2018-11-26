@@ -1,15 +1,13 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -21,23 +19,19 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.plugin.Plugin;
-
-import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
-import com.sk89q.worldedit.MaxChangedBlocksException;
+import io.github.LonelyNeptune.HorizonProfessions.ProfessionAPI;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 
-@SuppressWarnings("deprecation")
-public class ShipHandler 
+class ShipHandler
 {	
-	ProfessionAPI prof;
+	private ProfessionAPI prof;
 	FileConfiguration data;
-	static FileConfiguration config;
-	Plugin plugin;
+	private static FileConfiguration config;
+	private Plugin plugin;
 	
-	HashMap<String, SchematicManager> schemManagers = new HashMap<String, SchematicManager>();
-	
-	public ShipHandler(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, Plugin plugin) 
+	ShipHandler(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, Plugin plugin)
 	{
 		this.prof = prof;
 		this.data = data;
@@ -54,14 +48,6 @@ public class ShipHandler
 	 * createShip() creates a new ship to be recorded in the data.yml file. It will have a name, current destination,
 	 * a list of destinations (containing only the current destination), and a list of pilots (empty).
 	 * It will have a fuel level of zero and will not be broken.
-	 * 
-	 * @param shipName
-	 * @param player
-	 * @param destinationName
-	 * @throws DataException
-	 * @throws IOException
-	 * @throws NullPointerException
-	 * @throws IllegalArgumentException
 	 */
 	void createShip(String shipName, Player player) throws DataException, IOException, IllegalArgumentException
 	{
@@ -80,7 +66,7 @@ public class ShipHandler
 		
 		//Check for collisions
 		SchematicManager sm = new SchematicManager(player.getWorld());
-		Selection s = null;
+		Selection s;
 		try { s = sm.getPlayerSelection(player); }
 		catch (NullPointerException e) { throw new IllegalArgumentException(e.getMessage()); }
 		Location newMin = s.getMinimumPoint();
@@ -91,19 +77,11 @@ public class ShipHandler
 		new Ship(data, shipName, newMin, newMax);
 	}
 
-	/**
-	 * deleteShip() removes all saved information on the given ship.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @throws IllegalArgumentException
-	 */
-	void deleteShip(CommandSender sender, String shipName) throws IllegalArgumentException, IOException
+	// deleteShip() removes all saved information on the given ship.
+	void deleteShip(String shipName) throws IllegalArgumentException
 	{
 		//Check that the ship exists
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Remove the ship reference the dock it is inhabiting.
 		Dock dock = ship.getDock();
@@ -120,11 +98,6 @@ public class ShipHandler
 	/**
 	 * addDestination() creates a new destination. This destination does not have a physical location; it serves
 	 * to group and organise that numerous docks that will belong to the destination.
-	 * 
-	 * @param sm
-	 * @param player
-	 * @param shipName
-	 * @param destinationName
 	 */
 	void addDestination(String destinationName) throws IllegalArgumentException
 	{
@@ -135,12 +108,7 @@ public class ShipHandler
 		new Destination(data, destinationName, false);
 	}
 	
-	/**
-	 * removeDestination() removes the destination and all its docks.
-	 * 
-	 * @param shipName
-	 * @param destinationName
-	 */
+	// removeDestination() removes the destination and all its docks.
 	void removeDestination(String destinationName) throws IllegalArgumentException
 	{	
 		//Make sure the destination isn't "temp" - that's reserved.
@@ -149,9 +117,7 @@ public class ShipHandler
 		
 		//Check that the destination exists
 		Destination destination;
-		try { destination = new Destination(data, destinationName, true); }
-		//When creating a new destination, this will only be thrown if the destination doesn't exist.
-		catch (IllegalArgumentException e) { throw e; }
+		destination = new Destination(data, destinationName, true);
 		
 		//If there are any ships at that destination, create temporary docks for them.
 		ArrayList<Dock> docks = destination.getDocks();
@@ -173,21 +139,11 @@ public class ShipHandler
 		destination.delete();
 	}
 	
-	/**
-	 * addDock() adds a new dock to the destination provided.
-	 * 
-	 * @param player
-	 * @param destination
-	 * @param length
-	 * @param width
-	 * @param height
-	 * @throws IllegalArgumentException
-	 */
+	// addDock() adds a new dock to the destination provided.
 	int addDock(Player player, String destinationName) throws IllegalArgumentException
 	{	
 		//Check that the destination exists.
-		try { new Destination(data, destinationName, true); }
-		catch (IllegalArgumentException e) { throw e; };
+		new Destination(data, destinationName, true);
 		
 		//Get the current selection of the player, which is used to determine the region of the new dock.
 		SchematicManager sm = new SchematicManager(player.getWorld());
@@ -209,12 +165,10 @@ public class ShipHandler
 		return dock.getID();
 	}
 	
-	void removeDock(CommandSender sender, String destinationName, String dockNumber) throws IllegalArgumentException, NumberFormatException
+	void removeDock(String destinationName, String dockNumber) throws IllegalArgumentException
 	{
 		//Check that the destination exists
-		try { new Destination(data, destinationName, true); }
-		//When creating a new destination, this will only be thrown if the destination doesn't exist.
-		catch (IllegalArgumentException e) { throw e; }
+		new Destination(data, destinationName, true);
 		
 		//Check that the dock exists (throws NumberFormatException if number isn't valid)
 		int dockID = Integer.parseInt(dockNumber);
@@ -234,11 +188,7 @@ public class ShipHandler
 		dock.delete();
 	}
 	
-	/**
-	 * listShips() sends the sender a list of names of all the existing ships.
-	 * 
-	 * @param sender
-	 */
+	// listShips() sends the sender a list of names of all the existing ships.
 	void listShips(CommandSender sender)
 	{
 		Set<String> ships;
@@ -264,11 +214,7 @@ public class ShipHandler
 		sender.sendMessage(ChatColor.YELLOW + list);
 	}
 	
-	/**
-	 * listDestinations() sends the sender a list of names of all the existing destinations.
-	 * 
-	 * @param sender
-	 */
+	// listDestinations() sends the sender a list of names of all the existing destinations.
 	void listDestinations(CommandSender sender)
 	{
 		Set<String> destinations;
@@ -294,24 +240,15 @@ public class ShipHandler
 		sender.sendMessage(ChatColor.YELLOW + list);
 	}
 	
-	/**
-	 * listDocks() sends the sender a list of docks of the requested destination.
-	 * 
-	 * @param sender
-	 * @param docks
-	 */
+	// listDocks() sends the sender a list of docks of the requested destination.
 	void listDocks(CommandSender sender, String destinationName)
 	{
-		//Check that the destination exists
-		try { new Destination(data, destinationName, true); }
-		//When creating a new destination, this will only be thrown if the destination doesn't exist.
-		catch (IllegalArgumentException e) { throw e; }
-		
-
 		sender.sendMessage(ChatColor.YELLOW + "Destination " + destinationName + " contains...");
 		
 		Destination destination = new Destination(data, destinationName, true);
-		for (Dock d: destination.getDocks())
+		ArrayList<Dock> docks = destination.getDocks();
+
+		for (Dock d: docks)
 		{
 			sender.sendMessage(ChatColor.YELLOW + "Dock " + d.getID() + " at (" + d.getLocation().getBlockX() + "," 
 								+ d.getLocation().getBlockY() + "," + d.getLocation().getBlockZ() + ") to ("
@@ -322,18 +259,12 @@ public class ShipHandler
 	
 	/**
 	 * moveShip() handles all the actions required when a player pilots a ship from one destination to another.
-	 * It saves the schematic at current location, pastes the schematic at the new location, teleports all the players within the
-	 * ship's region to the new location, erases the old ship, and reduces the ship fuel by one.
+	 * It saves the schematic at current location, pastes the schematic at the new location, teleports all the players
+	 * within the ship's region to the new location, erases the old ship, and reduces the ship fuel by one.
 	 * The dock to move the ship to is also selected based on ship size.
-	 * 
-	 * @param player
-	 * @param destination
-	 * @throws DataException
-	 * @throws IOException
-	 * @throws MaxChangedBlocksException
-	 * @throws IllegalArgumentException
 	 */
-	void moveShip(Player player, String destinationName) throws DataException, IOException, MaxChangedBlocksException, IllegalArgumentException
+	void moveShip(Player player, String destinationName) throws DataException, IOException, MaxChangedBlocksException,
+			IllegalArgumentException
 	{
 		//Ensure that the player has the tier requirement
 		UUID uuid = player.getUniqueId();
@@ -342,8 +273,9 @@ public class ShipHandler
 		
 		if (prof != null && professionReq != null && prof.isValidProfession(professionReq) 
 				&& !prof.hasTier(uuid, professionReq, tierReq))
-			throw new IllegalArgumentException("You cannot pilot a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
-					+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
+			throw new IllegalArgumentException("You cannot pilot a ship because you are not "
+					+ getDeterminer(prof.getTierName(tierReq)) + " " + prof.getTierName(tierReq) + " "
+					+ professionReq + ".");
 		
 		//Determine the ship the player is trying to pilot.
 		Ship ship = findCurrentShip(player);
@@ -371,9 +303,7 @@ public class ShipHandler
 			throw new IllegalArgumentException("The ship is out of fuel.");
 		
 		//Check that the destination exists
-		try { new Destination(data, destinationName, true); }
-		//When creating a new destination, this will only be thrown if the destination doesn't exist.
-		catch (IllegalArgumentException e) { throw e; }
+		new Destination(data, destinationName, true);
 
 		//Save schematic at current location
 		SchematicManager sm = new SchematicManager(player.getWorld());
@@ -398,7 +328,7 @@ public class ShipHandler
 				try { dock = new Dock(data, destinationName, Integer.parseInt(id)); }
 				catch (NumberFormatException e) { continue; }
 				
-				//Check that the dock isn't alread occupied
+				//Check that the dock isn't already occupied
 				if (dock.getShip() != null)
 					continue;
 				
@@ -451,11 +381,11 @@ public class ShipHandler
 		ship.reduceFuel();
 		
 		//Event trigger
-		ShipEvent shipEvent = new ShipEvent(prof, config, data);
+		ShipEvent shipEvent = new ShipEvent(prof, config);
 		String message = null;
 		try {
 		shipEvent.chooseEvent();
-		message = shipEvent.trigger(player, ship);
+		message = shipEvent.trigger(player, ship, destinationName);
 		} catch (IllegalArgumentException e)
 		{
 			player.sendMessage(ChatColor.RED + "There was an error with ship events. Please contact an Administrator.");
@@ -464,16 +394,12 @@ public class ShipHandler
 		Set<Player> playersToNotify = getPlayersInsideRegion(ship);
 		for (Player p: playersToNotify)
 			p.sendMessage(ChatColor.YELLOW + message);
-		
+
 		//Change the current dock
 		ship.setDock(newDock);
 	}
 	
-	/**
-	 * diagnose() reveals to the player which item is required to fix a broken ship.
-	 * 
-	 * @param player
-	 */
+	// diagnose() reveals to the player which item is required to fix a broken ship.
 	void diagnose(Player player) throws IllegalArgumentException
 	{
 		//Only novice pilots can diagnose a ship.
@@ -483,8 +409,9 @@ public class ShipHandler
 			int tierReq = config.getInt("professionReqs.repair.tier");
 			
 			if (!prof.hasTier(player.getUniqueId(), professionReq, tierReq))
-				throw new IllegalArgumentException("You cannot diagnose a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
-						+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
+				throw new IllegalArgumentException("You cannot diagnose a ship because you are not "
+						+ getDeterminer(prof.getTierName(tierReq)) + " " + prof.getTierName(tierReq) + " "
+						+ professionReq + ".");
 		}
 		
 		//Determine the ship the player is trying to diagnose.
@@ -500,14 +427,14 @@ public class ShipHandler
 		String repairItem = ship.getRepairItem();
 		
 		//Use custom name for item.
-		Boolean consumePart = ship.getConsumePart();
+		boolean consumePart = ship.getConsumePart();
 		if (consumePart)
 			repairItem = config.getString("events.breakdown.spareParts." + repairItem + ".name", repairItem);
 		else
 			repairItem = config.getString("events.breakdown.tools." + repairItem + ".name", repairItem);
 		
 		String article;
-		Set<Character> vowels = new HashSet<Character>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
+		Set<Character> vowels = new HashSet<>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
 
 		if(vowels.contains(Character.toLowerCase(repairItem.charAt(0)))) 
 			article = "an ";
@@ -521,8 +448,6 @@ public class ShipHandler
 	/**
 	 * repair() ensures the player has the correct item to repair the ship, and if it does,
 	 * it removes the item from the player and sets the ship's broken status to false.
-	 * 
-	 * @param player
 	 */
 	void repair(Player player)
 	{
@@ -535,8 +460,9 @@ public class ShipHandler
 			int tierReq = config.getInt("professionReqs.repair.tier");
 			
 			if (!prof.hasTier(uuid, professionReq, tierReq))
-				throw new IllegalArgumentException("You cannot repair a ship because you are not " + getDeterminer(prof.getTierName(tierReq)) 
-						+ " " + prof.getTierName(tierReq) + " " + professionReq + ".");
+				throw new IllegalArgumentException("You cannot repair a ship because you are not "
+						+ getDeterminer(prof.getTierName(tierReq)) + " " + prof.getTierName(tierReq) + " "
+						+ professionReq + ".");
 		}
 		
 		//Determine the ship the player is trying to repair.
@@ -611,9 +537,6 @@ public class ShipHandler
 	/**
 	 * refuel() checks that the player has the correct item to refuel the ship, and if they do,
 	 * it removes the item from the player and sets the ship's fuel level.
-	 * 
-	 * @param player
-	 * @throws IllegalArgumentException
 	 */
 	void refuel(Player player) throws IllegalArgumentException
 	{
@@ -669,17 +592,11 @@ public class ShipHandler
 	
 	/**
 	 * shipInfo() displays some information about the given ship to the player.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @throws IllegalArgumentException
 	 */
 	void shipInfo(CommandSender sender, String shipName) throws IllegalArgumentException
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Check that the person checking is the owner, a permitted pilot, an admin, or the console
 		Player player = null;
@@ -757,8 +674,8 @@ public class ShipHandler
 		//Displaying
 		if (sender instanceof Player)
 		{
-			sender.sendMessage("-----------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD + shipName + " " 
-								+ ChatColor.WHITE + ">-----------");
+			sender.sendMessage("-----------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD
+					+ shipName + " " + ChatColor.WHITE + ">-----------");
 			sender.sendMessage(ChatColor.YELLOW + "OWNER: " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "DESTINATIONS: " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "CURRENT LOCATION: " + ChatColor.WHITE + currentDestination);
@@ -766,13 +683,12 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "DIMENSIONS: " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "PERMITTED PILOTS: " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "MECHANICAL CONDITION: " + conditionStatus + condition);
-			sender.sendMessage(ChatColor.YELLOW + "FUEL: " + fuelStatus + 
-					Integer.toString(ship.getFuel()));
+			sender.sendMessage(ChatColor.YELLOW + "FUEL: " + fuelStatus + ship.getFuel());
 		}
 		else
 		{
-			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD + shipName + " " 
-								+ ChatColor.WHITE + ">---------------");
+			sender.sendMessage("---------------<" + ChatColor.GOLD + " Ship " + ChatColor.WHITE + "- " + ChatColor.GOLD
+					+ shipName + " " + ChatColor.WHITE + ">---------------");
 			sender.sendMessage(ChatColor.YELLOW + "Owner:                 " + ChatColor.WHITE + owner);
 			sender.sendMessage(ChatColor.YELLOW + "Destinations:          " + ChatColor.WHITE + destinationString);
 			sender.sendMessage(ChatColor.YELLOW + "Current location:      " + ChatColor.WHITE + currentDestination);
@@ -780,24 +696,15 @@ public class ShipHandler
 			sender.sendMessage(ChatColor.YELLOW + "Dimensions:            " + ChatColor.WHITE + dimensions);
 			sender.sendMessage(ChatColor.YELLOW + "Permitted pilots:      " + ChatColor.WHITE + pilotsString);
 			sender.sendMessage(ChatColor.YELLOW + "Mechanical condition:  " + conditionStatus + condition);
-			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + fuelStatus + Integer.toString(ship.getFuel()));
+			sender.sendMessage(ChatColor.YELLOW + "Fuel:                  " + fuelStatus + ship.getFuel());
 		}
 	}
 	
-	/**
-	 * setOwner() sets the owner of the ship.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @param owner
-	 * @throws IllegalArgumentException
-	 */
-	void setOwner(CommandSender sender, String shipName, String owner) throws IllegalArgumentException
+	// setOwner() sets the owner of the ship.
+	void setOwner(String shipName, String owner) throws IllegalArgumentException
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Set the new owner
 		UUID uuid = getUUID(owner);
@@ -807,20 +714,11 @@ public class ShipHandler
 		ship.setOwner(uuid);		
 	}
 	
-	/**
-	 * transfer() sets the new owner of a ship, but also ensures that the player
-	 * performing the command owns the ship.
-	 * 
-	 * @param owner
-	 * @param shipName
-	 * @param newOwner
-	 */
+	// transfer() sets the new owner of a ship, but also ensures that the player performing the command owns the ship.
 	void transfer(Player owner, String shipName, String newOwner)
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Ensure the player is the owner of the ship
 		if (!owner.getUniqueId().equals(ship.getOwner()))
@@ -837,23 +735,17 @@ public class ShipHandler
 	/**
 	 * addPilot() ensures that the sender is an owner of the ship or an administrator,
 	 * then adds the pilot given to the list of permitted pilots for the ship given.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @param pilot
-	 * @throws IllegalArgumentException
 	 */
 	void addPilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null && !player.getUniqueId().equals(ship.getOwner()))
+		if (!sender.hasPermission("horizonships.admin.pilot.add") && player != null
+				&& !player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Make sure the pilot isn't already a pilot
@@ -873,23 +765,17 @@ public class ShipHandler
 	/**
 	 * removePilot() ensures that the sender is an owner of the ship or an administrator,
 	 * then removes the pilot given from the list of permitted pilots for the ship given.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @param pilot
-	 * @throws IllegalArgumentException
 	 */
 	void removePilot(CommandSender sender, String shipName, String pilot) throws IllegalArgumentException
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && !player.getUniqueId().equals(ship.getOwner()))
+		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null
+				&& !player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Check that the pilot is currently a pilot of the ship
@@ -910,27 +796,17 @@ public class ShipHandler
 		ship.removePilot(pilotUUID);
 	}
 	
-	/**
-	 * rename() changes the name of the ship. The player must be an admin or the owner of the ship.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @param newName
-	 * @throws IllegalArgumentException
-	 * @throws IOException 
-	 * @throws DataException 
-	 */
-	void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException, DataException, IOException
+	// rename() changes the name of the ship. The player must be an admin or the owner of the ship.
+	void rename(CommandSender sender, String shipName, String newName) throws IllegalArgumentException
 	{
 		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
+		Ship ship = new Ship(data, shipName);
 		
 		//Check that the sender is an administrator OR owns the ship
 		Player player = Bukkit.getPlayer(sender.getName());
 		
-		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null && !player.getUniqueId().equals(ship.getOwner()))
+		if (!sender.hasPermission("horizonships.admin.pilot.remove") && player != null
+				&& !player.getUniqueId().equals(ship.getOwner()))
 			throw new IllegalArgumentException("That ship does not belong to you.");
 		
 		//Check that a ship doesn't already exist by the new name
@@ -945,81 +821,33 @@ public class ShipHandler
 		throw new IllegalArgumentException("A ship already exists by that name.");
 	}
 	
-	/**
-	 * teleport() teleports the player to the current destination of the ship given.
-	 * 
-	 * @param player
-	 * @param shipName
-	 * @throws IllegalArgumentException
-	 */
+	// teleport() teleports the player to the current destination of the ship given.
 	void teleport(Player player, String shipName) throws IllegalArgumentException
 	{
-		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
-		
-		//Teleport the player there
-		player.teleport(ship.getDock().getLocation(), TeleportCause.PLUGIN);
+		player.teleport(new Ship(data, shipName).getDock().getLocation(), TeleportCause.PLUGIN);
 	}
 	
-	/**
-	 * forceRefuel() sets the ship's fuel to full without taking any items.
-	 * 
-	 * @param shipName
-	 * @throws IllegalArgumentException
-	 */
+	// forceRefuel() sets the ship's fuel to full without taking any items.
 	void forceRefuel(String shipName) throws IllegalArgumentException
 	{
-		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
-		
-		//Refuel the ship.
-		ship.setFuel(config.getInt("refuel.maxtank"));
+		new Ship(data, shipName).setFuel(config.getInt("refuel.maxtank"));
 	}
 	
-	/**
-	 * forceRepair() sets the ship to fixed without taking any items or requiring any skill.
-	 * 
-	 * @param shipName
-	 * @throws IllegalArgumentException
-	 */
+	// forceRepair() sets the ship to fixed without taking any items or requiring any skill.
 	void forceRepair(String shipName) throws IllegalArgumentException
 	{
-		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
-		
-		//Repair the ship.
-		ship.setBroken(false);
+		new Ship(data, shipName).setBroken(false);
 	}
 	
-	/**
-	 * forceBreak() sets the ship to broken.
-	 * 
-	 * @param shipName
-	 * @throws IllegalArgumentException
-	 */
+	// forceBreak() sets the ship to broken.
 	void forceBreak(String shipName) throws IllegalArgumentException
 	{
-		//Get the ship - exception will be thrown if it doesn't exist
-		Ship ship;
-		try { ship = new Ship(data, shipName); }
-		catch (IllegalArgumentException e) { throw e; }
-		
-		//Break the ship
-		ship.setBroken(true);
+		new Ship(data, shipName).setBroken(true);
 	}
 	
 	/**
 	 * Searches through the locations of all the ships to determine if a player is inside one, and if so,
 	 * returns the name of that ship.
-	 * 
-	 * @param player
-	 * @return
 	 */
 	private Ship findCurrentShip(Player player)
 	{
@@ -1027,7 +855,7 @@ public class ShipHandler
 		try { shipStrings = data.getConfigurationSection("ships").getKeys(false); }
 		catch (NullPointerException e)
 		{ return null; }
-		Set<Ship> ships = new HashSet<Ship>();
+		Set<Ship> ships = new HashSet<>();
 		
 		for (String ss: shipStrings)
 			ships.add(new Ship(data, ss));
@@ -1044,11 +872,8 @@ public class ShipHandler
 	}
 	
 	/**
-	 * teleportPlayers() teleports all players within the ship region to newLocation. The position of all players teleported is offset by 
-	 * their offset at the original location.
-	 * 
-	 * @param ship
-	 * @param newLocation
+	 * teleportPlayers() teleports all players within the ship region to newLocation. The position of all players
+	 * teleported is offset by their offset at the original location.
 	 */
 	private void teleportPlayers(final Ship ship, final Location newLocation)
 	{
@@ -1076,11 +901,8 @@ public class ShipHandler
 	}
 	
 	/**
-	 * teleportEntities() teleports all entities within the ship region to newLocation. The position of all entities teleported is offset by
-	 * their offset at the original location.
-	 * 
-	 * @param ship
-	 * @param newLocation
+	 * teleportEntities() teleports all entities within the ship region to newLocation. The position of all entities
+	 * teleported is offset by their offset at the original location.
 	 */
 	private void teleportEntities(Ship ship, Location newLocation)
 	{
@@ -1102,21 +924,21 @@ public class ShipHandler
 	/**
 	 * getPlayersInsideRegion() returns a set containing all the players whose locations are
 	 * within the ship region.
-	 * 
-	 * @param ship
-	 * @return
 	 */
 	private Set<Player> getPlayersInsideRegion(Ship ship)
 	{
 		Collection<? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
-		Set<Player> playersInside = new HashSet<Player>();
+		Set<Player> playersInside = new HashSet<>();
 		Location location = ship.getDock().getLocation();
 
 		for (Player p: onlinePlayers)
 			if (p.getWorld().equals(location.getWorld())
-					&& p.getLocation().getBlockX() >= location.getBlockX() && p.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
-					&& p.getLocation().getBlockY() >= location.getBlockY() && p.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
-					&& p.getLocation().getBlockZ() >= location.getBlockZ() && p.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
+					&& p.getLocation().getBlockX() >= location.getBlockX()
+					&& p.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
+					&& p.getLocation().getBlockY() >= location.getBlockY()
+					&& p.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
+					&& p.getLocation().getBlockZ() >= location.getBlockZ()
+					&& p.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
 				playersInside.add(p);
 
 		return playersInside;
@@ -1125,21 +947,21 @@ public class ShipHandler
 	/**
 	 * getEntitiesInsideRegion() returns a set containing all the entities whose locations are
 	 * within the ship region.
-	 * 
-	 * @param ship
-	 * @return
 	 */
 	private Set<Entity> getEntitiesInsideRegion(Ship ship)
 	{
 		List<Entity> entities = ship.getDock().getLocation().getWorld().getEntities();
-		Set<Entity> entitiesInside = new HashSet<Entity>();
+		Set<Entity> entitiesInside = new HashSet<>();
 		Location location = ship.getDock().getLocation();
 		
 		for (Entity e: entities)
 			if (e.getWorld().equals(location.getWorld())
-					&& e.getLocation().getBlockX() >= location.getBlockX() && e.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
-					&& e.getLocation().getBlockY() >= location.getBlockY() && e.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
-					&& e.getLocation().getBlockZ() >= location.getBlockZ() && e.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
+					&& e.getLocation().getBlockX() >= location.getBlockX()
+					&& e.getLocation().getBlockX() <= location.getBlockX() + ship.getLength()
+					&& e.getLocation().getBlockY() >= location.getBlockY()
+					&& e.getLocation().getBlockY() <= location.getBlockY() + ship.getHeight()
+					&& e.getLocation().getBlockZ() >= location.getBlockZ()
+					&& e.getLocation().getBlockZ() <= location.getBlockZ() + ship.getWidth())
 				entitiesInside.add(e);
 
 		return entitiesInside;
@@ -1159,13 +981,8 @@ public class ShipHandler
 			return "a";
 	}
 	
-	/**
-	 * getUUID() searches the data file for a name and returns the UUID if found.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	UUID getUUID(String name)
+	// getUUID() searches the data file for a name and returns the UUID if found.
+	private UUID getUUID(String name)
 	{
 		Set<String> uuids;
 		try { uuids = data.getConfigurationSection("uuids.").getKeys(false); }
@@ -1179,24 +996,16 @@ public class ShipHandler
 		return null;
 	}
 	
-	/**
-	 * getName() returns the name of a given UUID if saved.
-	 * 
-	 * @param uuid
-	 * @return
-	 */
-	String getName(UUID uuid)
+	// getName() returns the name of a given UUID if saved.
+	private String getName(UUID uuid)
 	{
 		return data.getString("uuids." + uuid);
 	}
 	
-	/**
-	 * checkForCollisions() is used to ensure that any new dock does not intersect with any existing docks.
-	 * 
-	 */
-	boolean checkForCollisions(Location newMin, Location newMax)
+	// checkForCollisions() is used to ensure that any new dock does not intersect with any existing docks.
+	private boolean checkForCollisions(Location newMin, Location newMax)
 	{
-		Set<String> destinations = new HashSet<String>();
+		Set<String> destinations = new HashSet<>();
 		boolean skipCollisionTesting = false;
 		
 		//Get the names of all the destinations saved, including temporary destinations.
@@ -1215,27 +1024,36 @@ public class ShipHandler
 				{
 					//Existing dock to check against
 					Location min = dock.getLocation();
-					Location max = new Location(min.getWorld(), min.getX() + dock.getLength(), min.getY() + dock.getHeight(), min.getZ() 
-												+ dock.getWidth());
+					Location max = new Location(
+							min.getWorld(),
+							min.getX() + dock.getLength(),
+							min.getY() + dock.getHeight(),
+							min.getZ() + dock.getWidth()
+					);
 					
 					if (min.getWorld().equals(newMin.getWorld()))
 					{
 						//New dock is inside the old dock
-						if ((newMax.getX() >= min.getX() && newMax.getX() <= max.getX() || newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
-							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY() || newMin.getY() >= min.getY() && newMin.getY() <= max.getY())
-							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ() || newMin.getZ() >= min.getZ() && newMin.getZ() <= max.getZ()))
+						if ((newMax.getX() >= min.getX() && newMax.getX() <= max.getX()
+								|| newMin.getX() >= min.getX() && newMin.getX() <= max.getX())
+							&& (newMax.getY() >= min.getY() && newMax.getY() <= max.getY()
+								|| newMin.getY() >= min.getY() && newMin.getY() <= max.getY())
+							&& (newMax.getZ() >= min.getZ() && newMax.getZ() <= max.getZ()
+								|| newMin.getZ() >= min.getZ() && newMin.getZ() <= max.getZ()))
 							return true;
 						
 						//Old dock is inside the new dock
-						if ((max.getX() >= newMin.getX() && max.getX() <= newMax.getX() || min.getX() >= newMin.getX() && min.getX() <= newMax.getX())
-							&& (max.getY() >= newMin.getY() && max.getY() <= newMax.getY() || min.getY() >= newMin.getY() && min.getY() <= newMax.getY())
-							&& (max.getZ() >= newMin.getZ() && max.getZ() <= newMax.getZ() || min.getZ() >= newMin.getZ() && min.getZ() <= newMax.getZ()))
+						if ((max.getX() >= newMin.getX() && max.getX() <= newMax.getX()
+								|| min.getX() >= newMin.getX() && min.getX() <= newMax.getX())
+							&& (max.getY() >= newMin.getY() && max.getY() <= newMax.getY()
+								|| min.getY() >= newMin.getY() && min.getY() <= newMax.getY())
+							&& (max.getZ() >= newMin.getZ() && max.getZ() <= newMax.getZ()
+								|| min.getZ() >= newMin.getZ() && min.getZ() <= newMax.getZ()))
 							return true;
 					}
 				}
 			}
 		}
-		
 		return false;
 	}
 }

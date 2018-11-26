@@ -1,4 +1,4 @@
-Horizon Ships - Version 1.0 20/11/2015
+Horizon Ships - Version 1.1 2018/11/25
 
 Horizon Ships is a travel system that incorporates elements of special events. 
 Players will be able to own, run and travel in ships. Players will also face 
@@ -24,6 +24,8 @@ DEPENDENCIES
 This plugin has a hard dependency on WorldEdit and will not load without it.
 WorldEdit is used by this plugin to handle region selection, copying, pasting
 saving/loading schematics, and manipulating the block types of large areas.
+
+Current WorldEdit version required: 6.1.4
 
 INSTALLATION
 ------------

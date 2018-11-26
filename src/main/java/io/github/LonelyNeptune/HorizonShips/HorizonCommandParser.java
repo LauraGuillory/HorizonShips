@@ -1,8 +1,7 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,25 +11,24 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
+import io.github.LonelyNeptune.HorizonProfessions.ProfessionAPI;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.data.DataException;
 
-@SuppressWarnings("deprecation")
 public class HorizonCommandParser implements CommandExecutor 
 {
-	ProfessionAPI prof;
+	private ProfessionAPI prof;
 	FileConfiguration data;
-	FileConfiguration config;
-	ShipHandler shipHandler;
-	JavaPlugin plugin;
+	private FileConfiguration config;
+	private ShipHandler shipHandler;
+	private JavaPlugin plugin;
+
+	private HashMap<String, String> confirmCreate = new HashMap<>();	//Used to confirm commands
+	private HashMap<String, String> confirmDelete = new HashMap<>();
+	private HashMap<String, String> confirmRemoveDestination = new HashMap<>();
+	private HashMap<String, String> confirmTransfer = new HashMap<>();
 	
-	HashMap<String, String> confirmCreate = new HashMap<String, String>();	//Used to confirm commands
-	HashMap<String, String> confirmDelete = new HashMap<String, String>();
-	HashMap<String, String> confirmRemoveDestination = new HashMap<String, String>();
-	HashMap<String, String> confirmTransfer = new HashMap<String, String>();
-	
-    public HorizonCommandParser(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, JavaPlugin plugin) 
+    HorizonCommandParser(ProfessionAPI prof, FileConfiguration data, FileConfiguration config, JavaPlugin plugin)
     {
     	this.prof = prof;
 		this.data = data;
@@ -43,7 +41,8 @@ public class HorizonCommandParser implements CommandExecutor
      * onCommand() is called when a player enters a command recognised by Bukkit to belong to this plugin.
      * After that it is up to the contents of this method to determine what the commands do.
      * 
-     * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+     * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command,
+	 * java.lang.String, java.lang.String[])
      */
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) 
@@ -77,7 +76,8 @@ public class HorizonCommandParser implements CommandExecutor
 					return shipCreate(sender, args);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create [shipName]");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship create " +
+							"[shipName]");
 					return false;
 				}
 			
@@ -87,7 +87,8 @@ public class HorizonCommandParser implements CommandExecutor
 					return shipDelete(sender, args);
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete [shipName]");
+					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship delete " +
+							"[shipName]");
 					return false;
 				}
 			
@@ -113,17 +114,16 @@ public class HorizonCommandParser implements CommandExecutor
 					if (args.length >= 3)
 						return addDock(sender, args[2]);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add dock "
-								+ "[destinationName]");
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add " +
+								"dock [destinationName]");
 				
 				//ship add pilot [pilotName] [shipName] 
 				if (args[1].equalsIgnoreCase("pilot"))
 					if (args.length >= 4)
 						return addPilot(sender, args);
 					else
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add pilot [pilotName] "
-								+ "[shipName]");
-				
+						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship add " +
+								"pilot [pilotName] [shipName]");
 				return false;
 			}
 			
@@ -168,7 +168,8 @@ public class HorizonCommandParser implements CommandExecutor
 			{
 				if (args.length < 2)
 				{
-					sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, docks");
+					sender.sendMessage(ChatColor.RED
+							+ "What do you want to list? Possible lists: ships, destinations, docks");
 					return false;
 				}
 				
@@ -185,14 +186,16 @@ public class HorizonCommandParser implements CommandExecutor
 				{
 					if (args.length < 3)
 					{
-						sender.sendMessage(ChatColor.RED + "For which destination? Use /ship list docks [destination].");
+						sender.sendMessage(ChatColor.RED
+								+ "For which destination? Use /ship list docks [destination].");
 						return false;
 					}
 					
 					return listDocks(sender, args[2]);
 				}
 				
-				sender.sendMessage(ChatColor.RED + "What do you want to list? Possible lists: ships, destinations, docks");
+				sender.sendMessage(ChatColor.RED
+						+ "What do you want to list? Possible lists: ships, destinations, docks");
 				return false;
 			}
 			
@@ -210,7 +213,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship diagnose
 			if (args[0].equalsIgnoreCase("diagnose"))
 				if (args.length == 1)
-					return diagnoseShip(sender, args);
+					return diagnoseShip(sender);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship diagnose");
@@ -220,7 +223,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship repair
 			if (args[0].equalsIgnoreCase("repair"))
 				if (args.length == 1)
-					return repairShip(sender, args);
+					return repairShip(sender);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship repair");
@@ -230,7 +233,7 @@ public class HorizonCommandParser implements CommandExecutor
 			//ship refuel
 			if (args[0].equalsIgnoreCase("refuel"))
 				if (args.length == 1)
-					return refuelShip(sender, args);
+					return refuelShip(sender);
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship refuel");
@@ -299,8 +302,8 @@ public class HorizonCommandParser implements CommandExecutor
 						return forceRefuel(sender, args[2]);
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force refuel "
-							+ "[shipName]");
+						sender.sendMessage(ChatColor.RED
+								+ "Incorrect number of arguments! Correct usage: /ship force refuel [shipName]");
 						return false;
 					}
 				//ship force repair [shipName]
@@ -309,8 +312,8 @@ public class HorizonCommandParser implements CommandExecutor
 						return forceRepair(sender, args);
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force repair "
-								+ "[shipName]");
+						sender.sendMessage(ChatColor.RED
+								+ "Incorrect number of arguments! Correct usage: /ship force repair [shipName]");
 							return false;
 					}
 				//ship force break [shipName]
@@ -319,8 +322,8 @@ public class HorizonCommandParser implements CommandExecutor
 						return forceBreak(sender, args);
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Incorrect number of arguments! Correct usage: /ship force break "
-								+ "[shipName]");
+						sender.sendMessage(ChatColor.RED
+								+ "Incorrect number of arguments! Correct usage: /ship force break [shipName]");
 							return false;
 					}
 			
@@ -364,14 +367,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return false;
 	}
 	
-	/**
-	 * shipCreate() performs all the checks necessary for the /ship create command,
-	 * then sets aside the action to be carried out when it is confirmed.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	//shipCreate() performs all the checks necessary for the /ship create command,  then sets aside the action to be
+	// carried out when it is confirmed.
 	private boolean shipCreate(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -392,8 +389,8 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 
-		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this correct?"
-				+ " Type '/ship confirm create' to confirm.");
+		sender.sendMessage(ChatColor.YELLOW + "A ship will be created using your current WorldEdit selection. Is this" +
+				" correct? Type '/ship confirm create' to confirm.");
 		
 		//Put together a string of the name.
 		StringBuilder shipName = new StringBuilder();
@@ -412,14 +409,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * shipDelete() performs all the checks necessary for the /ship delete command,
-	 * then sets aside the action to be carried out when it is confirmed.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// shipDelete() performs all the checks necessary for the /ship delete command, then sets aside the action to be
+	// carried out when it is confirmed.
 	private boolean shipDelete(CommandSender sender, String[] args)
 	{
 		//Check the player has permission OR is the console
@@ -449,14 +440,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 
-	/**
-	 * addDock() performs all the checks necessary for the /ship add dock command,
-	 * then attempts to add a dock to a given destination.
-	 * 
-	 * @param sender
-	 * @param destination
-	 * @return
-	 */
+	// addDock() performs all the checks necessary for the /ship add dock command, then attempts to add a dock to a
+	// given destination.
 	private boolean addDock(CommandSender sender, String destination)
 	{
 		Player player;
@@ -477,7 +462,7 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		int dockID = -1;
+		int dockID;
 		try { dockID = shipHandler.addDock(player, destination); } 
 		catch (IllegalArgumentException e)
 		{
@@ -488,14 +473,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * removeDock() performs all the checks necessary for the /ship remove dock command,
-	 * then sets aside the action to be carried out when it is confirmed.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// removeDock() performs all the checks necessary for the /ship remove dock command, then sets aside the action to
+	// be carried out when it is confirmed.
 	private boolean removeDock(CommandSender sender, String[] args)
 	{
 		String dock = args[3];
@@ -508,18 +487,12 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		shipHandler.removeDock(sender, destination, dock);
+		shipHandler.removeDock(destination, dock);
 		sender.sendMessage(ChatColor.YELLOW + "Ship dock with ID: " + dock + " removed.");
 		return true;
 	}
 	
-	/**
-	 * addDestination() adds a new destination which is used to group docks.
-	 * 
-	 * @param sender
-	 * @param destination
-	 * @return
-	 */
+	// addDestination() adds a new destination which is used to group docks.
 	private boolean addDestination(CommandSender sender, String destination)
 	{
 		Player player;
@@ -545,14 +518,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * removeDestination() performs all the checks necessary for the /ship remove destination command,
-	 * then sets aside the action to be carried out when it is confirmed.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// removeDestination() performs all the checks necessary for the /ship remove destination command, then sets aside
+	// the action to be carried out when it is confirmed.
 	private boolean removeDestination(CommandSender sender, String destination)
 	{
 		//Check the player has permission OR is the console
@@ -570,14 +537,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * addPilot() performs all the checks necessary for the /ship add pilot command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// addPilot() performs all the checks necessary for the /ship add pilot command, then calls the shipHandler class
+	// to carry out the action.
 	private boolean addPilot(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission to add a pilot OR is the console
@@ -610,19 +571,13 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * removePilot() performs all the checks necessary for the /ship remove pilot command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// removePilot() performs all the checks necessary for the /ship remove pilot command, then calls the shipHandler
+	// class to carry out the action.
 	private boolean removePilot(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission to remove a pilot OR is the console
-		if (!sender.hasPermission("horizonships.pilot.remove") && !sender.hasPermission("horizonships.admin.pilot.remove") 
-				&& sender instanceof Player)
+		if (!sender.hasPermission("horizonships.pilot.remove")
+				&& !sender.hasPermission("horizonships.admin.pilot.remove") && sender instanceof Player)
 		{
 			sender.sendMessage(ChatColor.RED + "You don't have permission to remove a pilot.");
 			return false;
@@ -650,14 +605,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * listShips() performs all the checks necessary for the /ship list ships command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// listShips() performs all the checks necessary for the /ship list ships command, then calls the shipHandler class
+	// to carry out the action.
 	private boolean listShips(CommandSender sender)
 	{
 		//Check that the player has permission OR is the console
@@ -671,13 +620,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * listDestinations performs all the checks necessary for the /ship list destinations command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @return
-	 */
+	// listDestinations performs all the checks necessary for the /ship list destinations command, then calls the
+	// shipHandler class to carry out the action.
 	private boolean listDestinations(CommandSender sender)
 	{
 		//Check that the player has permission OR is the console
@@ -704,14 +648,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * pilotShip() performs all the checks necessary for the /ship pilot command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// pilotShip() performs all the checks necessary for the /ship pilot command, then calls the shipHandler class to carry out the action.
 	private boolean pilotShip(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -740,7 +677,7 @@ public class HorizonCommandParser implements CommandExecutor
 		try {
 			shipHandler.moveShip(player, destination);
 		} catch (DataException | IOException e) {
-			player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Adminstrator.");
+			player.sendMessage(ChatColor.RED + "Couldn't move ship. Please report this to an Administrator.");
 			e.printStackTrace();
 		} catch (MaxChangedBlocksException e) {
 			player.sendMessage(ChatColor.RED + "Ship too large!");
@@ -752,15 +689,9 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * diagnoseShip() performs all the checks necessary for the /ship diagnose command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean diagnoseShip(CommandSender sender, String[] args)
+	// diagnoseShip() performs all the checks necessary for the /ship diagnose command, then calls the shipHandler class
+	// to carry out the action.
+	private boolean diagnoseShip(CommandSender sender)
 	{
 		Player player;
 		
@@ -789,15 +720,9 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * repairShip() performs all the checks necessary for the /ship repair command,
-	 * then calls the shipHandler class to carry out the action.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean repairShip(CommandSender sender, String[] args)
+	// repairShip() performs all the checks necessary for the /ship repair command, then calls the shipHandler class to
+	// carry out the action.
+	private boolean repairShip(CommandSender sender)
 	{
 		Player player;
 		
@@ -827,15 +752,9 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * refuelShip() performs checks to ensure that the refuel command is valid, then calls
-	 * shipHandler to perform the action of refuelling the ship.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
-	private boolean refuelShip(CommandSender sender, String[] args)
+	// refuelShip() performs checks to ensure that the refuel command is valid, then calls shipHandler to perform the
+	// action of refuelling the ship.
+	private boolean refuelShip(CommandSender sender)
 	{
 		Player player;
 		
@@ -865,13 +784,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * shipInfo() displays some information about a ship to the sender.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// shipInfo() displays some information about a ship to the sender.
 	private boolean shipInfo(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
@@ -883,9 +796,9 @@ public class HorizonCommandParser implements CommandExecutor
 		
 		//Put together a string of the name.
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < args.length; i++)
+		for (String arg: args)
 		{
-			sb.append(args[i]);
+			sb.append(arg);
 			sb.append(" ");
 		}
 		sb.deleteCharAt(sb.length()-1);
@@ -900,15 +813,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * setOwner() performs checks to ensure the setowner command is valid, then calls shipHandler
-	 * to perform the action of setting the owner.
-	 * It is an administrator-only command.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// setOwner() performs checks to ensure the setowner command is valid, then calls shipHandler to perform the action
+	// of setting the owner. It is an administrator-only command.
 	private boolean setOwner(CommandSender sender, String[] args)
 	{
 		//Check that the sender has permission OR is the console
@@ -917,18 +823,9 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + "You don't have permission to set the owner of a ship.");
 			return false;
 		}
-		
-		//Put together a string of the name.
-		StringBuilder sb = new StringBuilder();
-		for (int i = 3; i < args.length; i++)
-		{
-			sb.append(args[i]);
-			sb.append(" ");
-		}
-		sb.deleteCharAt(sb.length()-1);
 
 		try {
-			shipHandler.setOwner(sender, sb.toString(), args[1]);
+			shipHandler.setOwner(args[2], args[1]);
 		} catch (IllegalArgumentException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
@@ -939,14 +836,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * transferShip() performs checks to ensure that the command is valid, then
-	 * sets aside the action to be performed when it is confirmed.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// transferShip() performs checks to ensure that the command is valid, then sets aside the action to be performed
+	// when it is confirmed.
 	private boolean transferShip(CommandSender sender, String[] args)
 	{
 		Player player;
@@ -984,14 +875,8 @@ public class HorizonCommandParser implements CommandExecutor
 		confirmTransferTimeout(sender);
 		return true;
 	}
-	
-	/**
-	 * renameShip() changes the name of the ship.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+
+	// renameShip() changes the name of the ship.
 	private boolean renameShip(CommandSender sender, String arg1, String arg2)
 	{
 		//Check that they have permission.
@@ -1015,25 +900,13 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			e.printStackTrace();
 			return false;
-		} catch (DataException | IOException e) 
-		{
-			sender.sendMessage(ChatColor.RED + e.getMessage());
-			sender.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
-			e.printStackTrace();
-			return false;
 		}
 		sender.sendMessage(ChatColor.YELLOW + "Ship renamed from " + oldName + " to " + newName);
 		return true;
 	}
 	
-	/**
-	 * teleport() checks if the sender is a player and has permission and teleports the player
-	 * to the current destination of the ship name given.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @return
-	 */
+	// teleport() checks if the sender is a player and has permission and teleports the player to the current
+	// destination of the ship name given.
 	private boolean teleport(CommandSender sender, String[] args)
 	{
 		//Check that they have permission and is a player
@@ -1064,13 +937,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * forceRefuel() sets the ship's fuel to full without taking any items or requiring the ship's owner.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @return
-	 */
+	// forceRefuel() sets the ship's fuel to full without taking any items or requiring the ship's owner.
 	private boolean forceRefuel(CommandSender sender, String shipName)
 	{
 		//Check that they have permission
@@ -1092,13 +959,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * forceRepair() forces the ship to repair without taking any items or requiring any skill.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @return
-	 */
+	// forceRepair() forces the ship to repair without taking any items or requiring any skill.
 	private boolean forceRepair(CommandSender sender, String[] args)
 	{
 		//Check that they have permission
@@ -1129,13 +990,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * forceBreak() forces a ship to break down.
-	 * 
-	 * @param sender
-	 * @param shipName
-	 * @return
-	 */
+	// forceBreak() forces a ship to break down.
 	private boolean forceBreak(CommandSender sender, String[] args)
 	{
 		//Check that they have permission
@@ -1166,13 +1021,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * confirmCreate() performs the delayed action for the /ship create command.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// confirmCreate() performs the delayed action for the /ship create command.
 	private boolean confirmCreate(CommandSender sender)
 	{
 		Player player;
@@ -1192,7 +1041,7 @@ public class HorizonCommandParser implements CommandExecutor
 				player.sendMessage(ChatColor.YELLOW + "Ship " + shipName + " created!");
 		} catch (DataException | IOException e) {
 			sender.sendMessage(ChatColor.RED + e.getMessage());
-			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
+			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Administrator.");
 			e.printStackTrace();
 			return false;
 		} catch (IllegalArgumentException e) {
@@ -1203,13 +1052,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * confirmDelete() performs the delayed action for the /ship delete command.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// confirmDelete() performs the delayed action for the /ship delete command.
 	private boolean confirmDelete(CommandSender sender)
 	{	
 		String shipName = confirmDelete.get(sender.getName());
@@ -1220,23 +1063,11 @@ public class HorizonCommandParser implements CommandExecutor
 			return false;
 		}
 		
-		Bukkit.getLogger().info(shipName);
-		
-		Player player = Bukkit.getPlayer(sender.getName());
-		
-		try { shipHandler.deleteShip(sender, shipName); } 
+		try { shipHandler.deleteShip(shipName); }
 		catch (IllegalArgumentException e)
 		{
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			confirmDelete.remove(sender.getName());
-			return false;
-		} 
-		catch (IOException e) 
-		{
-			sender.sendMessage(ChatColor.RED + e.getMessage());
-			player.sendMessage(ChatColor.RED + "Couldn't create ship. Please report this to an Adminstrator.");
-			confirmDelete.remove(sender.getName());
-			e.printStackTrace();
 			return false;
 		}
 		
@@ -1245,13 +1076,7 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 	
-	/**
-	 * confirmRemoveDestination() performs the delayed action for the /ship remove destination command.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// confirmRemoveDestination() performs the delayed action for the /ship remove destination command.
 	private boolean confirmRemoveDestination(CommandSender sender)
 	{
 		String name = sender.getName();
@@ -1276,14 +1101,8 @@ public class HorizonCommandParser implements CommandExecutor
 		return true;
 	}
 
-	/**
-	 * confirmTransfer() calls shipHandler to perform the action of transferring ownership
-	 * of a ship, that has previously been set aside by transferShip()
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// confirmTransfer() calls shipHandler to perform the action of transferring ownership of a ship, that has
+	// previously been set aside by transferShip()
 	private boolean confirmTransfer(CommandSender sender)
 	{
 		String name = sender.getName();
@@ -1313,54 +1132,39 @@ public class HorizonCommandParser implements CommandExecutor
 			sender.sendMessage(ChatColor.RED + e.getMessage());
 			return false;
 		}
-		sender.sendMessage(ChatColor.YELLOW + "You transfer ownership of " + sb.toString() + " to " + arguments[0] + ".");
+		sender.sendMessage(ChatColor.YELLOW + "You transfer ownership of " + sb.toString() + " to " + arguments[0]
+				+ ".");
 		return false;
 	}
 	
-	/**
-	 * cancelAction() cancels all pending actions by removing the player's name
-	 * from all pending action lists.
-	 * 
-	 * @param sender
-	 * @param args
-	 * @return
-	 */
+	// cancelAction() cancels all pending actions by removing the player's name from all pending action lists.
 	private boolean cancelAction(CommandSender sender)
 	{
 		String name = sender.getName();
-		
 		if (confirmCreate.containsKey(name))
 		{
 			confirmCreate.remove(name);
 			sender.sendMessage(ChatColor.YELLOW + "Ship creation cancelled.");
 			return true;
 		}
-		
 		if (confirmDelete.containsKey(name))
 		{
 			confirmDelete.remove(name);
 			sender.sendMessage(ChatColor.YELLOW + "Ship deletion cancelled.");
 			return true;
 		}
-		
 		if (confirmRemoveDestination.containsKey(name))
 		{
 			confirmRemoveDestination.remove(name);
 			sender.sendMessage(ChatColor.YELLOW + "Destination removal cancelled.");
 			return true;
 		}
-		
 		sender.sendMessage(ChatColor.RED + "There is nothing to cancel.");
 		return false;
 	}
 	
-	/**
-	 * confirmCreateTimeout() removes the player from the list of players who have a create command awaiting
-	 * confirmation after 10 seconds.
-	 * 
-	 * @param sender
-	 * @param key
-	 */
+	// confirmCreateTimeout() removes the player from the list of players who have a create command awaiting
+	// confirmation after 10 seconds.
 	private void confirmCreateTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
@@ -1376,13 +1180,8 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 400);
 	}
 
-	/**
-	 * confirmDeleteTimeout() removes the player from the list of players who have a delete command awaiting
-	 * confirmation after 10 seconds.
-	 * 
-	 * @param sender
-	 * @param key
-	 */
+	// confirmDeleteTimeout() removes the player from the list of players who have a delete command awaiting
+	// confirmation after 10 seconds.
 	private void confirmDeleteTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
@@ -1398,12 +1197,8 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 400);
 	}
 	
-	/**
-	 * confirmRemoveDestinationTimeout() removes the player from the list of players who are in the process
-	 * of removing a destination.
-	 * 
-	 * @param sender
-	 */
+	// confirmRemoveDestinationTimeout() removes the player from the list of players who are in the process of removing
+	// a destination.
 	private void confirmRemoveDestinationTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
@@ -1419,12 +1214,8 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 400);
 	}
 	
-	/**
-	 * confirmTransferTimeout() removes the player from the list of players who are in the process
-	 * of transfering ownership of their ship.
-	 * 
-	 * @param sender
-	 */
+	// confirmTransferTimeout() removes the player from the list of players who are in the process of transfering
+	// ownership of their ship.
 	private void confirmTransferTimeout(final CommandSender sender)
 	{
 		Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.plugin, new Runnable()
@@ -1440,25 +1231,19 @@ public class HorizonCommandParser implements CommandExecutor
 		} , 400);
 	}
 	
-	/**
-	 * showCommands() displays all available commands to the sender.
-	 * Commands are only displayed if the sender has permission to use them.
-	 * 
-	 * @param sender
-	 * @return
-	 */
+	// showCommands() displays all available commands to the sender. Commands are only displayed if the sender has
+	// permission to use them.
 	private boolean showCommands(CommandSender sender)
 	{
 		Player player = null;
-		
-		if (sender instanceof Player)
-			player = Bukkit.getPlayer(sender.getName()); //Some commands are not available to console - which is not a player
-		
+		if (sender instanceof Player) //Some commands are not available to console - which is not a player
+			player = Bukkit.getPlayer(sender.getName());
 		if (player != null)
-			sender.sendMessage("-----------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">-----------");
+			sender.sendMessage("-----------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE
+					+ ">-----------");
 		else
-			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE + ">----------------");
-			
+			sender.sendMessage("----------------<" + ChatColor.GOLD + " Horizon Ships Commands " + ChatColor.WHITE
+					+ ">----------------");
 		sender.sendMessage(ChatColor.GOLD + "Horizon Ships allows you to maintain and travel in ships!");
 		if (sender.hasPermission("horizonships.admin.ship.create") && player != null)
 		{
@@ -1569,7 +1354,6 @@ public class HorizonCommandParser implements CommandExecutor
 		}
 		sender.sendMessage(ChatColor.YELLOW + "/ship cancel");
 		sender.sendMessage("Cancel any actions that are currently awaiting confirmation.");
-		
 		return true;
 	}
 }

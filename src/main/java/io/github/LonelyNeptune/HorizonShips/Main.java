@@ -1,20 +1,19 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.gmail.Rhisereld.HorizonProfessions.ProfessionAPI;
-
+import io.github.LonelyNeptune.HorizonProfessions.ProfessionAPI;
 
 public class Main extends JavaPlugin implements CommandExecutor
 {
-	static JavaPlugin plugin;					//Some functions require a reference to the plugin in args.
-	HorizonCommandParser hcp;
-	ProfessionAPI prof;
-	
-	ConfigAccessor config;						//Configuration file.
-	ConfigAccessor data;						//Data file.
+	static JavaPlugin plugin;	//Some functions require a reference to the plugin in args.
+	private HorizonCommandParser hcp;
+	private ProfessionAPI prof;
+
+	private ConfigAccessor config;	//Configuration file.
+	ConfigAccessor data;	//Data file.
 
 	/**
 	 * onEnable() is called when the server is started or the plugin is enabled.
@@ -38,7 +37,8 @@ public class Main extends JavaPlugin implements CommandExecutor
     	//WorldEdit integration for schematics.
         if (!getServer().getPluginManager().isPluginEnabled("WorldEdit")) 
         {
-            getLogger().severe(String.format("[%s] - Disabled due to no WorldEdit dependency found!", getDescription().getName()));
+            getLogger().severe(String.format("[%s] - Disabled due to no WorldEdit dependency found!",
+					getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }

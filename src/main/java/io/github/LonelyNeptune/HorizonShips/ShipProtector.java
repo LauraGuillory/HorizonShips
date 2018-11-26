@@ -1,4 +1,4 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.util.Set;
 
@@ -13,7 +13,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 /**
- * ShipProtector listens for block breaking or block placing and prevents these events from occuring within a ship
+ * ShipProtector listens for block breaking or block placing and prevents these events from occurring within a ship
  * unless the actor is the ship's owner or a permitted pilot.
  * 
  * @author Rhisereld
@@ -22,16 +22,12 @@ public class ShipProtector implements Listener
 {
 	FileConfiguration data;
 	
-	public ShipProtector(FileConfiguration data)
+	ShipProtector(FileConfiguration data)
 	{
 		this.data = data;
 	}
 	
-	/**
-	 * onBreakBlock() is triggered each time a block is broken.
-	 * 
-	 * @param event
-	 */
+	// onBreakBlock() is triggered each time a block is broken.
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreakBlock(BlockBreakEvent event)
 	{
@@ -87,7 +83,8 @@ public class ShipProtector implements Listener
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
 					ship = new Ship(data, dock.getShip());
 					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) 
-							&& !ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.canbuildinsideships"))
+							&& !ship.isPilot(player.getUniqueId())
+							&& !player.hasPermission("horizonships.admin.canbuildinsideships"))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);
@@ -100,11 +97,7 @@ public class ShipProtector implements Listener
 		}
 	}
 	
-	/**
-	 * onBlockPlace() is triggered every time a block is placed.
-	 * 
-	 * @param event
-	 */
+	// onBlockPlace() is triggered every time a block is placed.
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBlockPlace(BlockPlaceEvent event)
 	{
@@ -161,7 +154,8 @@ public class ShipProtector implements Listener
 					//If the player isn't the owner or a permitted pilot, notify them and cancel the event.
 					ship = new Ship(data, dock.getShip());
 					if ((ship.getOwner() != null && !ship.getOwner().equals(player.getUniqueId())) 
-							&& !ship.isPilot(player.getUniqueId()) && !player.hasPermission("horizonships.admin.canbuildinsideships"))
+							&& !ship.isPilot(player.getUniqueId())
+							&& !player.hasPermission("horizonships.admin.canbuildinsideships"))
 					{
 						player.sendMessage(ChatColor.RED + "You don't own this ship!");
 						event.setCancelled(true);

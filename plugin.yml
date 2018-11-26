@@ -1,6 +1,6 @@
 name: HorizonShips
-main: com.gmail.Rhisereld.HorizonShips.Main
-version: 1.0
+main: io.github.LonelyNeptune.HorizonShips.Main
+version: 1.1
 depend: [WorldEdit]
 softdepend: [HorizonProfessions]
 commands:

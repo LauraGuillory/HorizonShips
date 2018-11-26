@@ -1,12 +1,11 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
-public class Dock 
+class Dock
 {
 	private FileConfiguration data;
 	private int id;
@@ -17,12 +16,7 @@ public class Dock
 	private int width;
 	private String ship;
 	
-	/**
-	 * Constructor for fetching a dock from file.
-	 * 
-	 * @param data
-	 * @param name
-	 */
+	// Constructor for fetching a dock from file.
 	Dock(FileConfiguration data, String destination, int id) throws IllegalArgumentException
 	{
 		this.data = data;
@@ -42,15 +36,7 @@ public class Dock
 		this.ship = data.getString("docks." + destination + "." + id + ".ship");
 	}
 	
-	/**
-	 * Constructor for creating a new dock and adding it to the data file.
-	 * 
-	 * @param data
-	 * @param location
-	 * @param length
-	 * @param height
-	 * @param width
-	 */
+	// Constructor for creating a new dock and adding it to the data file.
 	Dock(FileConfiguration data, String destination, Location location, int length, int height, int width)
 	{
 		this.data = data;
@@ -79,43 +65,26 @@ public class Dock
 		setWidth(width);
 	}
 	
-	/**
-	 * getID() returns the ID of the dock.
-	 * 
-	 * @param name
-	 * @return
-	 */
+	// getID() returns the ID of the dock.
 	int getID()
 	{
 		return id;
 	}
 	
-	/**
-	 * getdestination() returns the destination of the dock.
-	 * 
-	 * @return
-	 */
+	// getDestination() returns the destination of the dock.
 	String getDestination()
 	{
 		return destination;
 	}
 	
-	/**
-	 * getLocation() returns the location at the origin of the dock.
-	 * 
-	 * @return
-	 */
+	// getLocation() returns the location at the origin of the dock.
 	Location getLocation()
 	{
 		return location;
 	}
 	
-	/**
-	 * setLocation() sets the new location of the origin of the dock.
-	 * 
-	 * @param location
-	 */
-	void setLocation(Location location)
+	// setLocation() sets the new location of the origin of the dock.
+	private void setLocation(Location location)
 	{
 		this.location = location;
 		data.set("docks." + destination + "." + id + ".world", location.getWorld().getName());
@@ -124,111 +93,68 @@ public class Dock
 		data.set("docks." + destination + "." + id + ".z", location.getBlockZ());
 	}
 	
-	/**
-	 * getLength() returns the length of the docking space.
-	 * 
-	 * @return
-	 */
+	// getLength() returns the length of the docking space.
 	int getLength()
 	{
 		return length;
 	}
 	
-	/**
-	 * setLength() sets the new length of the docking space.
-	 * 
-	 * @param length
-	 */
-	void setLength(int length)
+	// setLength() sets the new length of the docking space.
+	private void setLength(int length)
 	{
 		this.length = length;
 		data.set("docks." + destination + "." + id + ".length", length);
 	}
 	
-	/**
-	 * getHeight() returns the height of the docking space.
-	 * 
-	 * @return
-	 */
+	// getHeight() returns the height of the docking space.
 	int getHeight()
 	{
 		return height;
 	}
 	
-	/**
-	 * setHeight() sets the new height of the docking space.
-	 * 
-	 * @param height
-	 */
-	void setHeight(int height)
+	// setHeight() sets the new height of the docking space.
+	private void setHeight(int height)
 	{
 		this.height = height;
 		data.set("docks." + destination + "." + id + ".height", height);
 	}
 	
-	/**
-	 * getWidth() returns the width of the docking space.
-	 * 
-	 * @return
-	 */
+	// getWidth() returns the width of the docking space.
 	int getWidth()
 	{
 		return width;
 	}
 	
-	/**
-	 * setWidth() sets the new width of the docking space.
-	 * 
-	 * @param width
-	 */
-	void setWidth(int width)
+	// setWidth() sets the new width of the docking space.
+	private void setWidth(int width)
 	{
 		this.width = width;
 		data.set("docks." + destination + "." + id + ".width", width);
 	}
 	
-	/**
-	 * exists() returns true if the dock was present in the data file.
-	 * (Relies on the "world" field returning null.)
-	 * 
-	 * @return
-	 */
+	// exists() returns true if the dock was present in the data file. (Relies on the "world" field returning null.)
 	boolean exists()
 	{
-		if (location == null)
-			return false;
-		else 
-			return true;
+		return location != null;
 	}
 	
-	/**
-	 * delete() removes all information pertaining to this dock.
-	 * The instance should not continue to be used after this is called.
-	 * 
-	 */
+	// delete() removes all information pertaining to this dock. The instance should not continue to be used after this
+	// is called.
 	void delete()
 	{
 		data.getConfigurationSection("docks." + destination).set(Integer.toString(this.id), null);
 	}
 	
-	/**
-	 * updateShipName() updates the stored name of the ship that may be inhabiting this location.
-	 * Should be set to null if there is no ship.
-	 * 
-	 * @param shipName
-	 */
+	// updateShipName() updates the stored name of the ship that may be inhabiting this location. Should be set to null
+	// if there is no ship.
 	void updateShipName(String shipName)
 	{
 		ship = shipName;
 		data.set("docks." + destination + "." + id + ".ship", ship);
 	}
 	
-	/**
-	 * getShip() returns the name of the ship that may be inhabiting this location
-	 * Should return null if there is no ship.
-	 * 
-	 * @return
-	 */
+	// getShip() returns the name of the ship that may be inhabiting this location. Should return null if there is no
+	// ship.
 	String getShip()
 	{
 		return ship;

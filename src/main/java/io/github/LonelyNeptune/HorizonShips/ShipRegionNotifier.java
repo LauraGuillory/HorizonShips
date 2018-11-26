@@ -1,4 +1,4 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -20,18 +20,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class ShipRegionNotifier implements Listener
 {
 	FileConfiguration data;
-	HashMap<String, String> playersInsideDocks = new HashMap<String, String>();
+	private HashMap<String, String> playersInsideDocks = new HashMap<>();
 	
-	public ShipRegionNotifier(FileConfiguration data)
+	ShipRegionNotifier(FileConfiguration data)
 	{
 		this.data = data;
 	}
 	
-	/**
-	 * onPlayerMove() is triggered every time a player moves.
-	 * 
-	 * @param event
-	 */
+	// onPlayerMove() is triggered every time a player moves.
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerMove(PlayerMoveEvent event)
 	{
@@ -59,7 +55,7 @@ public class ShipRegionNotifier implements Listener
 		if (playersInsideDocks.containsKey(player.getName()))
 		{			
 			String[] arguments = playersInsideDocks.get(player.getName()).split(" ");
-			int ID = 0;
+			int ID;
 			try { ID = Integer.parseInt(arguments[1]); }
 			catch (NumberFormatException e) 
 			{
@@ -103,7 +99,10 @@ public class ShipRegionNotifier implements Listener
 		{	
 			for (String dest: destinations)
 			{
-				//Get the docks at this destination. If there are no docks, continue to the next destination immediately.
+				/*
+				 * Get the docks at this destination. If there are no docks, continue to the next destination
+				 * immediately.
+				 */
 				try { docks = data.getConfigurationSection("docks." + dest).getKeys(false); }
 				catch (NullPointerException e)
 				{ continue; }

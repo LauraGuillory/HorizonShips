@@ -1,4 +1,4 @@
-package com.gmail.Rhisereld.HorizonShips;
+package io.github.LonelyNeptune.HorizonShips;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -10,7 +10,7 @@ public class UUIDsaver implements Listener
 {
 	FileConfiguration data;
 	
-	public UUIDsaver(FileConfiguration data)
+	UUIDsaver(FileConfiguration data)
 	{
 		this.data = data;
 	}
